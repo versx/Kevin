@@ -1,0 +1,9 @@
+//
+// Prefix header for all source files of the 'Jarvis++' target in the 'Jarvis++' project
+//
+
+//#import <_Prefix/HBLog.h>
+
+#ifdef __OBJC__
+    #import <Foundation/Foundation.h>
+#endif

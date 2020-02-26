@@ -1,0 +1,362 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		C02890892404BEB400854FA0 /* Jarvis__.h in Headers */ = {isa = PBXBuildFile; fileRef = C02890882404BEB400854FA0 /* Jarvis__.h */; };
+		C028908B2404BEB400854FA0 /* Jarvis__.m in Sources */ = {isa = PBXBuildFile; fileRef = C028908A2404BEB400854FA0 /* Jarvis__.m */; };
+		C028909B2404CC4900854FA0 /* UIC.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C02890992404CC4900854FA0 /* UIC.cpp */; };
+		C028909C2404CC4900854FA0 /* UIC.hpp in Headers */ = {isa = PBXBuildFile; fileRef = C028909A2404CC4900854FA0 /* UIC.hpp */; };
+		C02890A22404E36E00854FA0 /* JSON.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C028909E2404E36E00854FA0 /* JSON.cpp */; };
+		C02890A32404E36E00854FA0 /* JSONValue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C028909F2404E36E00854FA0 /* JSONValue.cpp */; };
+		C02890A42404E36E00854FA0 /* JSONValue.h in Headers */ = {isa = PBXBuildFile; fileRef = C02890A02404E36E00854FA0 /* JSONValue.h */; };
+		C02890A52404E36E00854FA0 /* JSON.h in Headers */ = {isa = PBXBuildFile; fileRef = C02890A12404E36E00854FA0 /* JSON.h */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		C02890792404BEB300854FA0 /* libJarvis++.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libJarvis++.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C028907C2404BEB400854FA0 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		C028907E2404BEB400854FA0 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		C02890832404BEB400854FA0 /* control.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = control.txt; path = Package/DEBIAN/control.txt; sourceTree = "<group>"; };
+		C02890842404BEB400854FA0 /* control */ = {isa = PBXFileReference; lastKnownFileType = text; name = control; path = Package/DEBIAN/control; sourceTree = "<group>"; };
+		C02890862404BEB400854FA0 /* PackageVersion.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = PackageVersion.plist; sourceTree = "<group>"; };
+		C02890872404BEB400854FA0 /* Jarvis++-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Jarvis++-Prefix.pch"; sourceTree = "<group>"; };
+		C02890882404BEB400854FA0 /* Jarvis__.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Jarvis__.h; sourceTree = "<group>"; };
+		C028908A2404BEB400854FA0 /* Jarvis__.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Jarvis__.m; sourceTree = "<group>"; };
+		C028908E2404BEB400854FA0 /* 0xdeadfa11 */ = {isa = PBXFileReference; lastKnownFileType = text; name = 0xdeadfa11; path = Package/usr/lib/0xdeadfa11; sourceTree = "<group>"; };
+		C02890992404CC4900854FA0 /* UIC.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = UIC.cpp; path = UIC/UIC.cpp; sourceTree = "<group>"; };
+		C028909A2404CC4900854FA0 /* UIC.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = UIC.hpp; path = UIC/UIC.hpp; sourceTree = "<group>"; };
+		C028909E2404E36E00854FA0 /* JSON.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JSON.cpp; path = "../../../../Downloads/SimpleJSON-master/src/JSON.cpp"; sourceTree = "<group>"; };
+		C028909F2404E36E00854FA0 /* JSONValue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JSONValue.cpp; path = "../../../../Downloads/SimpleJSON-master/src/JSONValue.cpp"; sourceTree = "<group>"; };
+		C02890A02404E36E00854FA0 /* JSONValue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSONValue.h; path = "../../../../Downloads/SimpleJSON-master/src/JSONValue.h"; sourceTree = "<group>"; };
+		C02890A12404E36E00854FA0 /* JSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JSON.h; path = "../../../../Downloads/SimpleJSON-master/src/JSON.h"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C02890752404BEB300854FA0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		C028906F2404BEB300854FA0 = {
+			isa = PBXGroup;
+			children = (
+				C02890802404BEB400854FA0 /* Jarvis++ */,
+				C028907B2404BEB300854FA0 /* Frameworks */,
+				C028907A2404BEB300854FA0 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		C028907A2404BEB300854FA0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C02890792404BEB300854FA0 /* libJarvis++.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C028907B2404BEB300854FA0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C028907C2404BEB400854FA0 /* Foundation.framework */,
+				C028907E2404BEB400854FA0 /* UIKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C02890802404BEB400854FA0 /* Jarvis++ */ = {
+			isa = PBXGroup;
+			children = (
+				C028909D2404E34300854FA0 /* SimpleJSON */,
+				C02890982404CC2800854FA0 /* UIC */,
+				C02890882404BEB400854FA0 /* Jarvis__.h */,
+				C028908A2404BEB400854FA0 /* Jarvis__.m */,
+				C02890812404BEB400854FA0 /* Package */,
+				C02890852404BEB400854FA0 /* Supporting Files */,
+			);
+			path = "Jarvis++";
+			sourceTree = "<group>";
+		};
+		C02890812404BEB400854FA0 /* Package */ = {
+			isa = PBXGroup;
+			children = (
+				C02890822404BEB400854FA0 /* DEBIAN */,
+				C028908C2404BEB400854FA0 /* usr */,
+			);
+			name = Package;
+			sourceTree = "<group>";
+		};
+		C02890822404BEB400854FA0 /* DEBIAN */ = {
+			isa = PBXGroup;
+			children = (
+				C02890832404BEB400854FA0 /* control.txt */,
+				C02890842404BEB400854FA0 /* control */,
+			);
+			name = DEBIAN;
+			sourceTree = "<group>";
+		};
+		C02890852404BEB400854FA0 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				C02890862404BEB400854FA0 /* PackageVersion.plist */,
+				C02890872404BEB400854FA0 /* Jarvis++-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		C028908C2404BEB400854FA0 /* usr */ = {
+			isa = PBXGroup;
+			children = (
+				C028908D2404BEB400854FA0 /* lib */,
+			);
+			name = usr;
+			sourceTree = "<group>";
+		};
+		C028908D2404BEB400854FA0 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				C028908E2404BEB400854FA0 /* 0xdeadfa11 */,
+			);
+			name = lib;
+			sourceTree = "<group>";
+		};
+		C02890982404CC2800854FA0 /* UIC */ = {
+			isa = PBXGroup;
+			children = (
+				C02890992404CC4900854FA0 /* UIC.cpp */,
+				C028909A2404CC4900854FA0 /* UIC.hpp */,
+			);
+			name = UIC;
+			sourceTree = "<group>";
+		};
+		C028909D2404E34300854FA0 /* SimpleJSON */ = {
+			isa = PBXGroup;
+			children = (
+				C028909E2404E36E00854FA0 /* JSON.cpp */,
+				C02890A12404E36E00854FA0 /* JSON.h */,
+				C028909F2404E36E00854FA0 /* JSONValue.cpp */,
+				C02890A02404E36E00854FA0 /* JSONValue.h */,
+			);
+			path = SimpleJSON;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		C02890762404BEB300854FA0 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C02890A52404E36E00854FA0 /* JSON.h in Headers */,
+				C02890A42404E36E00854FA0 /* JSONValue.h in Headers */,
+				C028909C2404CC4900854FA0 /* UIC.hpp in Headers */,
+				C02890892404BEB400854FA0 /* Jarvis__.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		C02890782404BEB300854FA0 /* Jarvis++ */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C02890912404BEB400854FA0 /* Build configuration list for PBXNativeTarget "Jarvis++" */;
+			buildPhases = (
+				C02890742404BEB300854FA0 /* Sources */,
+				C02890752404BEB300854FA0 /* Frameworks */,
+				C02890762404BEB300854FA0 /* Headers */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Jarvis++";
+			productName = "Jarvis++";
+			productReference = C02890792404BEB300854FA0 /* libJarvis++.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C02890702404BEB300854FA0 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1010;
+				TargetAttributes = {
+					C02890782404BEB300854FA0 = {
+						CreatedOnToolsVersion = 10.1;
+					};
+				};
+			};
+			buildConfigurationList = C02890732404BEB300854FA0 /* Build configuration list for PBXProject "Jarvis++" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = C028906F2404BEB300854FA0;
+			productRefGroup = C028907A2404BEB300854FA0 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C02890782404BEB300854FA0 /* Jarvis++ */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C02890742404BEB300854FA0 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C02890A32404E36E00854FA0 /* JSONValue.cpp in Sources */,
+				C028909B2404CC4900854FA0 /* UIC.cpp in Sources */,
+				C028908B2404BEB400854FA0 /* Jarvis__.m in Sources */,
+				C02890A22404E36E00854FA0 /* JSON.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		C028908F2404BEB400854FA0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.gch (*) .DS_Store CVS .svn .git .hg *.xcodeproj *.xcode *.pbproj *.pbxproj";
+				FRAMEWORK_SEARCH_PATHS = "$(SDKROOT)/System/Library/PrivateFrameworks";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "$(THEOS)/vendor/include/**";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				LIBRARY_SEARCH_PATHS = "$(THEOS)/vendor/lib/**";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				THEOS = /opt/theos;
+				VALIDATE_PRODUCT = NO;
+			};
+			name = Debug;
+		};
+		C02890902404BEB400854FA0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.gch (*) .DS_Store CVS .svn .git .hg *.xcodeproj *.xcode *.pbproj *.pbxproj";
+				FRAMEWORK_SEARCH_PATHS = "$(SDKROOT)/System/Library/PrivateFrameworks";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "$(THEOS)/vendor/include/**";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				LIBRARY_SEARCH_PATHS = "$(THEOS)/vendor/lib/**";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				THEOS = /opt/theos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		C02890922404BEB400854FA0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					arm64,
+					arm64e,
+					armv7,
+					armv7s,
+				);
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = lib;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Jarvis++/Jarvis++-Prefix.pch";
+				INSTALL_PATH = /usr/lib;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				iOSOpenDevBuildPackageOnAnyBuild = NO;
+				iOSOpenDevCopyOnBuild = NO;
+				iOSOpenDevDevice = 192.168.0.0;
+				iOSOpenDevInstallOnAnyBuild = NO;
+				iOSOpenDevInstallOnProfiling = NO;
+				iOSOpenDevRespringOnInstall = YES;
+				iOSOpenDevUsePackageVersionPList = YES;
+			};
+			name = Debug;
+		};
+		C02890932404BEB400854FA0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = (
+					arm64,
+					arm64e,
+					armv7,
+					armv7s,
+				);
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				EXECUTABLE_PREFIX = lib;
+				GCC_INPUT_FILETYPE = sourcecode.cpp.objcpp;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Jarvis++/Jarvis++-Prefix.pch";
+				INSTALL_PATH = /usr/lib;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				iOSOpenDevBuildPackageOnAnyBuild = NO;
+				iOSOpenDevCopyOnBuild = NO;
+				iOSOpenDevDevice = 192.168.0.0;
+				iOSOpenDevInstallOnAnyBuild = NO;
+				iOSOpenDevInstallOnProfiling = NO;
+				iOSOpenDevRespringOnInstall = YES;
+				iOSOpenDevUsePackageVersionPList = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C02890732404BEB300854FA0 /* Build configuration list for PBXProject "Jarvis++" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C028908F2404BEB400854FA0 /* Debug */,
+				C02890902404BEB400854FA0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C02890912404BEB400854FA0 /* Build configuration list for PBXNativeTarget "Jarvis++" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C02890922404BEB400854FA0 /* Debug */,
+				C02890932404BEB400854FA0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = C02890702404BEB300854FA0 /* Project object */;
+}
