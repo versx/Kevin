@@ -12,5 +12,6 @@
 -(void *)start_listener;
 -(NSString *)handle_data:(NSDictionary *)params;
 -(NSString *)handle_location:(NSDictionary *)params;
+-(void *)logout;
 
 @end

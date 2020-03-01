@@ -418,6 +418,88 @@ static NSNumber *_port = @(8080);
     return response;
 }
 
+-(void *)logout {
+    _isLoggedIn = false;
+    //_action = nil;
+    _delayQuest = false;
+    NSDictionary *dict = @{
+        @"uuid": [[Device sharedInstance] uuid],
+        @"username": _username,
+        @"level": _level,
+        @"type": @"logged_out"
+    };
+    [self postRequest:_backendControllerUrl dict:dict blocking:true completion:nil];
+    _username = nil;
+    _password = nil;
+    [NSThread sleepForTimeInterval:0.5];
+    if (_username == nil && [_uicSettings objectForKey:@"enableAccountManager"] ?: false) {
+        NSDictionary *payload = @{
+        };
+        [self postRequest:_backendControllerUrl dict:payload blocking:true completion:^(NSDictionary *result) {
+            NSDictionary *data = [dict objectForKey:@"data"];
+            if (data != nil) {
+                NSString *username = [data objectForKey:@"username"];
+                NSString *password = [data objectForKey:@"password"];
+                NSNumber *level = [data objectForKey:@"level"];
+                NSDictionary *job = [data objectForKey:@"job"];
+                NSNumber *startLat = [job objectForKey:@"lat"];
+                NSNumber *startLon = [job objectForKey:@"lon"];
+                NSNumber *lastLat = [data objectForKey:@"last_encounter_lat"];
+                NSNumber *lastLon = [data objectForKey:@"last_encounter_lon"];
+                NSString *ptcToken = [data objectForKey:@"ptcToken"]; // TODO: Change from camel casing.
+                if (![startLat isEqualToNumber:@0.0] && ![startLon isEqualToNumber:@0.0]) {
+                    _startupLocation = [self createCoordinate:[startLat doubleValue] lon:[startLon doubleValue]];
+                } else if (![lastLat isEqualToNumber:@0.0] && ![lastLon isEqualToNumber:@0.0]) {
+                    _startupLocation = [self createCoordinate:[lastLat doubleValue] lon:[lastLon doubleValue]];
+                } else {
+                    _startupLocation = [self createCoordinate:[startLat doubleValue] lon:[startLon doubleValue]];
+                }
+            
+                _currentLocation = _startupLocation;
+                NSLog(@"[UIC] StartupLocation: %@", _startupLocation);
+                NSNumber *firstWarningTimestamp = [data objectForKey:@"first_warning_timestamp"];
+                if (firstWarningTimestamp != nil) {
+                    _firstWarningDate = [NSDate dateWithTimeIntervalSince1970:[firstWarningTimestamp doubleValue]];
+                }
+                if (username != nil && ptcToken != nil && ![ptcToken isEqualToString:@""]) {
+                    NSLog(@"[UIC] Got token %@ level %@ from backend.", ptcToken, level);
+                    NSLog(@"[UIC] Got account %@ level %@ from backend.", username, level);
+                    _username = username;
+                    _password = password;
+                    _ptcToken__hgj = ptcToken;
+                    _level = level;
+                    _isLoggedIn = true;
+                    //UserDefaults.standard.set ptcToken "5750bac0-483c-4131-80fd-6b047b2ca7b4"
+                    //UserDefaults.standard.synchronize
+                } else {
+                    NSLog(@"[UIC][Jarvis] Failed to get account with token. Restarting for normal login.");
+                    //UserDefaults.standard.removeObject "60b01025-c1ea-422c-9b0e-d70bf489de7f"
+                    _username = username;
+                    _password = password;
+                    _ptcToken__hgj = ptcToken;
+                    _level = level;
+                    _isLoggedIn = false;
+                    _shouldExit = true;
+                }
+            } else {
+                NSLog(@"[UIC][Jarvis] Failed to get account, restarting.");
+                [NSThread sleepForTimeInterval:1];
+                _minLevel = @0; // Never set to 0 until we can do tutorials.
+                _maxLevel = @29;
+                //UserDefaults.removeObject "60b01025-clea-422c-9b0e-d70bf489de7f"
+                [NSThread sleepForTimeInterval:5];
+                _isLoggedIn = false;
+                [self restart];
+            }
+        }];
+    }
+    
+    [NSThread sleepForTimeInterval:1];
+    [self restart];
+    
+    return 0;
+}
+
 -(void *)postRequest:(NSString *)urlString dict:(NSDictionary *)data blocking:(BOOL)blocking completion:(void (^)(NSDictionary* result))completion
 {
     //BOOL done = false;
@@ -474,6 +556,7 @@ static NSNumber *_port = @(8080);
         completion(resultDict);
     }
     */
+    return 0;
 }
 -(CLLocation *)createCoordinate:(double)lat lon:(double)lon
 {
