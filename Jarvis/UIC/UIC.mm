@@ -51,14 +51,17 @@ static double _encounterDistance = 0.0;
 static NSNumber *_encounterDelay = @0.0;
 static void* _image; // UIImage
 static NSNumber *_level = @0;
-static NSString *_ptcToken__hgj; // Load from UserDefaults (5750bac0-483c-4131-80fd-6b047b2ca7b4)
-static BOOL _menuButton__hgj = false;
-static BOOL _menuButton2__hgj = false;
+static NSString *_ptcToken; // Load from UserDefaults (5750bac0-483c-4131-80fd-6b047b2ca7b4)
+
+// Button Detection
+static BOOL _menuButton = false;
+static BOOL _menuButton2 = false;
 static NSString *_neededButton = @"";
-static BOOL _okButton__hgj = false;
-static BOOL _newPlayerButton__hgj = false;
-static BOOL _bannedScreen__hgj = false;
-static BOOL _invalidScreen__hgj = false;
+static BOOL _okButton = false;
+static BOOL _newPlayerButton = false;
+static BOOL _bannedScreen = false;
+static BOOL _invalidScreen = false;
+
 static NSNumber *_startupLat = @0.0;
 static NSNumber *_startupLon = @0.0;
 static CLLocation *_startupLocation;
@@ -126,7 +129,7 @@ static GCDAsyncSocket *_listenSocket;
     _port = port;
     bool started = false;
     NSNumber *startTryCount = @1;
-    // Try to start the HTTP listener, attempt 5 times on failure
+    // Try to start the HTTP listener, attempt 5 times on failure.
     while (!started) {
         @try {
             [self startListener];
@@ -135,7 +138,7 @@ static GCDAsyncSocket *_listenSocket;
                 NSLog(@"[UIC] Fatal error, failed to start server: %@. Try (%@/5)", exception, startTryCount);
                 
                 NSLog(@"[UIC] Failed to start server: %@. Try (%@/5). Trying again in 5 seconds.", exception, startTryCount);
-                [NSNumber numberWithInt:[startTryCount intValue] + 1];
+                startTryCount = [NSNumber numberWithInt:[startTryCount intValue] + 1];
                 [NSThread sleepForTimeInterval:5];
             }
         }
@@ -169,13 +172,8 @@ static GCDAsyncSocket *_listenSocket;
         [_listenSocket disconnect]; // TODO: Check for close/stop method or if disconnect is correct.
     });
     //dispatch_release(heatbeatQueue);
-
-    NSLog(@"[UIC] Running on %@ delay set to %@",
-          [[Device sharedInstance] model],
-          [[Device sharedInstance] multiplier]
-    );
     
-    // TODO: New thread while(startup) etc
+    [self startUicLoop];
     
     return 0;
 }
@@ -197,7 +195,148 @@ static GCDAsyncSocket *_listenSocket;
     NSDate *eggStart = [NSDate date]; //Date(timeInterval:-1860, since: Date());
     // Init AI
     //initJarvis();
+    
+    NSLog(@"[UIC] Running on %@ delay set to %@",
+          [[Device sharedInstance] model],
+          [[Device sharedInstance] multiplier]
+    );
+    dispatch_queue_t heatbeatQueue = dispatch_queue_create("state_queue", NULL);
+    dispatch_async(heatbeatQueue, ^{
+        NSNumber *startupCount = 0;
+        while (_startup) {
+            if (!_firststart) {
+                NSLog(@"[UIC][Jarvis] App still in startup...");
+                while (!_menuButton) {
+                    _newPlayerButton = [self clickButton:@"NewPlayerButton"];
+                    if (_newPlayerButton) {
+                        NSUserDefaults *defaults = [[NSUserDefaults alloc] init];
+                        [defaults removeObjectForKey:@"5750bac0-483c-4131-80fd-6b047b2ca7b4"];
+                        _newPlayerButton = false;
+                        NSLog(@"[UIC][Jarvis] Started at Login Screen");
+                        [NSThread sleepForTimeInterval:1];
+                        bool ptcButton = false;
+                        NSNumber *ptcTryCount = 0;
+                        while (!ptcButton) {
+                            ptcButton = [self clickButton:@"TrainerClubButton"];
+                            ptcTryCount = [NSNumber numberWithInt:[ptcTryCount intValue] + 1];
+                            if ([ptcTryCount intValue] > 10) {
+                                _newPlayerButton = [self clickButton:@"NewPlayerButton"];
+                                ptcTryCount = 0;
+                            }
+                            [NSThread sleepForTimeInterval:1];
+                        }
+                        
+                        bool usernameButton = false;
+                        while (!usernameButton) {
+                            usernameButton = [self clickButton:@"UsernameButton"];
+                            [NSThread sleepForTimeInterval:1];
+                        }
+                        // TODO: typeUsername();
+                        [NSThread sleepForTimeInterval:1];
+                        
+                        bool passwordButton = false;
+                        while (!passwordButton) {
+                            passwordButton = [self clickButton:@"PasswordButton"];
+                            [NSThread sleepForTimeInterval:1];
+                        }
+                        // TODO: typePassword();
+                        [NSThread sleepForTimeInterval:1];
+                        
+                        // TODO: touchAtPoint(180, 100);
+                        [NSThread sleepForTimeInterval:1];
+                        
+                        bool signinButton = false;
+                        while (!signinButton) {
+                            signinButton = [self clickButton:@"SignInButton"];
+                            [NSThread sleepForTimeInterval:1];
+                        }
+                        
+                        NSNumber *delayMultiplier = [[Device sharedInstance] multiplier];
+                        NSNumber *sleep = @([delayMultiplier intValue] + 15);
+                        [NSThread sleepForTimeInterval:[sleep intValue]];
+                    }
+                    
+                    _bannedScreen = [self findButton:@"BannedScreen"];
+                    if (_bannedScreen) {
+                        _bannedScreen = false;
+                        NSLog(@"[UIC][Jarvis] Account banned, switching accounts.");
+                        NSDictionary *data = @{
+                            @"uuid": [[Device sharedInstance] uuid],
+                            @"username": _username,
+                            @"type": @"account_banned"
+                        };
+                        [self postRequest:_backendControllerUrl dict:data blocking:true completion:^(NSDictionary *result) {}];
+                        [self logout];
+                    }
+                    
+                    _invalidScreen = [self findButton:@"WrongUser"];
+                    if (_invalidScreen) {
+                        _invalidScreen = false;
+                        NSLog(@"[UIC][Jarvis] Wrong username, switching accounts.");
+                        NSDictionary *data = @{
+                            @"uuid": [[Device sharedInstance] uuid],
+                            @"username": _username,
+                            @"type": @"account_banned" // TODO: Uhhh should be account_invalid_credentials no?
+                        };
+                        [self postRequest:_backendControllerUrl dict:data blocking:true completion:^(NSDictionary *result) {}];
+                        [self logout];
+                    }
+                    
+                    _neededButton = [self getMenuButton];
+                    if ([_neededButton isEqualToString:@"DifferentAccountButton"]) {
+                        NSDictionary *data = @{
+                            @"uuid": [[Device sharedInstance] uuid],
+                            @"username": _username,
+                            @"type": @"account_invalid_credentials"
+                        };
+                        [self postRequest:_backendControllerUrl dict:data blocking:true completion:^(NSDictionary *result) {}];
+                        [self logout];
+                    }
+                    
+                    if ([_neededButton isEqualToString:@"MenuButton"]) {
+                        _menuButton = true;
+                    }
+                    
+                    [NSThread sleepForTimeInterval:5];
+                    if ([startupCount intValue] > 10) {
+                        NSLog(@"");
+                        [self logout];
+                    }
+                    startupCount = [NSNumber numberWithInt:[startupCount intValue] + 1];
+                }
+                
+                [NSThread sleepForTimeInterval:1];
+                NSDictionary *dictPtcToken = @{
+                };
+                [self postRequest:_backendControllerUrl dict:dictPtcToken blocking:true completion:^(NSDictionary *result) {}];
+                NSLog(@"");
+                [self clickButton:@"TrackerButton"];
+                _startup = false;
+            } else {
+                [NSThread sleepForTimeInterval:10];
+                _firststart = false;
+            }
+        }
+    });
+    
     return 0;
+}
+
+-(BOOL)clickButton:(NSString *)buttonName
+{
+    // TODO: Parse button name, check coordinates list, simulate touch.
+    return YES;
+}
+
+-(BOOL)findButton:(NSString *)buttonName
+{
+    // TODO: findButton
+    return YES;
+}
+
+-(NSString *)getMenuButton
+{
+    return @"";
 }
 
 #pragma GCDAsyncSocket
@@ -365,7 +504,7 @@ static GCDAsyncSocket *_listenSocket;
     [params setObject:_username ?: @"" forKey:@"username"];
     [params setObject:pokemonEncounterId ?: @"" forKey:@"pokemon_encounter_id"];
     [params setObject:[[Device sharedInstance] uuid] forKey:@"uuid"];
-    [params setObject:_ptcToken__hgj ?: @"" forKey:@"ptcToken"];
+    [params setObject:_ptcToken ?: @"" forKey:@"ptcToken"];
 
     NSString *url = _backendRawUrl;
     // TODO: Post request
@@ -433,7 +572,7 @@ static GCDAsyncSocket *_listenSocket;
                     _waitForData = false;
                 }
             } else if (onlyEmptyGmos && !_startup) {
-                [NSNumber numberWithInt:[_emptyGmoCount intValue] + 1];
+                _emptyGmoCount = [NSNumber numberWithInt:[_emptyGmoCount intValue] + 1];
                 toPrint = @"[UIC] Got Empty Data";
             } else {
                 _emptyGmoCount = 0;
@@ -516,7 +655,7 @@ static GCDAsyncSocket *_listenSocket;
                     NSLog(@"[UIC] Got account %@ level %@ from backend.", username, level);
                     _username = username;
                     _password = password;
-                    _ptcToken__hgj = ptcToken;
+                    _ptcToken = ptcToken;
                     _level = level;
                     _isLoggedIn = true;
                     NSUserDefaults *defaults = [[NSUserDefaults alloc] init];
@@ -529,7 +668,7 @@ static GCDAsyncSocket *_listenSocket;
                     [defaults removeObjectForKey:@"60b01025-c1ea-422c-9b0e-d70bf489de7f"];
                     _username = username;
                     _password = password;
-                    _ptcToken__hgj = ptcToken;
+                    _ptcToken = ptcToken;
                     _level = level;
                     _isLoggedIn = false;
                     _shouldExit = true;
