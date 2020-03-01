@@ -20,7 +20,25 @@
 		C01B4980240ACF9400633B45 /* UIC.h in Headers */ = {isa = PBXBuildFile; fileRef = C01B497E240ACF9400633B45 /* UIC.h */; };
 		C01B4981240ACF9400633B45 /* UIC.mm in Sources */ = {isa = PBXBuildFile; fileRef = C01B497F240ACF9400633B45 /* UIC.mm */; };
 		C01B4983240AD01E00633B45 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01B4982240AD01E00633B45 /* CoreLocation.framework */; };
+		C0AC1CDD240BAD44008F4DFB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0AC1CDC240BAD44008F4DFB /* CoreGraphics.framework */; };
+		C0AC1CF2240BB365008F4DFB /* Device.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1CF1240BB365008F4DFB /* Device.m */; };
+		C0AC1CF4240BB37C008F4DFB /* Device.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1CF3240BB37C008F4DFB /* Device.h */; };
+		C0AC1CF6240BB96C008F4DFB /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1CF5240BB96C008F4DFB /* Settings.m */; };
+		C0AC1CF8240BB97A008F4DFB /* Settings.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1CF7240BB97A008F4DFB /* Settings.h */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		C0AC1C7E240BA8CD008F4DFB /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 12;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		C0132B52240B5DEC00719452 /* GCDAsyncUdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncUdpSocket.m; sourceTree = "<group>"; };
@@ -42,6 +60,12 @@
 		C01B497E240ACF9400633B45 /* UIC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIC.h; sourceTree = "<group>"; };
 		C01B497F240ACF9400633B45 /* UIC.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = UIC.mm; sourceTree = "<group>"; };
 		C01B4982240AD01E00633B45 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		C0AC1CDC240BAD44008F4DFB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		C0AC1CF1240BB365008F4DFB /* Device.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Device.m; sourceTree = "<group>"; };
+		C0AC1CF3240BB37C008F4DFB /* Device.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Device.h; sourceTree = "<group>"; };
+		C0AC1CF5240BB96C008F4DFB /* Settings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Settings.m; sourceTree = "<group>"; };
+		C0AC1CF7240BB97A008F4DFB /* Settings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Settings.h; sourceTree = "<group>"; };
+		C0AC1CF9240BDAC6008F4DFB /* uic.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = uic.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -49,6 +73,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C0AC1CDD240BAD44008F4DFB /* CoreGraphics.framework in Frameworks */,
 				C0132B64240B631700719452 /* Security.framework in Frameworks */,
 				C0132B62240B630000719452 /* CFNetwork.framework in Frameworks */,
 				C01B4983240AD01E00633B45 /* CoreLocation.framework in Frameworks */,
@@ -74,6 +99,7 @@
 		C01B4957240ACF5D00633B45 = {
 			isa = PBXGroup;
 			children = (
+				C0AC1CF9240BDAC6008F4DFB /* uic.plist */,
 				C0132B50240B5DEC00719452 /* GCD */,
 				C01B4968240ACF5D00633B45 /* Jarvis++ */,
 				C01B497D240ACF9400633B45 /* UIC */,
@@ -93,6 +119,7 @@
 		C01B4963240ACF5D00633B45 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C0AC1CDC240BAD44008F4DFB /* CoreGraphics.framework */,
 				C0132B63240B631700719452 /* Security.framework */,
 				C0132B61240B630000719452 /* CFNetwork.framework */,
 				C01B4982240AD01E00633B45 /* CoreLocation.framework */,
@@ -161,6 +188,10 @@
 			children = (
 				C01B497E240ACF9400633B45 /* UIC.h */,
 				C01B497F240ACF9400633B45 /* UIC.mm */,
+				C0AC1CF3240BB37C008F4DFB /* Device.h */,
+				C0AC1CF1240BB365008F4DFB /* Device.m */,
+				C0AC1CF7240BB97A008F4DFB /* Settings.h */,
+				C0AC1CF5240BB96C008F4DFB /* Settings.m */,
 			);
 			path = UIC;
 			sourceTree = "<group>";
@@ -173,8 +204,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				C01B4980240ACF9400633B45 /* UIC.h in Headers */,
+				C0AC1CF8240BB97A008F4DFB /* Settings.h in Headers */,
 				C0132B58240B5DEC00719452 /* GCDAsyncUdpSocket.h in Headers */,
 				C01B4971240ACF5D00633B45 /* Jarvis__.h in Headers */,
+				C0AC1CF4240BB37C008F4DFB /* Device.h in Headers */,
 				C0132B59240B5DEC00719452 /* GCDAsyncSocket.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -189,6 +222,7 @@
 				C01B495C240ACF5D00633B45 /* Sources */,
 				C01B495D240ACF5D00633B45 /* Frameworks */,
 				C01B495E240ACF5D00633B45 /* Headers */,
+				C0AC1C7E240BA8CD008F4DFB /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -237,7 +271,9 @@
 			files = (
 				C0132B57240B5DEC00719452 /* GCDAsyncSocket.m in Sources */,
 				C01B4973240ACF5D00633B45 /* Jarvis__.m in Sources */,
+				C0AC1CF6240BB96C008F4DFB /* Settings.m in Sources */,
 				C0132B56240B5DEC00719452 /* GCDAsyncUdpSocket.m in Sources */,
+				C0AC1CF2240BB365008F4DFB /* Device.m in Sources */,
 				C01B4981240ACF9400633B45 /* UIC.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -306,6 +342,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_PREFIX = lib;
+				FRAMEWORK_SEARCH_PATHS = "$(SDKROOT)/System/Library/PrivateFrameworks";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Jarvis++/Jarvis++-Prefix.pch";
 				INSTALL_PATH = "@rpath/";
@@ -336,12 +373,14 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_PREFIX = lib;
+				FRAMEWORK_SEARCH_PATHS = "$(SDKROOT)/System/Library/PrivateFrameworks";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Jarvis++/Jarvis++-Prefix.pch";
 				INSTALL_PATH = "@rpath/";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = "";
 				USER_HEADER_SEARCH_PATHS = "$(PROJECTDIR)/**";
 				VALID_ARCHS = arm64;
 				iOSOpenDevBuildPackageOnAnyBuild = NO;

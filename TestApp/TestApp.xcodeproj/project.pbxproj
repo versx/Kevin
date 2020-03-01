@@ -16,6 +16,7 @@
 		C01B4986240AD1B500633B45 /* libJarvis++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C01B4985240AD1B500633B45 /* libJarvis++.dylib */; };
 		C01B4989240AD9AA00633B45 /* libJarvis++.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = C01B4985240AD1B500633B45 /* libJarvis++.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		C01B498D240AE47200633B45 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C01B498C240AE47200633B45 /* SceneDelegate.m */; };
+		C0AC1CFE240BE0F9008F4DFB /* uic.plist in Resources */ = {isa = PBXBuildFile; fileRef = C0AC1CFC240BE0E7008F4DFB /* uic.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -46,6 +47,7 @@
 		C01B4985240AD1B500633B45 /* libJarvis++.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; path = "libJarvis++.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C01B498B240AE47200633B45 /* SceneDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
 		C01B498C240AE47200633B45 /* SceneDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
+		C0AC1CFC240BE0E7008F4DFB /* uic.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = uic.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +65,7 @@
 		C01B4932240ACF2400633B45 = {
 			isa = PBXGroup;
 			children = (
+				C0AC1CFC240BE0E7008F4DFB /* uic.plist */,
 				C01B493D240ACF2400633B45 /* TestApp */,
 				C01B493C240ACF2400633B45 /* Products */,
 				C01B4984240AD1B500633B45 /* Frameworks */,
@@ -161,6 +164,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C0AC1CFE240BE0F9008F4DFB /* uic.plist in Resources */,
 				C01B494E240ACF2500633B45 /* LaunchScreen.storyboard in Resources */,
 				C01B494B240ACF2500633B45 /* Assets.xcassets in Resources */,
 				C01B4949240ACF2400633B45 /* Main.storyboard in Resources */,
