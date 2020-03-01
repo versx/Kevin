@@ -117,17 +117,31 @@ static NSNumber *_port = @(8080);
 {
     NSLog(@"[UIC] start");
     NSLog(@"[UIC] Device Uuid: %@", [[Device sharedInstance] uuid]);
-    //_modelName = getModelIdentifier();
-    //_modelName = modelIdentifierToName(_modelName);
     NSLog(@"[UIC] Device Model: %@", [[Device sharedInstance] model]);
     NSLog(@"[UIC] Device OS: %@", [[Device sharedInstance] osName]);
     NSLog(@"[UIC] Device OS Version: %@", [[Device sharedInstance] osVersion]);
 
-    _port = port;
-    [self start_listener];
-    
     NSLog(@"[UIC] Loading UIC settings...");
     _uicSettings = [[Settings sharedInstance] config];
+    
+    _port = port;
+    bool started = false;
+    NSNumber *startTryCount = @1;
+    while (!started) {
+        @try {
+            [self start_listener];
+        } @catch(id exception) {
+            if (startTryCount > @5) { // TODO: Numeric literal
+                NSLog(@"[UIC] Fatal error, failed to start server: %@. Try (%@/5)", exception, startTryCount);
+                
+                NSLog(@"[UIC] Failed to start server: %@. Try (%@/5). Trying again in 5 seconds.", exception, startTryCount);
+                [NSNumber numberWithInt:[startTryCount intValue] + 1];
+                [NSThread sleepForTimeInterval:5];
+            }
+        }
+    }
+
+    // TODO: heatbeat loop
 
     NSLog(@"[UIC] Running on %@ delay set to %@",
           [[Device sharedInstance] model],
@@ -139,14 +153,14 @@ static NSNumber *_port = @(8080);
     return 0;
 }
 
--(void *)start_listener
+-(void *)startListener
 {
     GCDAsyncSocket *listenSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     NSError *error = nil;
     if (![listenSocket acceptOnPort:8080 error:&error]) {
         NSLog(@"[UIC] Failed to start webserver listener on port %@:\r\nError:%@", _port, error);
     }
-    NSLog(@"[UIC] Listening on port %@", _port);
+    NSLog(@"[UIC] Listening at localhost on port %@", _port);
     return 0;
 }
 
@@ -189,11 +203,11 @@ static NSNumber *_port = @(8080);
                         if ([query hasPrefix:@"/data"]) {
                             NSArray *querySplit = [query componentsSeparatedByString:@"?"];
                             NSDictionary *params = [self parseUrlQueryParameters:querySplit[1]];
-                            response = [self handle_data:params];
+                            response = [self handleDataRequest:params];
                         } else if ([query hasPrefix:@"/loc"]) {
                             NSArray *querySplit = [query componentsSeparatedByString:@"?"];
                             NSDictionary *params = [self parseUrlQueryParameters:querySplit[1]];
-                            response = [self handle_location:params];
+                            response = [self handleLocationRequest:params];
                         } else {
                             NSLog(@"[UIC] Invalid request endpoint.");
                         }
@@ -229,7 +243,7 @@ static NSNumber *_port = @(8080);
     [socket writeData:msg withTimeout:-1 tag:1];
 }
 
--(NSString *)handle_location:(NSMutableDictionary *)params {
+-(NSString *)handleLocationRequest:(NSMutableDictionary *)params {
     NSMutableDictionary *responseData = [[NSMutableDictionary alloc] init];
     //self.lock.lock
     CLLocation *currentLoc = _currentLocation;
@@ -311,7 +325,7 @@ static NSNumber *_port = @(8080);
     return response;
 }
 
--(NSString *)handle_data:(NSMutableDictionary *)params {
+-(NSString *)handleDataRequest:(NSMutableDictionary *)params {
     _lastUpdate = [NSDate date];
     CLLocation *currentLoc = [self createCoordinate:_currentLocation.coordinate.latitude lon: _currentLocation.coordinate.longitude];
     NSNumber *targetMaxDistance = _targetMaxDistance;
@@ -416,6 +430,14 @@ static NSNumber *_port = @(8080);
     }];
     NSString *response = [NSString stringWithFormat:@"%@\r\n%@", _response_200, params];
     return response;
+}
+
+-(void *)restart {
+    NSLog(@"[UIC][Jarvis] Restarting...");
+    while (true) {
+        // TODO: UIControl().sendAction(#selector(NSXPCConnection.invalidate) to:UIApplication.shared for:nil);
+        [NSThread sleepForTimeInterval:2];
+    }
 }
 
 -(void *)logout {
