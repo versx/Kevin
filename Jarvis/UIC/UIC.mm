@@ -9,22 +9,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <string>
 
+#include <sys/utsname.h>
+
+#include <string>
+#include <sstream>
+#include <iostream>
+#include <vector>
+
+// Objective-C
+#import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
 #import <UIKit/UIDevice.h>
 
-//#import <GCDAsyncSocket.h> // for TCP
+//#import <CocoaAsyncSocket/GCDAsyncSocket.h>
+#import "../GCD/GCDAsyncSocket.h"
 
-//#include <sstream.h>
-//#include <vector.h>
-
+// Listener
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <pthread.h>
 
-//#include <ctime>
+// Misc
 #include <math.h>
 //#include <curl/curl.h>
 
@@ -40,7 +47,7 @@ static NSString *_backendControllerUrl = [_backend stringByAppendingString:@"/co
 static NSString *_backendRawUrl = [_backend stringByAppendingString:@"/raw"];
 static NSString *_localUrl = @"http://localhost:8080/loc";
 static NSString *_uuid = [[UIDevice currentDevice] name];
-static NSString *_modelName = [[UIDevice currentDevice] localizedModel];// TODO: UIDevice.modelName__hgj;
+static NSString *_modelName; //[[UIDevice currentDevice] localizedModel];
 static NSString *_osName = [[UIDevice currentDevice] systemName];
 static NSString *_osVersion = [[UIDevice currentDevice] systemVersion];
 static BOOL _started = false;
@@ -102,20 +109,65 @@ static NSString *_response_404 = @"HTTP/1.1 404 Not Found\nContent-Type: text/js
 static double _baseHorizontalAccuracy = 200.0; // in meters
 static double _baseVerticalAccuracy = 200.0; // in meters
 
-// Mizu
-/*
-string targetFortId;
-bool isQuestInit = false;
-float lastQuestLocation[2];
-float lastLocation[2];
-bool gotItems = false;
-int noItemsCount = 0;
-bool skipSpin = false;
-int luckyEggsNum = 0;
-time_t lastDeployTime = time(0);
-int spins = 401;
-bool ultraQuestSpin = false;
-*/
+static NSString* getModelIdentifier() {
+    struct utsname systemInfo;
+    uname(&systemInfo);
+    return [NSString stringWithCString:systemInfo.machine
+                              encoding:NSUTF8StringEncoding];
+}
+
+static NSString* modelIdentifierToName(NSString* identifier) {
+    if ([identifier isEqualToString:@"iPod5,1"]) { return @"iPod touch (5th generation)"; }
+    else if ([identifier isEqualToString:@"iPod7,1"]) { return @"iPod touch (6th generation)"; }
+    else if ([identifier isEqualToString:@"iPod9,1"]) { return @"iPod touch (7th generation)"; }
+    else if ([identifier isEqualToString:@"iPhone3,1"] || [identifier isEqualToString:@"iPhone3,2"] || [identifier isEqualToString:@"iPhone3,3"]) { return @"iPhone 4"; }
+    else if ([identifier isEqualToString:@"iPhone4,1"]) { return @"iPhone 4s"; }
+    else if ([identifier isEqualToString:@"iPhone5,1"] || [identifier isEqualToString:@"iPhone5,2"]) { return @"iPhone 5"; }
+    else if ([identifier isEqualToString:@"iPhone5,3"] || [identifier isEqualToString:@"iPhone5,4"]) { return @"iPhone 5c"; }
+    else if ([identifier isEqualToString:@"iPhone6,1"] || [identifier isEqualToString:@"iPhone6,2"]) { return @"iPhone 5s"; }
+    else if ([identifier isEqualToString:@"iPhone7,2"]) { return @"iPhone 6"; }
+    else if ([identifier isEqualToString:@"iPhone7,1"]) { return @"iPhone 6 Plus"; }
+    else if ([identifier isEqualToString:@"iPhone8,1"]) { return @"iPhone 6s"; }
+    else if ([identifier isEqualToString:@"iPhone8,2"]) { return @"iPhone 6s Plus"; }
+    else if ([identifier isEqualToString:@"iPhone9,1"] || [identifier isEqualToString:@"iPhone9,3"]) { return @"iPhone 7"; }
+    else if ([identifier isEqualToString:@"iPhone9,2"] || [identifier isEqualToString:@"iPhone9,4"]) { return @"iPhone 7 Plus"; }
+    else if ([identifier isEqualToString:@"iPhone8,4"]) { return @"iPhone SE"; }
+    else if ([identifier isEqualToString:@"iPhone10,1"] || [identifier isEqualToString:@"iPhone10,4"]) { return @"iPhone 8"; }
+    else if ([identifier isEqualToString:@"iPhone10,2"] || [identifier isEqualToString:@"iPhone10,5"]) { return @"iPhone 8 Plus"; }
+    else if ([identifier isEqualToString:@"iPhone10,3"] || [identifier isEqualToString:@"iPhone10,6"]) { return @"iPhone X"; }
+    else if ([identifier isEqualToString:@"iPhone11,2"]) { return @"iPhone XS"; }
+    else if ([identifier isEqualToString:@"iPhone11,4"] || [identifier isEqualToString:@"iPhone11,6"]) { return @"iPhone XS Max"; }
+    else if ([identifier isEqualToString:@"iPhone11,8"]) { return @"iPhone XR"; }
+    else if ([identifier isEqualToString:@"iPhone12,1"]) { return @"iPhone 11"; }
+    else if ([identifier isEqualToString:@"iPhone12,3"]) { return @"iPhone 11 Pro"; }
+    else if ([identifier isEqualToString:@"iPhone12,5"]) { return @"iPhone 11 Pro Max"; }
+    else if ([identifier isEqualToString:@"iPad2,1"] || [identifier isEqualToString:@"iPad2,2"] || [identifier isEqualToString:@"iPad2,3"] || [identifier isEqualToString:@"iPad2,4"]) { return @"iPad 2"; }
+    else if ([identifier isEqualToString:@"iPad3,1"] || [identifier isEqualToString:@"iPad3,2"] || [identifier isEqualToString:@"iPad3,3"]) { return @"iPad (3rd generation)"; }
+    else if ([identifier isEqualToString:@"iPad3,4"] || [identifier isEqualToString:@"iPad3,5"] || [identifier isEqualToString:@"iPad3,6"]) { return @"iPad (4th generation)"; }
+    else if ([identifier isEqualToString:@"iPad6,11"] || [identifier isEqualToString:@"iPad6,12"]) { return @"iPad (5th generation)"; }
+    else if ([identifier isEqualToString:@"iPad7,5"] || [identifier isEqualToString:@"iPad7,6"]) { return @"iPad (6th generation)"; }
+    else if ([identifier isEqualToString:@"iPad7,11"] || [identifier isEqualToString:@"iPad7,12"]) { return @"iPad (7th generation)"; }
+    else if ([identifier isEqualToString:@"iPad4,1"] || [identifier isEqualToString:@"iPad4,2"] || [identifier isEqualToString:@"iPad4,3"]) { return @"iPad Air"; }
+    else if ([identifier isEqualToString:@"iPad5,3"] || [identifier isEqualToString:@"iPad5,4"]) { return @"iPad Air 2"; }
+    else if ([identifier isEqualToString:@"iPad11,4"] || [identifier isEqualToString:@"iPad11,5"]) { return @"iPad Air (3rd generation)"; }
+    else if ([identifier isEqualToString:@"iPad2,5"] || [identifier isEqualToString:@"iPad2,6"] || [identifier isEqualToString:@"iPad2,7"]) { return @"iPad mini"; }
+    else if ([identifier isEqualToString:@"iPad4,4"] || [identifier isEqualToString:@"iPad4,5"] || [identifier isEqualToString:@"iPad4,6"]) { return @"iPad mini 2"; }
+    else if ([identifier isEqualToString:@"iPad4,7"] || [identifier isEqualToString:@"iPad4,8"] || [identifier isEqualToString:@"iPad4,9"]) { return @"iPad mini 3"; }
+    else if ([identifier isEqualToString:@"iPad5,1"] || [identifier isEqualToString:@"iPad5,2"]) { return @"iPad mini 4"; }
+    else if ([identifier isEqualToString:@"iPad11,1"] || [identifier isEqualToString:@"iPad11,2"]) { return @"iPad mini (5th generation)"; }
+    else if ([identifier isEqualToString:@"iPad6,3"] || [identifier isEqualToString:@"iPad6,4"]) { return @"iPad Pro (9.7-inch)"; }
+    else if ([identifier isEqualToString:@"iPad6,7"] || [identifier isEqualToString:@"iPad6,8"]) { return @"iPad Pro (12.9-inch)"; }
+    else if ([identifier isEqualToString:@"iPad7,1"] || [identifier isEqualToString:@"iPad7,2"]) { return @"iPad Pro (12.9-inch) (2nd generation)"; }
+    else if ([identifier isEqualToString:@"iPad7,3"] || [identifier isEqualToString:@"iPad7,4"]) { return @"iPad Pro (10.5-inch)"; }
+    else if ([identifier isEqualToString:@"iPad8,1"] || [identifier isEqualToString:@"iPad8,2"] || [identifier isEqualToString:@"iPad8,3"] || [identifier isEqualToString:@"iPad8,4"]) { return @"iPad Pro (11-inch)"; }
+    else if ([identifier isEqualToString:@"iPad8,5"] || [identifier isEqualToString:@"iPad8,6"] || [identifier isEqualToString:@"iPad8,7"] || [identifier isEqualToString:@"iPad8,8"]) { return @"iPad Pro (12.9-inch) (3rd generation)"; }
+    else if ([identifier isEqualToString:@"AppleTV5,3"]) { return @"Apple TV"; }
+    else if ([identifier isEqualToString:@"AppleTV6,2"]) { return @"Apple TV 4K"; }
+    else if ([identifier isEqualToString:@"AudioAccessory1,1"]) { return @"HomePod"; }
+    else if ([identifier isEqualToString:@"i386"] || [identifier isEqualToString:@"x86_64"]) { return @"Simulator"; }
+    return identifier;
+}
+
 
 @implementation UIC2
 
@@ -134,170 +186,128 @@ static NSNumber *_port = @(8080);
     
     return self;
 }
+
 -(void *)start:(NSNumber *)port
 {
     NSLog(@"[UIC] start");
     NSLog(@"[UIC] Device Uuid: %@", _uuid);
+    _modelName = getModelIdentifier();
+    _modelName = modelIdentifierToName(_modelName);
     NSLog(@"[UIC] Device Model: %@", _modelName);
     NSLog(@"[UIC] Device OS: %@", _osName);
     NSLog(@"[UIC] Device OS Version: %@", _osVersion);
+
     _port = port;
-    //[self start_listener:port];
-    start_listener(port);
+    [self start_listener:port];
+
     return 0;
 }
-//-(void *)start_listener:(NSNumber *)port
-static void* start_listener(NSNumber *port)
+
+-(void *)start_listener:(NSNumber *)port
 {
-    NSLog(@"[UIC] start_listener: %@", port);
-    _port = port;
-    
-    int sockfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-    struct sockaddr_in servaddr;
-    pthread_t thread;
-    if (sockfd < 0) {
-        NSLog(@"[UIC] socket() error");
-        close(sockfd);
-        exit(EXIT_FAILURE);
+    GCDAsyncSocket *listenSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+    NSError *error = nil;
+    if (![listenSocket acceptOnPort:8080 error:&error]) {
+        NSLog(@"[UIC] Failed to start webserver listener on port %@:\r\nError:%@", port, error);
     }
-    
-    servaddr.sin_family = AF_INET;
-    servaddr.sin_port = htons(8080);
-    servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    
-    if (bind(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) {
-        NSLog(@"[UIC] bind() error");
-        close(sockfd);
-        exit(EXIT_FAILURE);
-    }
-    
-    if (listen(sockfd, 1000) < 0) {
-        NSLog(@"[UIC] listen() error");
-        close(sockfd);
-        exit(EXIT_FAILURE);
-    }
-    
-    struct sockaddr_storage clieaddr;
-    int cliefd;
-    char s[INET_ADDRSTRLEN];
-    socklen_t cliesize;
-    
-    while (true) {
-        cliesize = sizeof(clieaddr);
-        cliefd = accept(sockfd, (struct sockaddr *)&clieaddr, &cliesize);
-        if (cliefd < 0) {
-            NSLog(@"[UIC] accept() error");
-            exit(EXIT_FAILURE);
-        }
-        
-        inet_ntop(clieaddr.ss_family, (void *)&((struct sockaddr_in *)&clieaddr)->sin_addr, s, sizeof(s));
-        NSLog(@"[UIC] accept() %s\n", s);
-        
-        int *pcliefd = new int;
-        *pcliefd = cliefd;
-        if (pcliefd) { //true
-            if (pthread_create(&thread, 0, handle_request, pcliefd) < 0) {
-                NSLog(@"[UIC] Handling request from %ld with new thread. pthread_create()", (long)pcliefd);
-            }
-        } else {
-            //[self handle_request:pcliefd];
-            NSLog(@"[UIC] Handling request from %ld", (long)pcliefd);
-            handle_request(pcliefd);
-        }
-    }
+    NSLog(@"[UIC] Listening on port %@", port);
+    return 0;
 }
-/*
-- (void)socket:(GCDAsyncSocket *)sender didAcceptNewSocket:(GCDAsyncSocket *)newSocket
+
+-(void)socket:(GCDAsyncSocket *)sender didAcceptNewSocket:(nonnull GCDAsyncSocket *)newSocket
 {
     // The "sender" parameter is the listenSocket we created.
     // The "newSocket" is a new instance of GCDAsyncSocket.
     // It represents the accepted incoming client connection.
-
-    // Do server stuff with newSocket...
-}
-- (void)socket:(GCDAsyncSocket *)sender didReadData:(NSData *)data withTag:(long)tag
-{
-    if (tag == HTTP_HEADER)
-    {
-        int bodyLength = [self parseHttpHeader:data];
-        [socket readDataToLength:bodyLength withTimeout:-1 tag:HTTP_BODY];
-    }
-    else if (tag == HTTP_BODY)
-    {
-        // Process response
-        [self processHttpBody:data];
-
-        // Read header of next response
-        NSData *term = [@"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding];
-        [socket readDataToData:term withTimeout:-1 tag:HTTP_HEADER];
-    }
-}
-*/
-
-// TODO: Convert C code to ObjC and make ObjC method.
-static void* handle_request(void* pcliefd) {
-    NSLog(@"[UIC] handle_request: %ld", (long)pcliefd);
-    int cliefd = *(int*)pcliefd;
-    //delete (int *)pcliefd;
     
-    ssize_t n;
-    char buffer[255];
-    const char *response = "";
+    //NSLog(@"[UIC] New connection at %@", [newSocket connectedHost]);
+    NSString *host = [newSocket connectedHost];
+    UInt16 port = [newSocket connectedPort];
     
-    n = recv(cliefd, buffer, sizeof(buffer), 0);
-    if (n < 0) {
-        NSLog(@"[UIC] recv() error");
-        // TODO: close cliefd?
-        return 0;
-    }
-    
-    buffer[n] = 0;
-    NSLog(@"[UIC] recv() %s\n", buffer);
-     
-    /*
-    string s(buffer), token;
-    istringstream ss(s);
-    vector<string> token_list;
-    for (int i = 0; i < 3 && ss; i++) {
-        ss >> token;
-        //printf("token %d %s\n", i, token.c_str());
-        token_list.push_back(token);
-    }
-    
-    if (token_list.size() == 3
-        && (token_list[0] == "GET" || token_list[0] == "POST")
-        && token_list[2].substr(0, 4) == "HTTP") {
-        switch (token_list[1]) {
-            case "/data":
-                response = [UIC handle_data: s];
-                //response = handle_data(s);
-                break;
-            case "/loc":
-                response = handle_location(s);
-                break;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        @autoreleasepool {
+            NSLog(@"[UIC] Accepted client %@:%hu", host, port);
         }
-    }
-    */
-     
-    n = write(cliefd, response, strlen(response));
-    if (n < 0) {
-        NSLog(@"[UIC] write() error");
-        // TODO: close cliefd?
-        return 0;
-    }
-
-    close(cliefd);
-    return 0;
+    });
+    
+    //NSString *welcomeMsg = @"Welcome to the AsyncSocket Echo Server";
+    //NSData *welcomeData = [welcomeMsg dataUsingEncoding:NSUTF8StringEncoding];
+    //[newSocket writeData:welcomeData withTimeout:-1 tag:WELCOME_MSG];
+    [newSocket readDataToData:[GCDAsyncSocket CRLFData] withTimeout:-1 tag:0];
+    
+    //NSString *response = [NSString stringWithFormat:@"%@\r\n%@", _response_200, @"Hi"];
+    //[self sendData:newSocket data:response];
 }
- 
--(NSString *)handle_location:(NSString *) data {
-     NSString *response = _response_200;
-     return response;
- }
- 
--(NSString *)handle_data:(NSString *) data {
+
+-(void)socket:(GCDAsyncSocket *)sender didReadData:(nonnull NSData *)data withTag:(long)tag
+{
+    dispatch_async(dispatch_get_main_queue(), ^{
+        @autoreleasepool {
+            NSData *strData = [data subdataWithRange:NSMakeRange(0, [data length] - 2)];
+            NSString *msg = [[NSString alloc] initWithData:strData encoding:NSUTF8StringEncoding];
+            if (msg) {
+                NSLog(@"[UIC] Received data: %@", msg);
+                NSArray *split = [msg componentsSeparatedByString:@" "];
+                if ([split count] == 3) {
+                    NSString *method = split[0];
+                    NSString *query = split[1];
+                    NSString *httpProtocol = split[2];
+                    if (([method isEqualToString:@"GET"] || [method isEqualToString:@"POST"])
+                    && [[httpProtocol substringWithRange:NSMakeRange(0, 4)] isEqualToString:@"HTTP"]) {
+                        NSString *response = _response_404;
+                        if ([query hasPrefix:@"/data"]) {
+                            NSArray *querySplit = [query componentsSeparatedByString:@"?"];
+                            NSDictionary *params = [self parseUrlQueryParameters:querySplit[1]];
+                            NSString *dataResponse = [self handle_data:params];
+                            response = [_response_200 stringByAppendingString:dataResponse];
+                        } else if ([query hasPrefix:@"/loc"]) {
+                            NSArray *querySplit = [query componentsSeparatedByString:@"?"];
+                            NSDictionary *params = [self parseUrlQueryParameters:querySplit[1]];
+                            NSString *locResponse = [self handle_location:params];
+                            response = [_response_200 stringByAppendingString:locResponse];
+                        } else {
+                            NSLog(@"[UIC] Invalid request endpoint.");
+                        }
+                        [sender writeData:[response dataUsingEncoding:NSUTF8StringEncoding] withTimeout:-1 tag:1];
+                    }
+                }
+            } else {
+                NSLog(@"[UIC] Error converting received data into UTF-8 String");
+            }
+        }
+    });
+}
+
+-(NSMutableDictionary *)parseUrlQueryParameters:(NSString *)queryParameters
+{
+    NSMutableDictionary *queryStringDictionary = [[NSMutableDictionary alloc] init];
+    NSArray *components = [queryParameters componentsSeparatedByString:@"&"];
+    for (NSString *pair in components)
+    {
+        NSArray *pairComponents = [pair componentsSeparatedByString:@"="];
+        NSString *key = [[pairComponents firstObject] stringByRemovingPercentEncoding];
+        NSString *value = [[pairComponents lastObject] stringByRemovingPercentEncoding];
+
+        [queryStringDictionary setObject:value forKey:key];
+    }
+    return queryStringDictionary;
+}
+
+-(void)sendData:(GCDAsyncSocket *)socket data:(NSString *)data
+{
+    NSData *msg = [data dataUsingEncoding:NSUTF8StringEncoding];
+    NSLog(@"[UIC] Sending data: %@", data);
+    [socket writeData:msg withTimeout:-1 tag:1];
+}
+
+-(NSString *)handle_location:(NSMutableDictionary *)params {
+    NSLog(@"[UIC] Got param test=%@", [params objectForKey:@"test"]);
+    NSString *response = _response_200;
+    return response;
+}
+
+-(NSString *)handle_data:(NSMutableDictionary *)params {
     _lastUpdate = [NSDate date];
-    //self.lock.lock();
     CLLocation *currentLoc = [[CLLocation alloc] initWithCoordinate:CLLocationCoordinate2DMake(
                                 _currentLocation.coordinate.latitude,
                                 _currentLocation.coordinate.longitude)
@@ -307,35 +317,20 @@ static void* handle_request(void* pcliefd) {
                                  timestamp:[NSDate date]];
     NSNumber *targetMaxDistance = _targetMaxDistance;
     NSString *pokemonEncounterId = _pokemonEncounterId;
-    //self.lock.unlock();
 
-    NSMutableDictionary* jsonObj;
-    NSError *error;
-    try {
-        jsonObj = [NSJSONSerialization JSONObjectWithData:
-                   [data dataUsingEncoding:NSUTF8StringEncoding]
-                   options:0
-                   error:&error];
-    } catch (exception &ex) {
-        return _response_400;
-    }
-    if (jsonObj == NULL) {
-        return _response_200;
-    }
     if (_currentLocation == nil) {
-        return _response_200;
+        //return _response_200;
     }
+    [params setObject:@(currentLoc.coordinate.latitude) forKey:@"lat_target"];
+    [params setObject:@(currentLoc.coordinate.longitude) forKey:@"lon_target"];
+    [params setObject:targetMaxDistance forKey:@"target_max_distance"];
+    [params setObject:_username ?: @"" forKey:@"username"];
+    [params setObject:pokemonEncounterId ?: @"" forKey:@"pokemon_encounter_id"];
+    [params setObject:_uuid forKey:@"uuid"];
+    [params setObject:_ptcToken__hgj ?: @"" forKey:@"ptcToken"];
 
-    jsonObj[@"lat_target"] = @(currentLoc.coordinate.latitude);
-    jsonObj[@"lon_target"] = @(currentLoc.coordinate.longitude);
-    jsonObj[@"target_max_distance"] = targetMaxDistance;
-    jsonObj[@"username"] = _username;
-    jsonObj[@"pokemon_encounter_id"] = pokemonEncounterId;
-    jsonObj[@"uuid"] = _uuid;
-    jsonObj[@"ptcToken"] = _ptcToken__hgj;
-     
     /*
-    string url = this->backendRawUrl;
+    NSString *url = _backendRawUrl;
     CURL *curl;
     CURLcode res;
     string readBuffer;
@@ -430,12 +425,78 @@ static void* handle_request(void* pcliefd) {
         }
     }
     */
-    NSString *response = [NSString stringWithFormat:@"%@\r\n%@", _response_200, jsonObj];
+    NSString *response = [NSString stringWithFormat:@"%@\r\n%@", _response_200, params];
     return response;
+}
+
+// TODO: Convert C code to ObjC and make ObjC method.
+/*
+static void* handle_request(void* pcliefd) {
+    NSLog(@"[UIC] handle_request: %ld", (long)pcliefd);
+    int cliefd = *(int*)pcliefd;
+    delete (int *)pcliefd;
+    
+    ssize_t n;
+    char buffer[255];
+    const char *response;
+    
+    n = recv(cliefd, buffer, sizeof(buffer), 0);
+    if (n < 0) {
+        NSLog(@"[UIC] recv() error");
+        // TODO: close cliefd?
+        return 0;
+    }
+    
+    buffer[n] = 0;
+    response = string([_response_400 UTF8String]).c_str();
+    NSLog(@"[UIC] recv() %s\n", buffer);
+     
+    string s(buffer), token;
+    istringstream ss(s);
+    vector<string> token_list;
+    for (int i = 0; i < 3 && ss; i++) {
+        ss >> token;
+        NSLog(@"[UIC] token[%d] = %s\n", i, token.c_str());
+        token_list.push_back(token);
+    }
+    
+    if (token_list.size() == 3
+        && (token_list[0] == "GET" || token_list[0] == "POST")
+        && token_list[2].substr(0, 4) == "HTTP") {
+        if (token_list[1] == "/data") {
+            NSString *dataResponse = handle_data(toObjCString(s.c_str()));
+            string resp = string([dataResponse UTF8String]);
+            response = resp.c_str();
+        } else if (token_list[1] == "/loc") {
+            NSString *locResponse = handle_location(toObjCString(s.c_str()));
+            string resp = string([locResponse UTF8String]);
+            response = resp.c_str();
+        } else {
+            NSLog(@"[UIC] Invalid request endpoint.");
+            response = string([_response_404 UTF8String]).c_str();
+        }
+    }
+    
+    //long length = strlen(response);
+    n = write(cliefd, response, sizeof(response));
+    if (n < 0) {
+        NSLog(@"[UIC] write() error");
+        return 0;
+    }
+
+    close(cliefd);
+    return 0;
+}
+*/
+
+static NSString* toObjCString(string value) {
+    return [NSString stringWithCString:value.c_str() encoding:NSUTF8StringEncoding];
 }
 
 
 @end
+
+#pragma Old C++ Class
 
 /*
 class UIC {
@@ -444,69 +505,6 @@ public:
         start_listener();
     }
 private:
-    string backend = "http://10.0.1.100:9001";
-    string backendControllerUrl = backend + "/controler";
-    string backendRawUrl = backend + "/raw";
-    string localUrl = "http://localhost:8080/loc";
-    string uuid = "test"; // TODO: UIDevice.current.name;
-    string modelName = "test"; // TODO: UIDevice.modelName__hgj;
-    bool started = false;
-    float currentLocation[2] = { 0, 0 };
-    bool waitRequiresPokemon = false;
-    bool waitForData = false;
-    //lock = NSLock();
-    time_t firstWarningDate; // ctime(time(&0))
-    int jitterCorner = 0;
-    bool gotQuest = false;
-    bool gotIV = false;
-    int noQuestCount = 0;
-    int noEncounterCount = 0;
-    float targetMaxDistance = 250.0;
-    int emptyGmoCount = 0;
-    string pokemonEncounterId;
-    string action;
-    float encounterDistance = 0.0;
-    float encounterDelay = 0.0;
-    void* image; // UIImage
-    int level = 0;
-    string ptcToken__hgj; // Load from UserDefaults (5750bac0-483c-4131-80fd-6b047b2ca7b4)
-    bool menuButton__hgj = false;
-    bool menuButton2__hgj = false;
-    string neededButton = "";
-    bool okButton__hgj = false;
-    bool newPlayerButton__hgj = false;
-    bool bannedScreen__hgj = false;
-    bool invalidScreen__hgj = false;
-    //string loggingUrl = "";
-    //string loggingPort = 80;
-    //string loggingUseTls = true;
-    float startupLat = 0.0;
-    float startupLon = 0.0;
-    float startupLocation[2];
-    float lastEncounterLat = 0.0;
-    float lastEncounterLon = 0.0;
-    time_t lastUpdate = time(0);
-    bool delayQuest = false;
-    bool gotQuestEarly = false;
-    string friendName = "";
-    
-    // Mizu
-    string targetFortId;
-    bool isQuestInit = false;
-    float lastQuestLocation[2];
-    float lastLocation[2];
-    bool gotItems = false;
-    int noItemsCount = 0;
-    bool skipSpin = false;
-    int luckyEggsNum = 0;
-    time_t lastDeployTime = time(0);
-    int spins = 401;
-    bool ultraQuestSpin = false;
-    
-    const char *response_200 = "HTTP/1.1 200 OK\nContent-Type: text/json; charset=utf-8\n\n";
-    const char *response_400 = "HTTP/1.1 400 Bad Request\nContent-Type: text/json; charset=utf-8\n\n";
-    const char *response_404 = "HTTP/1.1 404 Not Found\nContent-Type: text/json; charset=utf-8\n\n";
-
     void logout() {
         this->isLoggedIn = false;
         this->delayQuest = false;
@@ -539,10 +537,6 @@ private:
                 }
             }
         }
-    }
-    
-    static NSString* toObjCString(string value) {
-        return [NSString stringWithCString:value.c_str() encoding:[NSString NSUTF8Encoding]];
     }
     
     static NSMutableDictionary* toDictionary(string data) {

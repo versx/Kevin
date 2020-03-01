@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C0132B56240B5DEC00719452 /* GCDAsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = C0132B52240B5DEC00719452 /* GCDAsyncUdpSocket.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
+		C0132B57240B5DEC00719452 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = C0132B53240B5DEC00719452 /* GCDAsyncSocket.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
+		C0132B58240B5DEC00719452 /* GCDAsyncUdpSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = C0132B54240B5DEC00719452 /* GCDAsyncUdpSocket.h */; };
+		C0132B59240B5DEC00719452 /* GCDAsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = C0132B55240B5DEC00719452 /* GCDAsyncSocket.h */; };
+		C0132B62240B630000719452 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0132B61240B630000719452 /* CFNetwork.framework */; };
+		C0132B64240B631700719452 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0132B63240B631700719452 /* Security.framework */; };
 		C01B4965240ACF5D00633B45 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01B4964240ACF5D00633B45 /* Foundation.framework */; };
 		C01B4967240ACF5D00633B45 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01B4966240ACF5D00633B45 /* UIKit.framework */; };
 		C01B4971240ACF5D00633B45 /* Jarvis__.h in Headers */ = {isa = PBXBuildFile; fileRef = C01B4970240ACF5D00633B45 /* Jarvis__.h */; };
@@ -17,6 +23,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C0132B52240B5DEC00719452 /* GCDAsyncUdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncUdpSocket.m; sourceTree = "<group>"; };
+		C0132B53240B5DEC00719452 /* GCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
+		C0132B54240B5DEC00719452 /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
+		C0132B55240B5DEC00719452 /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
+		C0132B61240B630000719452 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		C0132B63240B631700719452 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		C01B4961240ACF5D00633B45 /* libJarvis++.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libJarvis++.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C01B4964240ACF5D00633B45 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		C01B4966240ACF5D00633B45 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -37,6 +49,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C0132B64240B631700719452 /* Security.framework in Frameworks */,
+				C0132B62240B630000719452 /* CFNetwork.framework in Frameworks */,
 				C01B4983240AD01E00633B45 /* CoreLocation.framework in Frameworks */,
 				C01B4965240ACF5D00633B45 /* Foundation.framework in Frameworks */,
 				C01B4967240ACF5D00633B45 /* UIKit.framework in Frameworks */,
@@ -46,11 +60,23 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C0132B50240B5DEC00719452 /* GCD */ = {
+			isa = PBXGroup;
+			children = (
+				C0132B52240B5DEC00719452 /* GCDAsyncUdpSocket.m */,
+				C0132B53240B5DEC00719452 /* GCDAsyncSocket.m */,
+				C0132B54240B5DEC00719452 /* GCDAsyncUdpSocket.h */,
+				C0132B55240B5DEC00719452 /* GCDAsyncSocket.h */,
+			);
+			path = GCD;
+			sourceTree = "<group>";
+		};
 		C01B4957240ACF5D00633B45 = {
 			isa = PBXGroup;
 			children = (
-				C01B497D240ACF9400633B45 /* UIC */,
+				C0132B50240B5DEC00719452 /* GCD */,
 				C01B4968240ACF5D00633B45 /* Jarvis++ */,
+				C01B497D240ACF9400633B45 /* UIC */,
 				C01B4963240ACF5D00633B45 /* Frameworks */,
 				C01B4962240ACF5D00633B45 /* Products */,
 			);
@@ -67,6 +93,8 @@
 		C01B4963240ACF5D00633B45 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C0132B63240B631700719452 /* Security.framework */,
+				C0132B61240B630000719452 /* CFNetwork.framework */,
 				C01B4982240AD01E00633B45 /* CoreLocation.framework */,
 				C01B4964240ACF5D00633B45 /* Foundation.framework */,
 				C01B4966240ACF5D00633B45 /* UIKit.framework */,
@@ -145,7 +173,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				C01B4980240ACF9400633B45 /* UIC.h in Headers */,
+				C0132B58240B5DEC00719452 /* GCDAsyncUdpSocket.h in Headers */,
 				C01B4971240ACF5D00633B45 /* Jarvis__.h in Headers */,
+				C0132B59240B5DEC00719452 /* GCDAsyncSocket.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -205,7 +235,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C0132B57240B5DEC00719452 /* GCDAsyncSocket.m in Sources */,
 				C01B4973240ACF5D00633B45 /* Jarvis__.m in Sources */,
+				C0132B56240B5DEC00719452 /* GCDAsyncUdpSocket.m in Sources */,
 				C01B4981240ACF9400633B45 /* UIC.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -267,6 +299,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ARCHS = arm64;
+				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
@@ -279,7 +312,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
-				USER_HEADER_SEARCH_PATHS = "$(PROJECTDIR)";
+				USER_HEADER_SEARCH_PATHS = "$(PROJECTDIR)/**";
 				VALID_ARCHS = arm64;
 				iOSOpenDevBuildPackageOnAnyBuild = NO;
 				iOSOpenDevCopyOnBuild = NO;
@@ -296,6 +329,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ARCHS = arm64;
+				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
@@ -308,7 +342,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
-				USER_HEADER_SEARCH_PATHS = "";
+				USER_HEADER_SEARCH_PATHS = "$(PROJECTDIR)/**";
 				VALID_ARCHS = arm64;
 				iOSOpenDevBuildPackageOnAnyBuild = NO;
 				iOSOpenDevCopyOnBuild = NO;

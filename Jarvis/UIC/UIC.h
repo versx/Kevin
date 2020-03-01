@@ -9,7 +9,8 @@
 @property (class, nonatomic, assign, readonly) NSNumber *port;
 
 -(void *)start:(NSNumber *)port;
-//- (void *) start_listener:(NSNumber *)port;
-//- (void *) handle_request:(void *)pcliefd;
+-(void *)start_listener:(NSNumber *)port;
+-(NSString *)handle_data:(NSDictionary *)params;
+-(NSString *)handle_location:(NSDictionary *)params;
 
 @end
