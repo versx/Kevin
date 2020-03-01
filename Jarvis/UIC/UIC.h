@@ -10,6 +10,7 @@
 
 -(void *)start:(NSNumber *)port;
 -(void *)startListener;
+-(void *)startUicLoop;
 -(NSString *)handleDataRequest:(NSDictionary *)params;
 -(NSString *)handleLocationRequest:(NSDictionary *)params;
 -(void *)logout;

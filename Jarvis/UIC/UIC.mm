@@ -37,7 +37,7 @@ static CLLocation *_currentLocation;
 static BOOL _waitRequiresPokemon = false;
 static BOOL _waitForData = false;
 //lock = NSLock();
-static NSDate *_firstWarningDate; // ctime(time(&0))
+static NSDate *_firstWarningDate;
 static NSNumber *_jitterCorner = 0;
 static BOOL _gotQuest = false;
 static BOOL _gotIV = false;
@@ -59,9 +59,6 @@ static BOOL _okButton__hgj = false;
 static BOOL _newPlayerButton__hgj = false;
 static BOOL _bannedScreen__hgj = false;
 static BOOL _invalidScreen__hgj = false;
-//string loggingUrl = "";
-//string loggingPort = 80;
-//string loggingUseTls = true;
 static NSNumber *_startupLat = @0.0;
 static NSNumber *_startupLon = @0.0;
 static CLLocation *_startupLocation;
@@ -94,6 +91,7 @@ static double _baseVerticalAccuracy = 200.0; // in meters
 
 static NSDictionary *_uicSettings;
 static NSNumber *_port = @(8080);
+static GCDAsyncSocket *_listenSocket;
 
 +(NSNumber *)port {
     return _port;
@@ -116,22 +114,24 @@ static NSNumber *_port = @(8080);
 -(void *)start:(NSNumber *)port
 {
     NSLog(@"[UIC] start");
+    NSLog(@"-----------------------------");
     NSLog(@"[UIC] Device Uuid: %@", [[Device sharedInstance] uuid]);
     NSLog(@"[UIC] Device Model: %@", [[Device sharedInstance] model]);
     NSLog(@"[UIC] Device OS: %@", [[Device sharedInstance] osName]);
     NSLog(@"[UIC] Device OS Version: %@", [[Device sharedInstance] osVersion]);
-
+    NSLog(@"-----------------------------");
     NSLog(@"[UIC] Loading UIC settings...");
     _uicSettings = [[Settings sharedInstance] config];
     
     _port = port;
     bool started = false;
     NSNumber *startTryCount = @1;
+    // Try to start the HTTP listener, attempt 5 times on failure
     while (!started) {
         @try {
-            [self start_listener];
+            [self startListener];
         } @catch(id exception) {
-            if (startTryCount > @5) { // TODO: Numeric literal
+            if ([startTryCount intValue] > 5) {
                 NSLog(@"[UIC] Fatal error, failed to start server: %@. Try (%@/5)", exception, startTryCount);
                 
                 NSLog(@"[UIC] Failed to start server: %@. Try (%@/5). Trying again in 5 seconds.", exception, startTryCount);
@@ -141,7 +141,34 @@ static NSNumber *_port = @(8080);
         }
     }
 
-    // TODO: heatbeat loop
+    // Heatbeat loop
+    bool heatbeatRunning = false;
+    NSLog(@"[UIC] Starting heatbeat dispatch queue...");
+    dispatch_queue_t heatbeatQueue = dispatch_queue_create("heatbeat_queue", NULL);
+    dispatch_async(heatbeatQueue, ^{
+        NSDictionary *data = @{
+            @"uuid": [[Device sharedInstance] uuid],
+            @"username": _username,
+            @"type": @"heatbeat"
+        };
+        [self postRequest:_backendControllerUrl dict:data blocking:false completion:^(NSDictionary *result) {}];
+        while (heatbeatRunning) {
+            // Check if time since last checking was within 2 minutes, if not reboot device.
+            [NSThread sleepForTimeInterval:15];
+            NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:_lastUpdate];
+            if (timeIntervalSince >= 120) {
+                NSLog(@"[UIC][Jarvis] HTTP SERVER DIED. Restarting...");
+                [self restart];
+            } else {
+                NSLog(@"[UIC] Last data %f We Good", timeIntervalSince);
+            }
+        }
+        
+        // Force stop HTTP listener to prevent binding issues.
+        NSLog(@"[UIC] Force-stopping HTTP server.");
+        [_listenSocket disconnect]; // TODO: Check for close/stop method or if disconnect is correct.
+    });
+    //dispatch_release(heatbeatQueue);
 
     NSLog(@"[UIC] Running on %@ delay set to %@",
           [[Device sharedInstance] model],
@@ -155,14 +182,25 @@ static NSNumber *_port = @(8080);
 
 -(void *)startListener
 {
-    GCDAsyncSocket *listenSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
+    NSLog(@"[UIC] startListener");
+    _listenSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     NSError *error = nil;
-    if (![listenSocket acceptOnPort:8080 error:&error]) {
+    if (![_listenSocket acceptOnPort:[_port intValue] error:&error]) {
         NSLog(@"[UIC] Failed to start webserver listener on port %@:\r\nError:%@", _port, error);
     }
     NSLog(@"[UIC] Listening at localhost on port %@", _port);
     return 0;
 }
+
+-(void *)startUicLoop {
+    NSLog(@"[UIC] startUicLoop");
+    NSDate *eggStart = [NSDate date]; //Date(timeInterval:-1860, since: Date());
+    // Init AI
+    //initJarvis();
+    return 0;
+}
+
+#pragma GCDAsyncSocket
 
 -(void)socket:(GCDAsyncSocket *)sender didAcceptNewSocket:(nonnull GCDAsyncSocket *)newSocket
 {
@@ -221,20 +259,7 @@ static NSNumber *_port = @(8080);
     });
 }
 
--(NSMutableDictionary *)parseUrlQueryParameters:(NSString *)queryParameters
-{
-    NSMutableDictionary *queryStringDictionary = [[NSMutableDictionary alloc] init];
-    NSArray *components = [queryParameters componentsSeparatedByString:@"&"];
-    for (NSString *pair in components)
-    {
-        NSArray *pairComponents = [pair componentsSeparatedByString:@"="];
-        NSString *key = [[pairComponents firstObject] stringByRemovingPercentEncoding];
-        NSString *value = [[pairComponents lastObject] stringByRemovingPercentEncoding];
-
-        [queryStringDictionary setObject:value forKey:key];
-    }
-    return queryStringDictionary;
-}
+#pragma HTTP Listener
 
 -(void)sendData:(GCDAsyncSocket *)socket data:(NSString *)data
 {
@@ -250,7 +275,7 @@ static NSNumber *_port = @(8080);
     if (currentLoc != nil) {
         if (_waitRequiresPokemon) {
             //self.lock.unlock
-            NSNumber *jitterValue = 0; // TODO: Load from Settings
+            NSNumber *jitterValue = [_uicSettings objectForKey:@"jitterValue"]; // TODO: Load from Settings
             NSNumber *jitterLat;
             NSNumber *jitterLon;
             switch ([_jitterCorner intValue]) {
@@ -275,16 +300,16 @@ static NSNumber *_port = @(8080);
                     _jitterCorner = @0;
                     break;
             }
-            
-            /*
-            [responseData setObject:currentLoc.coordinate.latitude + jitterLat forKey:@"latitude"];
-            [responseData setObject:currentLoc.coordinate.longitude + jitterLon forKey:@"longitude"];
-            [responseData setObject:currentLoc.coordinate.latitude + jitterLat forKey:@"lat"];
-            [responseData setObject:currentLoc.coordinate.longitude + jitterLon forKey:@"lng"];
-            */
+
+            NSNumber *currentLat = @([[NSNumber numberWithDouble:currentLoc.coordinate.latitude] doubleValue] + [jitterLat doubleValue]);
+            NSNumber *currentLon = @([[NSNumber numberWithDouble:currentLoc.coordinate.longitude] doubleValue] + [jitterLon doubleValue]);
+            [responseData setObject:currentLat forKey:@"latitude"];
+            [responseData setObject:currentLon forKey:@"longitude"];
+            [responseData setObject:currentLon forKey:@"lat"];
+            [responseData setObject:currentLon forKey:@"lng"];
 
             //"scan_iv", "scan_pokemon"
-            if (_level >= @30) { // TODO: Fix direct literal
+            if ([_level intValue] >= 30) {
                 [responseData setObject:@[@"pokemon"] forKey:@"actions"];
             } else {
                 [responseData setObject:@[] forKey:@"actions"];
@@ -292,29 +317,29 @@ static NSNumber *_port = @(8080);
         } else {
             // raids, quests
             //self.lock.unlock
-            /*
-            [responseData setObject:currentLoc.coordinate.latitude forKey:@"latitude"];
-            [responseData setObject:currentLoc.coordinate.longitude forKey:@"longitude"];
-            [responseData setObject:currentLoc.coordinate.latitude forKey:@"lat"];
-            [responseData setObject:currentLoc.coordinate.longitude forKey:@"lng"];
-            */
+            NSNumber *currentLat = [NSNumber numberWithDouble:currentLoc.coordinate.latitude];
+            NSNumber *currentLon = [NSNumber numberWithDouble:currentLoc.coordinate.longitude];
+            [responseData setObject:currentLat forKey:@"latitude"];
+            [responseData setObject:currentLon forKey:@"longitude"];
+            [responseData setObject:currentLon forKey:@"lat"];
+            [responseData setObject:currentLon forKey:@"lng"];
             
-            // TODO:
-            /*
-             if ([Settings ultraQuests] ?: false && _action == "scan_quest" && _delayQuest {
-                 //autospinning should only happen when ultraQuests is set and the instance is scan_quest type
-                 if (_level >= 30) {
-                     [responseData setObject:@[@"pokemon", @"pokestop"] forKey:@"actions"];
-                 } else {
-                     [responseData setObject:@[@"pokestop"] forKey:@"actions"];
-                 }
-             } else if (_action == "leveling") {
-                 [responseData setObject:@[@"pokestop"] forKey:@"actions"];
-             } else if (_action == "scan_raid") {
-                 //raid instances do not need IV encounters, Use scan_pokemon type if you want to encounter while scanning raids.
-                 [responseData setObject:@[] forKey:@"actions"];
-             }
-             */
+            bool ultraQuests = [_uicSettings objectForKey:@"ultraQuests"] ?: false;
+            if (ultraQuests && [_action isEqualToString:@"scan_quest"] && _delayQuest) {
+                // Auto-spinning should only happen when ultraQuests is
+                // set and the instance is scan_quest type
+                if ([_level intValue] >= 30) {
+                    [responseData setObject:@[@"pokemon", @"pokestop"] forKey:@"actions"];
+                } else {
+                    [responseData setObject:@[@"pokestop"] forKey:@"actions"];
+                }
+            } else if ([_action isEqualToString:@"leveling"]) {
+                [responseData setObject:@[@"pokestop"] forKey:@"actions"];
+            } else if ([_action isEqualToString:@"scan_raid"]) {
+                // Raid instances do not need IV encounters, Use scan_pokemon
+                // type if you want to encounter while scanning raids.
+                [responseData setObject:@[] forKey:@"actions"];
+            }
         }
     }
     
@@ -347,6 +372,7 @@ static NSNumber *_port = @(8080);
     [self postRequest:url dict:params blocking:false completion:^(NSDictionary *result) {
         NSDictionary *data = [result objectForKey:@"data"];
         
+        // TODO: Check if works, might need to use objectForKey instead
         bool inArea = data[@"in_area"];
         NSNumber *level = data[@"level"];// ?? 0;
         NSNumber *nearby = data[@"nearby"];// ?? 0;
@@ -367,8 +393,8 @@ static NSNumber *_port = @(8080);
         NSString *toPrint;
         
         //self.lock.lock();
-        float diffLat = 0.001; // TODO: fabs([_currentLocation.coordinate.latitude doubleValue] - targetLat); //?? 0
-        float diffLon = 0.001; // TODO: fabs([_currentLocation.coordinate.longitude doubleValue ] - targetLon);
+        NSNumber *diffLat = @([[NSNumber numberWithDouble:currentLoc.coordinate.latitude] doubleValue] - [targetLat doubleValue]);
+        NSNumber *diffLon = @([[NSNumber numberWithDouble:currentLoc.coordinate.longitude] doubleValue] - [targetLon doubleValue]);
         
         // TODO: MIZU tut stuff
         
@@ -376,7 +402,7 @@ static NSNumber *_port = @(8080);
             _waitForData = false;
             toPrint = @"[UIC] Got GMO but it was malformed. Skipping.";
         } else if (containsGmo) {
-            if (inArea && diffLat < 0.0001 && diffLon < 0.0001) {
+            if (inArea && [diffLat doubleValue] < 0.0001 && [diffLon doubleValue] < 0.0001) {
                 _emptyGmoCount = 0;
                 if (_pokemonEncounterId != nil) {
                     if ([pokemonFoundCount intValue] > 0) {
@@ -431,6 +457,8 @@ static NSNumber *_port = @(8080);
     NSString *response = [NSString stringWithFormat:@"%@\r\n%@", _response_200, params];
     return response;
 }
+
+#pragma App Management
 
 -(void *)restart {
     NSLog(@"[UIC][Jarvis] Restarting...");
@@ -491,11 +519,14 @@ static NSNumber *_port = @(8080);
                     _ptcToken__hgj = ptcToken;
                     _level = level;
                     _isLoggedIn = true;
-                    //UserDefaults.standard.set ptcToken "5750bac0-483c-4131-80fd-6b047b2ca7b4"
-                    //UserDefaults.standard.synchronize
+                    NSUserDefaults *defaults = [[NSUserDefaults alloc] init];
+                    [defaults setValue:ptcToken forKey:@"5750bac0-483c-4131-80fd-6b047b2ca7b4"];
+                    [defaults synchronize];
                 } else {
                     NSLog(@"[UIC][Jarvis] Failed to get account with token. Restarting for normal login.");
-                    //UserDefaults.standard.removeObject "60b01025-c1ea-422c-9b0e-d70bf489de7f"
+                    NSUserDefaults *defaults = [[NSUserDefaults alloc] init];
+                    [defaults synchronize];
+                    [defaults removeObjectForKey:@"60b01025-c1ea-422c-9b0e-d70bf489de7f"];
                     _username = username;
                     _password = password;
                     _ptcToken__hgj = ptcToken;
@@ -508,7 +539,9 @@ static NSNumber *_port = @(8080);
                 [NSThread sleepForTimeInterval:1];
                 _minLevel = @0; // Never set to 0 until we can do tutorials.
                 _maxLevel = @29;
-                //UserDefaults.removeObject "60b01025-clea-422c-9b0e-d70bf489de7f"
+                NSUserDefaults *defaults = [[NSUserDefaults alloc] init];
+                [defaults synchronize];
+                [defaults removeObjectForKey:@"60b01025-clea-422c-9b0e-d70bf489de7f"];
                 [NSThread sleepForTimeInterval:5];
                 _isLoggedIn = false;
                 [self restart];
@@ -521,6 +554,8 @@ static NSNumber *_port = @(8080);
     
     return 0;
 }
+
+#pragma Utilities
 
 -(void *)postRequest:(NSString *)urlString dict:(NSDictionary *)data blocking:(BOOL)blocking completion:(void (^)(NSDictionary* result))completion
 {
@@ -580,6 +615,22 @@ static NSNumber *_port = @(8080);
     */
     return 0;
 }
+
+-(NSMutableDictionary *)parseUrlQueryParameters:(NSString *)queryParameters
+{
+    NSMutableDictionary *queryStringDictionary = [[NSMutableDictionary alloc] init];
+    NSArray *components = [queryParameters componentsSeparatedByString:@"&"];
+    for (NSString *pair in components)
+    {
+        NSArray *pairComponents = [pair componentsSeparatedByString:@"="];
+        NSString *key = [[pairComponents firstObject] stringByRemovingPercentEncoding];
+        NSString *value = [[pairComponents lastObject] stringByRemovingPercentEncoding];
+
+        [queryStringDictionary setObject:value forKey:key];
+    }
+    return queryStringDictionary;
+}
+
 -(CLLocation *)createCoordinate:(double)lat lon:(double)lon
 {
     CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(lat, lon);
