@@ -19,7 +19,6 @@
 #include <string>
 #include <sys/utsname.h>
 #include <math.h>
-//#include <curl/curl.h>
 
 using namespace std;
 
@@ -29,6 +28,7 @@ using namespace std;
 // TODO: PTFakeTouch
 // TODO: KIF library
 // TODO: StateManager class
+// TODO: Pixel checks
 
 static BOOL _firststart = true;
 static BOOL _startup = true;
@@ -56,7 +56,8 @@ static double _encounterDistance = 0.0;
 static NSNumber *_encounterDelay = @0.0;
 static void* _image; // UIImage
 static NSNumber *_level = @0;
-static NSString *_ptcToken; // Load from UserDefaults (5750bac0-483c-4131-80fd-6b047b2ca7b4)
+static NSUserDefaults *_defaults = [[NSUserDefaults alloc] init];
+static NSString *_ptcToken = [_defaults valueForKey:@"5750bac0-483c-4131-80fd-6b047b2ca7b4"];
 
 // Button Detection
 static BOOL _menuButton = false;
@@ -226,8 +227,7 @@ static GCDAsyncSocket *_listenSocket;
                 while (!_menuButton) {
                     _newPlayerButton = [self clickButton:@"NewPlayerButton"];
                     if (_newPlayerButton) {
-                        NSUserDefaults *defaults = [[NSUserDefaults alloc] init];
-                        [defaults removeObjectForKey:@"5750bac0-483c-4131-80fd-6b047b2ca7b4"];
+                        [_defaults removeObjectForKey:@"5750bac0-483c-4131-80fd-6b047b2ca7b4"];
                         _newPlayerButton = false;
                         NSLog(@"[UIC][Jarvis] Started at Login Screen");
                         [NSThread sleepForTimeInterval:1];
@@ -440,8 +440,7 @@ static GCDAsyncSocket *_listenSocket;
                     _minLevel = @1; // Never set to 0 until we can complete tutorials.
                     _maxLevel = @29;
                     [NSThread sleepForTimeInterval:1];
-                    NSUserDefaults *defaults = [[NSUserDefaults alloc] init];
-                    [defaults removeObjectForKey:@"60b01025-clea-422c-9b0e-d70bf489de7f"];
+                    [_defaults removeObjectForKey:@"60b01025-clea-422c-9b0e-d70bf489de7f"];
                     [NSThread sleepForTimeInterval:5];
                     _isLoggedIn = false;
                     [self restart];
@@ -1149,14 +1148,12 @@ static GCDAsyncSocket *_listenSocket;
                     _ptcToken = ptcToken;
                     _level = level;
                     _isLoggedIn = true;
-                    NSUserDefaults *defaults = [[NSUserDefaults alloc] init];
-                    [defaults setValue:ptcToken forKey:@"5750bac0-483c-4131-80fd-6b047b2ca7b4"];
-                    [defaults synchronize];
+                    [_defaults setValue:ptcToken forKey:@"5750bac0-483c-4131-80fd-6b047b2ca7b4"];
+                    [_defaults synchronize];
                 } else {
                     NSLog(@"[UIC][Jarvis] Failed to get account with token. Restarting for normal login.");
-                    NSUserDefaults *defaults = [[NSUserDefaults alloc] init];
-                    [defaults synchronize];
-                    [defaults removeObjectForKey:@"60b01025-c1ea-422c-9b0e-d70bf489de7f"];
+                    [_defaults synchronize];
+                    [_defaults removeObjectForKey:@"60b01025-c1ea-422c-9b0e-d70bf489de7f"];
                     _username = username;
                     _password = password;
                     _ptcToken = ptcToken;
@@ -1169,9 +1166,8 @@ static GCDAsyncSocket *_listenSocket;
                 [NSThread sleepForTimeInterval:1];
                 _minLevel = @0; // Never set to 0 until we can do tutorials.
                 _maxLevel = @29;
-                NSUserDefaults *defaults = [[NSUserDefaults alloc] init];
-                [defaults synchronize];
-                [defaults removeObjectForKey:@"60b01025-clea-422c-9b0e-d70bf489de7f"];
+                [_defaults synchronize];
+                [_defaults removeObjectForKey:@"60b01025-clea-422c-9b0e-d70bf489de7f"];
                 [NSThread sleepForTimeInterval:5];
                 _isLoggedIn = false;
                 [self restart];
