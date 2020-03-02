@@ -24,6 +24,8 @@
 -(NSString *)password;
 -(NSString *)ptcToken;
 -(NSNumber *)level;
+-(NSNumber *)minLevel;
+-(NSNumber *)maxLevel;
 -(BOOL)isLoggedIn;
 -(BOOL)shouldExit;
 
@@ -32,6 +34,8 @@
 -(void)setPassword:(NSString *)password;
 -(void)setPtcToken:(NSString *)ptcToken;
 -(void)setLevel:(NSNumber *)level;
+-(void)setMinLevel:(NSNumber *)minLevel;
+-(void)setMaxLevel:(NSNumber *)maxLevel;
 -(void)setIsLoggedIn:(BOOL)isLoggedIn;
 -(void)setShouldExit:(BOOL)shouldExit;
 

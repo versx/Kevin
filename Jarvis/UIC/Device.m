@@ -19,6 +19,8 @@ static NSString *_username;
 static NSString *_password;
 static NSString *_ptcToken;
 static NSNumber *_level;
+static NSNumber *_minLevel;
+static NSNumber *_maxLevel;
 static BOOL _isLoggedIn;
 static BOOL _shouldExit;
 
@@ -52,6 +54,12 @@ static BOOL _shouldExit;
 -(NSNumber *)level {
     return _level;
 }
+-(NSNumber *)minLevel {
+    return _minLevel;
+}
+-(NSNumber *)maxLevel {
+    return _maxLevel;
+}
 -(BOOL)isLoggedIn {
     return _isLoggedIn;
 }
@@ -70,6 +78,12 @@ static BOOL _shouldExit;
 }
 -(void)setLevel:(NSNumber *)level {
     _level = level;
+}
+-(void)setMinLevel:(NSNumber *)minLevel {
+    _minLevel = minLevel;
+}
+-(void)setMaxLevel:(NSNumber *)maxLevel {
+    _maxLevel = maxLevel;
 }
 -(void)setIsLoggedIn:(BOOL)isLoggedIn {
     _isLoggedIn = isLoggedIn;
@@ -96,6 +110,8 @@ static BOOL _shouldExit;
         } else {
             _multiplier = @5;
         }
+        _minLevel = @1;
+        _maxLevel = @29;
     });
     return sharedInstance;
 }

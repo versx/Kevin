@@ -12,6 +12,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
 #import <UIKit/UIDevice.h>
+#import <UIKit/UIKit.h>
 
 #import "../GCD/GCDAsyncSocket.h"
 //#import "PTFakeTouch/Headers/PTFakeMetaTouch.h"
@@ -28,11 +29,23 @@ using namespace std;
 // TODO: KIF library
 // TODO: StateManager class
 // TODO: Pixel checks
+// TODO: Mizu leveling
+
+static NSString *_response_200 = @"HTTP/1.1 200 OK\nContent-Type: text/json; charset=utf-8\n\n";
+static NSString *_response_400 = @"HTTP/1.1 400 Bad Request\nContent-Type: text/json; charset=utf-8\n\n";
+static NSString *_response_404 = @"HTTP/1.1 404 Not Found\nContent-Type: text/json; charset=utf-8\n\n";
+
+static NSString *TokenUserDefaultsKey = @"5750bac0-483c-4131-80fd-6b047b2ca7b4";
+static NSString *LoginUserDefaultsKey = @"60b01025-clea-422c-9b0e-d70bf489de7f";
+
+static NSArray *_validHttpVersions = @[
+    @"HTTP/1.1",
+    @"HTTP/2",
+    @"HTTP/3"
+];
 
 static BOOL _firststart = true;
 static BOOL _startup = true;
-
-static NSString *_localUrl = @"http://localhost:8080/loc";
 static BOOL _started = false;
 static CLLocation *_currentLocation;
 static BOOL _waitRequiresPokemon = false;
@@ -49,9 +62,8 @@ static NSString *_pokemonEncounterId;
 static NSString *_action;
 static NSNumber *_encounterDistance = @0.0;
 static NSNumber *_encounterDelay = @0.0;
-static void* _image; // UIImage
-static NSUserDefaults *_defaults = [[NSUserDefaults alloc] init];
-static NSString *_ptcToken = [_defaults valueForKey:@"5750bac0-483c-4131-80fd-6b047b2ca7b4"];
+static UIImage *_image;
+static NSString *_ptcToken = [[NSUserDefaults standardUserDefaults] valueForKey:TokenUserDefaultsKey];
 
 // Button Detection
 static BOOL _menuButton = false;
@@ -65,11 +77,11 @@ static BOOL _invalidScreen = false;
 static NSNumber *_failedGetJobCount;
 static NSNumber *_failedCount;
 
-static NSNumber *_startupLat = @0.0;
-static NSNumber *_startupLon = @0.0;
+//static NSNumber *_startupLat = @0.0;
+//static NSNumber *_startupLon = @0.0;
 static CLLocation *_startupLocation;
-static NSNumber *_lastEncounterLat = @0.0;
-static NSNumber *_lastEncounterLon = @0.0;
+//static NSNumber *_lastEncounterLat = @0.0;
+//static NSNumber *_lastEncounterLon = @0.0;
 static NSDate *_lastUpdate;
 static BOOL _delayQuest = false;
 static BOOL _gotQuestEarly = false;
@@ -78,16 +90,10 @@ static BOOL _gotQuestEarly = false;
 static BOOL _isQuestInit = false;
 
 // TODO: UIC properties
-static BOOL _newLogIn;
+//static BOOL _newLogIn;
 static BOOL _newCreated;
 static BOOL _needsLogout;
-static NSNumber *_minLevel = @0;
-static NSNumber *_maxLevel = @29;
 static NSDate *_eggStart;
-
-static NSString *_response_200 = @"HTTP/1.1 200 OK\nContent-Type: text/json; charset=utf-8\n\n";
-static NSString *_response_400 = @"HTTP/1.1 400 Bad Request\nContent-Type: text/json; charset=utf-8\n\n";
-static NSString *_response_404 = @"HTTP/1.1 404 Not Found\nContent-Type: text/json; charset=utf-8\n\n";
 
 static double _baseHorizontalAccuracy = 200.0; // in meters
 static double _baseVerticalAccuracy = 200.0; // in meters
@@ -207,7 +213,7 @@ static GCDAsyncSocket *_listenSocket;
                 while (!_menuButton) {
                     _newPlayerButton = [self clickButton:@"NewPlayerButton"];
                     if (_newPlayerButton) {
-                        [_defaults removeObjectForKey:@"5750bac0-483c-4131-80fd-6b047b2ca7b4"];
+                        [[NSUserDefaults standardUserDefaults] removeObjectForKey:TokenUserDefaultsKey];
                         _newPlayerButton = false;
                         NSLog(@"[UIC][Jarvis] Started at Login Screen");
                         [NSThread sleepForTimeInterval:1];
@@ -378,8 +384,8 @@ static GCDAsyncSocket *_listenSocket;
             NSDictionary *getAccountData = @{
                 @"uuid": [[Device sharedInstance] uuid],
                 @"username": [[Device sharedInstance] username],
-                @"min_level": _minLevel,
-                @"max_level": _maxLevel,
+                @"min_level": [[Device sharedInstance] minLevel],
+                @"max_level": [[Device sharedInstance] maxLevel],
                 @"type": @"get_account"
             };
             [self postRequest:[[Settings sharedInstance] backendControllerUrl]  dict:getAccountData blocking:true completion:^(NSDictionary *result) {
@@ -419,10 +425,10 @@ static GCDAsyncSocket *_listenSocket;
                     }
                 } else {
                     NSLog(@"[UIC] Failed to get account and not logged in.");
-                    _minLevel = @1; // Never set to 0 until we can complete tutorials.
-                    _maxLevel = @29;
+                    [[Device sharedInstance] setMinLevel:@1]; // Never set to 0 until we can complete tutorials.
+                    [[Device sharedInstance] setMaxLevel:@29];
                     [NSThread sleepForTimeInterval:1];
-                    [_defaults removeObjectForKey:@"60b01025-clea-422c-9b0e-d70bf489de7f"];
+                    [[NSUserDefaults standardUserDefaults] removeObjectForKey:LoginUserDefaultsKey];
                     [NSThread sleepForTimeInterval:5];
                     [[Device sharedInstance] setIsLoggedIn:false];
                     [self restart];
@@ -456,8 +462,8 @@ static GCDAsyncSocket *_listenSocket;
                         if (data != nil) {
                             NSNumber *minLevel = [data objectForKey:@"min_level"];
                             NSNumber *maxLevel = [data objectForKey:@"max_level"];
-                            _minLevel = minLevel;
-                            _maxLevel = maxLevel;
+                            [[Device sharedInstance] setMinLevel:minLevel];
+                            [[Device sharedInstance] setMaxLevel:maxLevel];
                             NSNumber *currentLevel = [[Device sharedInstance] level];
                             if (currentLevel != 0 && (currentLevel < minLevel || currentLevel > maxLevel)) {
                                 NSLog(@"[UIC] Account is outside min/max level. Current: %@ Min/Max: %@/%@. Logging out!", currentLevel, minLevel, maxLevel);
@@ -488,10 +494,14 @@ static GCDAsyncSocket *_listenSocket;
                             [[Device sharedInstance] setUsername:nil];
                             [[Device sharedInstance] setIsLoggedIn:false];
                             _isQuestInit = false;
-                            // TODO: UserDefaults.synchronize
+                            [[NSUserDefaults standardUserDefaults] synchronize];
                             [self logout];
+                        } else if ([action isEqualToString:@"leveling"]) {
+                            NSLog(@"[UIC][STATUS] Leveling");
+                            // TODO: Handle Mizu leveling jobs
                         } else if ([action isEqualToString:@"scan_iv"]) {
-      
+                            NSLog(@"[UIC][STATUS] IV");
+                            // TODO: Handle IV jobs
                         } else if ([action isEqualToString:@"gather_token"]) {
                             NSLog(@"[UIC][STATUS] Token");
                             if (_menuButton) {
@@ -563,7 +573,8 @@ static GCDAsyncSocket *_listenSocket;
     return false;
 }
 
--(void)handleQuestJob:(NSDictionary *)data hasWarning:(BOOL)hasWarning {
+-(void)handleQuestJob:(NSDictionary *)data hasWarning:(BOOL)hasWarning
+{
     _delayQuest = true;
     NSNumber *lat = [data objectForKey:@"lat"];
     NSNumber *lon = [data objectForKey:@"lon"];
@@ -578,7 +589,6 @@ static GCDAsyncSocket *_listenSocket;
         [self logout];
     }
     
-    // TODO: EggDeploy
     if ([[Settings sharedInstance] deployEggs] &&
         _eggStart < [NSDate date] &&
         [[[Device sharedInstance] level] intValue] >= 9 &&
@@ -722,7 +732,8 @@ static GCDAsyncSocket *_listenSocket;
     }
 }
 
--(void)handleRaidJob:(NSDictionary *)data hasWarning:(BOOL)hasWarning {
+-(void)handleRaidJob:(NSDictionary *)data hasWarning:(BOOL)hasWarning
+{
     NSTimeInterval timeSince = [[NSDate date] timeIntervalSinceDate:_firstWarningDate];
     NSNumber *maxWarningTimeRaid = [[Settings sharedInstance] maxWarningTimeRaid];
     if (hasWarning &&
@@ -778,7 +789,8 @@ static GCDAsyncSocket *_listenSocket;
     }
 }
 
--(void)handlePokemonJob:(NSDictionary *)data hasWarning:(BOOL)hasWarning {
+-(void)handlePokemonJob:(NSDictionary *)data hasWarning:(BOOL)hasWarning
+{
     if (hasWarning && [[Settings sharedInstance] enableAccountManager]) {
         NSLog(@"[UIC] Account has a warning and tried to scan for Pokemon. Logging out!");
         //self.lock.lock();
@@ -831,8 +843,7 @@ static GCDAsyncSocket *_listenSocket;
     // The "sender" parameter is the listenSocket we created.
     // The "newSocket" is a new instance of GCDAsyncSocket.
     // It represents the accepted incoming client connection.
-    
-    //NSLog(@"[UIC] New connection at %@", [newSocket connectedHost]);
+
     NSString *host = [newSocket connectedHost];
     UInt16 port = [newSocket connectedPort];
     
@@ -842,7 +853,7 @@ static GCDAsyncSocket *_listenSocket;
         }
     });
     
-    [self sendData:newSocket data:_response_200];
+    [self sendData:newSocket data:_response_200]; // TODO: Check if needed
     [newSocket readDataToData:[GCDAsyncSocket CRLFData] withTimeout:-1 tag:1];
 }
 
@@ -859,8 +870,9 @@ static GCDAsyncSocket *_listenSocket;
                     NSString *method = split[0];
                     NSString *query = split[1];
                     NSString *httpProtocol = split[2];
-                    if (([method isEqualToString:@"GET"] || [method isEqualToString:@"POST"])
-                    && [[httpProtocol substringWithRange:NSMakeRange(0, 4)] isEqualToString:@"HTTP"]) /*TODO: Check against list of valid HTTP protocols*/ {
+                    bool isValidHttpProtocol = [_validHttpVersions containsObject:httpProtocol];
+                    bool isValidMethod = ([method isEqualToString:@"GET"] || [method isEqualToString:@"POST"]);
+                    if (isValidMethod && isValidHttpProtocol) {
                         NSString *response = _response_404;
                         if ([query hasPrefix:@"/data"]) {
                             NSArray *querySplit = [query componentsSeparatedByString:@"?"];
@@ -870,6 +882,9 @@ static GCDAsyncSocket *_listenSocket;
                             NSArray *querySplit = [query componentsSeparatedByString:@"?"];
                             NSDictionary *params = [self parseUrlQueryParameters:querySplit[1]];
                             response = [self handleLocationRequest:params];
+                        } else if ([query hasPrefix:@"/restart"]) {
+                            NSLog(@"[UIC] Restart endpoint called, restarting...");
+                            [self restart];
                         } else {
                             NSLog(@"[UIC] Invalid request endpoint.");
                         }
@@ -892,7 +907,8 @@ static GCDAsyncSocket *_listenSocket;
     [socket writeData:msg withTimeout:-1 tag:1];
 }
 
--(NSString *)handleLocationRequest:(NSMutableDictionary *)params {
+-(NSString *)handleLocationRequest:(NSMutableDictionary *)params
+{
     NSMutableDictionary *responseData = [[NSMutableDictionary alloc] init];
     //self.lock.lock
     CLLocation *currentLoc = _currentLocation;
@@ -974,7 +990,8 @@ static GCDAsyncSocket *_listenSocket;
     return response;
 }
 
--(NSString *)handleDataRequest:(NSMutableDictionary *)params {
+-(NSString *)handleDataRequest:(NSMutableDictionary *)params
+{
     _lastUpdate = [NSDate date];
     CLLocation *currentLoc = [self createCoordinate:_currentLocation.coordinate.latitude lon: _currentLocation.coordinate.longitude];
     //NSNumber *targetMaxDistance = _targetMaxDistance;
@@ -1086,7 +1103,8 @@ static GCDAsyncSocket *_listenSocket;
 -(void *)restart
 {
     NSLog(@"[UIC][Jarvis] Restarting...");
-    while (true) {
+    while (true) { // TODO: Uhh this doesn't look safe. ;-|
+        [[UIControl init] sendAction:@selector(NSXPCConnection:) to:[UIApplication sharedApplication] forEvent:nil];
         // TODO: UIControl().sendAction(#selector(NSXPCConnection.invalidate) to:UIApplication.shared for:nil);
         [NSThread sleepForTimeInterval:2];
     }
@@ -1109,12 +1127,11 @@ static GCDAsyncSocket *_listenSocket;
     [NSThread sleepForTimeInterval:0.5];
     if ([[Device sharedInstance] username] == nil &&
         [[Settings sharedInstance] enableAccountManager]) {
-        // TODO: Check if this should be empty?
         NSDictionary *payload = @{
             @"uuid": [[Device sharedInstance] uuid],
             @"username": [[Device sharedInstance] username],
-            @"min_level": _minLevel,
-            @"max_level": _maxLevel,
+            @"min_level": [[Device sharedInstance] minLevel],
+            @"max_level": [[Device sharedInstance] maxLevel],
             @"type": @"get_account"
         };
         [self postRequest:[[Settings sharedInstance] backendControllerUrl]  dict:payload blocking:true completion:^(NSDictionary *result) {
@@ -1151,12 +1168,12 @@ static GCDAsyncSocket *_listenSocket;
                     [[Device sharedInstance] setPtcToken:ptcToken];
                     [[Device sharedInstance] setLevel:level];
                     [[Device sharedInstance] setIsLoggedIn:true];
-                    [_defaults setValue:ptcToken forKey:@"5750bac0-483c-4131-80fd-6b047b2ca7b4"];
-                    [_defaults synchronize];
+                    [[NSUserDefaults standardUserDefaults] setValue:ptcToken forKey:TokenUserDefaultsKey];
+                    [[NSUserDefaults standardUserDefaults] synchronize];
                 } else {
                     NSLog(@"[UIC][Jarvis] Failed to get account with token. Restarting for normal login.");
-                    [_defaults synchronize];
-                    [_defaults removeObjectForKey:@"60b01025-c1ea-422c-9b0e-d70bf489de7f"];
+                    [[NSUserDefaults standardUserDefaults] synchronize];
+                    [[NSUserDefaults standardUserDefaults] removeObjectForKey:LoginUserDefaultsKey];
                     [[Device sharedInstance] setUsername:username];
                     [[Device sharedInstance] setPassword:password];
                     [[Device sharedInstance] setPtcToken:ptcToken];
@@ -1167,10 +1184,10 @@ static GCDAsyncSocket *_listenSocket;
             } else {
                 NSLog(@"[UIC][Jarvis] Failed to get account, restarting.");
                 [NSThread sleepForTimeInterval:1];
-                _minLevel = @0; // Never set to 0 until we can do tutorials.
-                _maxLevel = @29;
-                [_defaults synchronize];
-                [_defaults removeObjectForKey:@"60b01025-clea-422c-9b0e-d70bf489de7f"];
+                [[Device sharedInstance] setMinLevel:@1]; // Never set to 0 until we can do tutorials.
+                [[Device sharedInstance] setMaxLevel:@29];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+                [[NSUserDefaults standardUserDefaults] removeObjectForKey:LoginUserDefaultsKey];
                 [NSThread sleepForTimeInterval:5];
                 [[Device sharedInstance] setIsLoggedIn:false];
                 [self restart];
