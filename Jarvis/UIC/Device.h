@@ -20,4 +20,19 @@
 -(NSString *)osVersion;
 -(NSNumber *)multiplier;
 
+-(NSString *)username;
+-(NSString *)password;
+-(NSString *)ptcToken;
+-(NSNumber *)level;
+-(BOOL)isLoggedIn;
+-(BOOL)shouldExit;
+
+
+-(void)setUsername:(NSString *)username;
+-(void)setPassword:(NSString *)password;
+-(void)setPtcToken:(NSString *)ptcToken;
+-(void)setLevel:(NSNumber *)level;
+-(void)setIsLoggedIn:(BOOL)isLoggedIn;
+-(void)setShouldExit:(BOOL)shouldExit;
+
 @end

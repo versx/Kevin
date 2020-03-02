@@ -15,6 +15,13 @@ static NSString *_osName;
 static NSString *_osVersion;
 static NSNumber *_multiplier;
 
+static NSString *_username;
+static NSString *_password;
+static NSString *_ptcToken;
+static NSNumber *_level;
+static BOOL _isLoggedIn;
+static BOOL _shouldExit;
+
 -(NSString *)uuid {
     return _uuid;
 }
@@ -29,6 +36,44 @@ static NSNumber *_multiplier;
 }
 -(NSNumber *)multiplier {
     return _multiplier;
+}
+
+-(NSString *)username {
+    return _username;
+}
+-(NSString *)password {
+    return _password;
+}
+-(NSString *)ptcToken {
+    return _ptcToken;
+}
+-(NSNumber *)level {
+    return _level;
+}
+-(BOOL)isLoggedIn {
+    return _isLoggedIn;
+}
+-(BOOL)shouldExit {
+    return _shouldExit;
+}
+
+-(void)setUsername:(NSString *)username {
+    _username = username;
+}
+-(void)setPassword:(NSString *)password {
+    _password = password;
+}
+-(void)setPtcToken:(NSString *)ptcToken {
+    _ptcToken = ptcToken;
+}
+-(void)setLevel:(NSNumber *)level {
+    _level = level;
+}
+-(void)setIsLoggedIn:(BOOL)isLoggedIn {
+    _isLoggedIn = isLoggedIn;
+}
+-(void)setShouldExit:(BOOL)shouldExit {
+    _shouldExit = shouldExit;
 }
 
 +(Device *)sharedInstance
