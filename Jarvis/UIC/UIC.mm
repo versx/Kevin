@@ -33,9 +33,6 @@ using namespace std;
 static BOOL _firststart = true;
 static BOOL _startup = true;
 
-static NSString *_backend = @"http://10.0.1.100:9001";
-static NSString *_backendControllerUrl = [_backend stringByAppendingString:@"/controler"];
-static NSString *_backendRawUrl = [_backend stringByAppendingString:@"/raw"];
 static NSString *_localUrl = @"http://localhost:8080/loc";
 static BOOL _started = false;
 static CLLocation *_currentLocation;
@@ -43,12 +40,11 @@ static BOOL _waitRequiresPokemon = false;
 static BOOL _waitForData = false;
 //lock = NSLock();
 static NSDate *_firstWarningDate;
-static NSNumber *_jitterCorner = 0;
+static NSNumber *_jitterCorner = @0;
 static BOOL _gotQuest = false;
 static BOOL _gotIV = false;
 static NSNumber *_noQuestCount = @0;
 static NSNumber *_noEncounterCount = @0;
-static NSNumber *_targetMaxDistance = @250.0;
 static NSNumber *_emptyGmoCount = @0;
 static NSString *_pokemonEncounterId;
 static NSString *_action;
@@ -87,7 +83,7 @@ static BOOL _newLogIn;
 static BOOL _newCreated;
 static BOOL _needsLogout;
 static NSNumber *_minLevel = @0;
-static NSNumber *_maxLevel = @(29);
+static NSNumber *_maxLevel = @29;
 static NSDate *_eggStart;
 
 static NSString *_response_200 = @"HTTP/1.1 200 OK\nContent-Type: text/json; charset=utf-8\n\n";
@@ -99,17 +95,7 @@ static double _baseVerticalAccuracy = 200.0; // in meters
 
 @implementation UIC2
 
-static NSDictionary *_uicSettings;
-static NSNumber *_port = @(8080);
 static GCDAsyncSocket *_listenSocket;
-
-+(NSNumber *)port {
-    return _port;
-}
-
-+(NSDictionary *)uicSettings {
-    return _uicSettings;
-}
 
 -(id)init
 {
@@ -121,7 +107,7 @@ static GCDAsyncSocket *_listenSocket;
     return self;
 }
 
--(void *)start:(NSNumber *)port
+-(void *)start
 {
     NSLog(@"[UIC] start");
     NSLog(@"-----------------------------");
@@ -131,9 +117,8 @@ static GCDAsyncSocket *_listenSocket;
     NSLog(@"[UIC] Device OS Version: %@", [[Device sharedInstance] osVersion]);
     NSLog(@"-----------------------------");
     NSLog(@"[UIC] Loading UIC settings...");
-    _uicSettings = [[Settings sharedInstance] config];
+    [[Settings sharedInstance] config];
     
-    _port = port;
     bool started = false;
     NSNumber *startTryCount = @1;
     // Try to start the HTTP listener, attempt 5 times on failure.
@@ -161,7 +146,7 @@ static GCDAsyncSocket *_listenSocket;
             @"username": [[Device sharedInstance] username],
             @"type": @"heatbeat"
         };
-        [self postRequest:_backendControllerUrl dict:data blocking:false completion:^(NSDictionary *result) {}];
+        [self postRequest:[[Settings sharedInstance] backendControllerUrl]  dict:data blocking:false completion:^(NSDictionary *result) {}];
         while (heatbeatRunning) {
             // Check if time since last checking was within 2 minutes, if not reboot device.
             [NSThread sleepForTimeInterval:15];
@@ -190,10 +175,11 @@ static GCDAsyncSocket *_listenSocket;
     NSLog(@"[UIC] startListener");
     _listenSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     NSError *error = nil;
-    if (![_listenSocket acceptOnPort:[_port intValue] error:&error]) {
-        NSLog(@"[UIC] Failed to start webserver listener on port %@:\r\nError:%@", _port, error);
+    NSNumber *port = [[Settings sharedInstance] port];
+    if (![_listenSocket acceptOnPort:[port intValue] error:&error]) {
+        NSLog(@"[UIC] Failed to start webserver listener on port %@:\r\nError:%@", port, error);
     }
-    NSLog(@"[UIC] Listening at localhost on port %@", _port);
+    NSLog(@"[UIC] Listening at localhost on port %@", port);
     return 0;
 }
 
@@ -277,7 +263,7 @@ static GCDAsyncSocket *_listenSocket;
                             @"username": [[Device sharedInstance] username],
                             @"type": @"account_banned"
                         };
-                        [self postRequest:_backendControllerUrl dict:data blocking:true completion:^(NSDictionary *result) {}];
+                        [self postRequest:[[Settings sharedInstance] backendControllerUrl]  dict:data blocking:true completion:^(NSDictionary *result) {}];
                         [self logout];
                     }
                     
@@ -290,7 +276,7 @@ static GCDAsyncSocket *_listenSocket;
                             @"username": [[Device sharedInstance] username],
                             @"type": @"account_banned" // TODO: Uhhh should be account_invalid_credentials no?
                         };
-                        [self postRequest:_backendControllerUrl dict:data blocking:true completion:^(NSDictionary *result) {}];
+                        [self postRequest:[[Settings sharedInstance] backendControllerUrl]  dict:data blocking:true completion:^(NSDictionary *result) {}];
                         [self logout];
                     }
                     
@@ -301,7 +287,7 @@ static GCDAsyncSocket *_listenSocket;
                             @"username": [[Device sharedInstance] username],
                             @"type": @"account_invalid_credentials"
                         };
-                        [self postRequest:_backendControllerUrl dict:data blocking:true completion:^(NSDictionary *result) {}];
+                        [self postRequest:[[Settings sharedInstance] backendControllerUrl]  dict:data blocking:true completion:^(NSDictionary *result) {}];
                         [self logout];
                     }
                     
@@ -320,7 +306,7 @@ static GCDAsyncSocket *_listenSocket;
                 [NSThread sleepForTimeInterval:1];
                 NSDictionary *dictPtcToken = @{
                 };
-                [self postRequest:_backendControllerUrl dict:dictPtcToken blocking:true completion:^(NSDictionary *result) {}];
+                [self postRequest:[[Settings sharedInstance] backendControllerUrl]  dict:dictPtcToken blocking:true completion:^(NSDictionary *result) {}];
                 NSLog(@"");
                 [self clickButton:@"TrackerButton"];
                 _startup = false;
@@ -350,7 +336,7 @@ static GCDAsyncSocket *_listenSocket;
             @"username": [[Device sharedInstance] username],
             @"type": @"init"
         };
-        [self postRequest:_backendControllerUrl dict:initData blocking:true completion:^(NSDictionary *result) {
+        [self postRequest:[[Settings sharedInstance] backendControllerUrl]  dict:initData blocking:true completion:^(NSDictionary *result) {
             if (result == nil) {
                 NSLog(@"[UIC] Failed to connect to backend!");
                 [NSThread sleepForTimeInterval:5];
@@ -389,7 +375,7 @@ static GCDAsyncSocket *_listenSocket;
         
         if (([[Device sharedInstance] username] == nil ||
              [[[Device sharedInstance] username] isEqualToString:@"fail"]) &&
-             [_uicSettings objectForKey:@"enableAccountManager"] ?: false) {
+             [[Settings sharedInstance] enableAccountManager]) {
             NSDictionary *getAccountData = @{
                 @"uuid": [[Device sharedInstance] uuid],
                 @"username": [[Device sharedInstance] username],
@@ -397,7 +383,7 @@ static GCDAsyncSocket *_listenSocket;
                 @"max_level": _maxLevel,
                 @"type": @"get_account"
             };
-            [self postRequest:_backendControllerUrl dict:getAccountData blocking:true completion:^(NSDictionary *result) {
+            [self postRequest:[[Settings sharedInstance] backendControllerUrl]  dict:getAccountData blocking:true completion:^(NSDictionary *result) {
                 NSDictionary *data = [result objectForKey:@"data"];
                 if (data != nil) {
                     NSString *username = [data objectForKey:@"username"];
@@ -458,7 +444,7 @@ static GCDAsyncSocket *_listenSocket;
                     @"username": [[Device sharedInstance] username],
                     @"type": @"get_job"
                 };
-                [self postRequest:_backendControllerUrl dict:getJobData blocking:true completion:^(NSDictionary *result) {
+                [self postRequest:[[Settings sharedInstance] backendControllerUrl]  dict:getJobData blocking:true completion:^(NSDictionary *result) {
                     if (result == nil) {
                         if ([_failedGetJobCount intValue] == 10) {
                             NSLog(@"[UIC] Failed to get job 10 times in a row. Exiting...");
@@ -517,7 +503,7 @@ static GCDAsyncSocket *_listenSocket;
                                     @"ptcToken": _ptcToken,
                                     @"type": @"ptcToken"
                                 };
-                                [self postRequest:_backendControllerUrl dict:tokenData blocking:true completion:^(NSDictionary *result) {}];
+                                [self postRequest:[[Settings sharedInstance] backendControllerUrl]  dict:tokenData blocking:true completion:^(NSDictionary *result) {}];
                                 NSLog(@"[UIC][Jarvis] Received ptcToken, swapping account...");
                                 [self logout];
                             }
@@ -526,12 +512,12 @@ static GCDAsyncSocket *_listenSocket;
                             NSLog(@"[UIC] Unknown Action: %@", action);
                         }
                         
-                        if (_emptyGmoCount >= [_uicSettings objectForKey:@"maxEmptyGMO"] ?: 50) {
+                        if (_emptyGmoCount >= [[Settings sharedInstance] maxEmptyGMO]) {
                             NSLog(@"[UIC] Got Empty GMO %@ times in a row. Restarting...", _emptyGmoCount);
                             [self restart];
                         }
                         
-                        if (_failedCount >= [_uicSettings objectForKey:@"maxFailedCount"] ?: 5) {
+                        if (_failedCount >= [[Settings sharedInstance] maxFailedCount]) {
                             NSLog(@"[UIC] Failed %@ times in a row. Restarting...", _failedCount);
                             [self restart];
                         }
@@ -604,7 +590,8 @@ static GCDAsyncSocket *_listenSocket;
     }
     */
     
-    if (delay >= [_uicSettings objectForKey:@"minDelayLogout"] ?: @180.0 && [[Settings sharedInstance] enableAccountManager]) {
+    if (delay >= [[Settings sharedInstance] minDelayLogout] &&
+                 [[Settings sharedInstance] enableAccountManager]) {
         NSLog(@"[UIC] Switching account. Delay too large.");
         NSDictionary *questData = @{
             @"uuid": [[Device sharedInstance] uuid],
@@ -613,7 +600,7 @@ static GCDAsyncSocket *_listenSocket;
             @"lon": lon,
             @"type": @"job_failed"
         };
-        [self postRequest:_backendControllerUrl dict:questData blocking:true completion:^(NSDictionary *result) {}];
+        [self postRequest:[[Settings sharedInstance] backendControllerUrl]  dict:questData blocking:true completion:^(NSDictionary *result) {}];
         //self.lock.lock();
         _currentLocation = _startupLocation;
         //self.lock.unlock();
@@ -626,7 +613,7 @@ static GCDAsyncSocket *_listenSocket;
     _currentLocation = [self createCoordinate:[lat doubleValue] lon:[lon doubleValue]];
     _waitRequiresPokemon = false;
     _pokemonEncounterId = nil;
-    _targetMaxDistance = [_uicSettings objectForKey:@"targetMaxDistance"] ?: @250.0;
+    //_targetMaxDistance = [[Settings sharedInstance] targetMaxDistance];
     _waitForData = true;
     //self.lock.unlock();
     NSLog(@"[UIC] Scanning prepared");
@@ -660,7 +647,7 @@ static GCDAsyncSocket *_listenSocket;
             continue;
         }
         //self.lock.lock();
-        NSNumber *raidMaxTime = [_uicSettings objectForKey:@"raidMaxTime"] ?: @25.0;
+        NSNumber *raidMaxTime = [[Settings sharedInstance] raidMaxTime];
         NSNumber *totalDelay = @([raidMaxTime doubleValue] + [delay doubleValue]);
         if (!found && timeIntervalSince >= [totalDelay doubleValue]) {
             locked = false;
@@ -675,7 +662,7 @@ static GCDAsyncSocket *_listenSocket;
                 @"lon": lon,
                 @"type": @"job_failed"
             };
-            [self postRequest:_backendControllerUrl dict:failedData blocking:true completion:^(NSDictionary *result) {}];
+            [self postRequest:[[Settings sharedInstance] backendControllerUrl]  dict:failedData blocking:true completion:^(NSDictionary *result) {}];
         } else {
             locked = _waitForData;
             if (!locked) {
@@ -697,7 +684,7 @@ static GCDAsyncSocket *_listenSocket;
         }
         _gotQuest = false;
         
-        if (_noQuestCount >= ([_uicSettings objectForKey:@"maxNoQuestCount"] ?: @5)) {
+        if (_noQuestCount >= [[Settings sharedInstance] maxNoQuestCount]) {
             //self.lock.unlock();
             NSLog(@"[UIC] Stuck somewhere. Restarting...");
             [self logout];
@@ -730,8 +717,11 @@ static GCDAsyncSocket *_listenSocket;
 
 -(void)handleRaidJob:(NSDictionary *)data hasWarning:(BOOL)hasWarning {
     NSTimeInterval timeSince = [[NSDate date] timeIntervalSinceDate:_firstWarningDate];
-    NSNumber *maxWarningTimeRaid = ([_uicSettings objectForKey:@"maxWarningTimeRaid"] ?: @432000);
-    if (hasWarning && _firstWarningDate != nil && timeSince >= [maxWarningTimeRaid intValue] && [[Settings sharedInstance] enableAccountManager]) {
+    NSNumber *maxWarningTimeRaid = [[Settings sharedInstance] maxWarningTimeRaid];
+    if (hasWarning &&
+        _firstWarningDate != nil &&
+        timeSince >= [maxWarningTimeRaid intValue] &&
+        [[Settings sharedInstance] enableAccountManager]) {
         NSLog(@"[UIC] Account has warning and is over maxWarningTimeRaid (%@). Logging out!", maxWarningTimeRaid);
         //self.lock.lock();
         _currentLocation = _startupLocation;
@@ -747,13 +737,13 @@ static GCDAsyncSocket *_listenSocket;
     //self.lock.lock();
     _currentLocation = [self createCoordinate:[lat doubleValue] lon:[lon doubleValue]];
     _waitRequiresPokemon = false;
-    _targetMaxDistance = [_uicSettings objectForKey:@"targetMaxDistance"] ?: @250.0;
+    //_targetMaxDistance = [[Settings sharedInstance] targetMaxDistance];
     _waitForData = true;
     //self.lock.unlock();
     NSLog(@"[UIC] Scanning prepared.");
     
     BOOL locked = true;
-    NSNumber *raidMaxTime = [_uicSettings objectForKey:@"raidMaxTime"] ?: @25.0;
+    NSNumber *raidMaxTime = [[Settings sharedInstance] raidMaxTime];
     while (locked) {
         //self.lock.lock();
         NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:start];
@@ -769,7 +759,7 @@ static GCDAsyncSocket *_listenSocket;
                 @"lon": lon,
                 @"type": @"job_failed"
             };
-            [self postRequest:_backendControllerUrl dict:raidData blocking:true completion:^(NSDictionary *result) {}];
+            [self postRequest:[[Settings sharedInstance] backendControllerUrl]  dict:raidData blocking:true completion:^(NSDictionary *result) {}];
         } else {
             locked = _waitForData;
             if (!locked) {
@@ -798,7 +788,7 @@ static GCDAsyncSocket *_listenSocket;
     //self.lock.lock();
     _waitRequiresPokemon = true;
     _pokemonEncounterId = nil;
-    _targetMaxDistance = [_uicSettings objectForKey:@"targetMaxDistance"] ?: @250.0;
+    //_targetMaxDistance = [[Settings sharedInstance] targetMaxDistance];
     _currentLocation = [self createCoordinate:[lat doubleValue] lon:[lon doubleValue]];
     _waitForData = true;
     //self.lock.unlock();
@@ -817,12 +807,12 @@ static GCDAsyncSocket *_listenSocket;
             NSDictionary *failedData = @{
                 @"uuid": [[Device sharedInstance] uuid],
                 @"username": [[Device sharedInstance] username],
-                @"action": @"scan_pokemon",
+                @"action": _action,// TODO: @"scan_pokemon",
                 @"lat": lat,
                 @"lon": lon,
                 @"type": @"job_failed"
             };
-            [self postRequest:_backendControllerUrl dict:failedData blocking:true completion:^(NSDictionary *result) {}];
+            [self postRequest:[[Settings sharedInstance] backendControllerUrl]  dict:failedData blocking:true completion:^(NSDictionary *result) {}];
         }
     }
 }
@@ -863,7 +853,7 @@ static GCDAsyncSocket *_listenSocket;
                     NSString *query = split[1];
                     NSString *httpProtocol = split[2];
                     if (([method isEqualToString:@"GET"] || [method isEqualToString:@"POST"])
-                    && [[httpProtocol substringWithRange:NSMakeRange(0, 4)] isEqualToString:@"HTTP"]) {
+                    && [[httpProtocol substringWithRange:NSMakeRange(0, 4)] isEqualToString:@"HTTP"]) /*TODO: Check against list of valid HTTP protocols*/ {
                         NSString *response = _response_404;
                         if ([query hasPrefix:@"/data"]) {
                             NSArray *querySplit = [query componentsSeparatedByString:@"?"];
@@ -902,7 +892,7 @@ static GCDAsyncSocket *_listenSocket;
     if (currentLoc != nil) {
         if (_waitRequiresPokemon) {
             //self.lock.unlock
-            NSNumber *jitterValue = [_uicSettings objectForKey:@"jitterValue"]; // TODO: Load from Settings
+            NSNumber *jitterValue = [[Settings sharedInstance] jitterValue];
             NSNumber *jitterLat;
             NSNumber *jitterLon;
             switch ([_jitterCorner intValue]) {
@@ -951,7 +941,7 @@ static GCDAsyncSocket *_listenSocket;
             [responseData setObject:currentLon forKey:@"lat"];
             [responseData setObject:currentLon forKey:@"lng"];
             
-            bool ultraQuests = [_uicSettings objectForKey:@"ultraQuests"] ?: false;
+            bool ultraQuests = [[Settings sharedInstance] ultraQuests];
             if (ultraQuests && [_action isEqualToString:@"scan_quest"] && _delayQuest) {
                 // Auto-spinning should only happen when ultraQuests is
                 // set and the instance is scan_quest type
@@ -980,7 +970,7 @@ static GCDAsyncSocket *_listenSocket;
 -(NSString *)handleDataRequest:(NSMutableDictionary *)params {
     _lastUpdate = [NSDate date];
     CLLocation *currentLoc = [self createCoordinate:_currentLocation.coordinate.latitude lon: _currentLocation.coordinate.longitude];
-    NSNumber *targetMaxDistance = _targetMaxDistance;
+    //NSNumber *targetMaxDistance = _targetMaxDistance;
     NSString *pokemonEncounterId = _pokemonEncounterId;
 
     if (_currentLocation == nil) {
@@ -988,32 +978,31 @@ static GCDAsyncSocket *_listenSocket;
     }
     [params setObject:@(currentLoc.coordinate.latitude) forKey:@"lat_target"];
     [params setObject:@(currentLoc.coordinate.longitude) forKey:@"lon_target"];
-    [params setObject:targetMaxDistance forKey:@"target_max_distance"];
+    [params setObject:[[Settings sharedInstance] targetMaxDistance] forKey:@"target_max_distance"];
     [params setObject:[[Device sharedInstance] username] ?: @"" forKey:@"username"];
     [params setObject:pokemonEncounterId ?: @"" forKey:@"pokemon_encounter_id"];
     [params setObject:[[Device sharedInstance] uuid] forKey:@"uuid"];
     [params setObject:_ptcToken ?: @"" forKey:@"ptcToken"];
 
-    NSString *url = _backendRawUrl;
-    // TODO: Post request
+    NSString *url = [[Settings sharedInstance] backendRawUrl];
     [self postRequest:url dict:params blocking:false completion:^(NSDictionary *result) {
         NSDictionary *data = [result objectForKey:@"data"];
         
         // TODO: Check if works, might need to use objectForKey instead
-        bool inArea = data[@"in_area"];
-        NSNumber *level = data[@"level"];// ?? 0;
-        NSNumber *nearby = data[@"nearby"];// ?? 0;
-        NSNumber *wild = data[@"wild"];// ?? 0;
-        NSNumber *quests = data[@"quests"];// ?? 0;
-        NSNumber *encounters = data[@"encounters"];// ?? 0;
-        NSNumber *pokemonLat = data[@"pokemon_lat"];// ?? 0.0;
-        NSNumber *pokemonLon = data[@"pokemon_lon"];// ?? 0.0;
-        NSString *pokemonEncounterIdResult = data[@"pokemon_encounter_id"];
-        NSNumber *targetLat = data[@"target_lat"];// ?? 0.0;
-        NSNumber *targetLon = data[@"target_lon"];// ?? 0.0;
-        bool onlyEmptyGmos = data[@"only_empty_gmos"];// ?? true;
-        bool onlyInvalidGmos = data[@"only_invalid_gmos"];// ?? false;
-        bool containsGmo = data[@"contains_gmos"];// ?? true;
+        bool inArea = [data objectForKey:@"in_area"] ?: false;
+        NSNumber *level = [data objectForKey:@"level"] ?: @0;
+        NSNumber *nearby = [data objectForKey:@"nearby"] ?: @0;
+        NSNumber *wild = [data objectForKey:@"wild"] ?: @0;
+        NSNumber *quests = [data objectForKey:@"quests"] ?: @0;
+        NSNumber *encounters = [data objectForKey:@"encounters"] ?: @0;
+        NSNumber *pokemonLat = [data objectForKey:@"pokemon_lat"] ?: @0.0;
+        NSNumber *pokemonLon = [data objectForKey:@"pokemon_lon"] ?: @0.0;
+        NSString *pokemonEncounterIdResult = [data objectForKey:@"pokemon_encounter_id"];
+        NSNumber *targetLat = [data objectForKey:@"target_lat"] ?: @0.0;
+        NSNumber *targetLon = [data objectForKey:@"target_lon"] ?: @0.0;
+        bool onlyEmptyGmos = [data objectForKey:@"only_empty_gmos"] ?: @true;
+        bool onlyInvalidGmos = [data objectForKey:@"only_invalid_gmos"] ?: false;
+        bool containsGmo = [data objectForKey:@"contains_gmos"] ?: @true;
         
         NSNumber *pokemonFoundCount = [NSNumber numberWithFloat:([wild intValue] + [nearby intValue])];
         [[Device sharedInstance] setLevel:level];
@@ -1107,14 +1096,21 @@ static GCDAsyncSocket *_listenSocket;
         @"level": [[Device sharedInstance] level],
         @"type": @"logged_out"
     };
-    [self postRequest:_backendControllerUrl dict:dict blocking:true completion:nil];
+    [self postRequest:[[Settings sharedInstance] backendControllerUrl]  dict:dict blocking:true completion:nil];
     [[Device sharedInstance] setUsername:nil];
     [[Device sharedInstance] setPassword:nil];
     [NSThread sleepForTimeInterval:0.5];
-    if ([[Device sharedInstance] username] == nil && [_uicSettings objectForKey:@"enableAccountManager"] ?: false) {
+    if ([[Device sharedInstance] username] == nil &&
+        [[Settings sharedInstance] enableAccountManager]) {
+        // TODO: Check if this should be empty?
         NSDictionary *payload = @{
+            @"uuid": [[Device sharedInstance] uuid],
+            @"username": [[Device sharedInstance] username],
+            @"min_level": _minLevel,
+            @"max_level": _maxLevel,
+            @"type": @"get_account"
         };
-        [self postRequest:_backendControllerUrl dict:payload blocking:true completion:^(NSDictionary *result) {
+        [self postRequest:[[Settings sharedInstance] backendControllerUrl]  dict:payload blocking:true completion:^(NSDictionary *result) {
             NSDictionary *data = [dict objectForKey:@"data"];
             if (data != nil) {
                 NSString *username = [data objectForKey:@"username"];

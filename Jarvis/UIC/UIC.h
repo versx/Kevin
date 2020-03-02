@@ -6,9 +6,9 @@
 //
 
 @interface UIC2 : NSObject
-@property (class, nonatomic, assign, readonly) NSNumber *port;
+//@property (class, nonatomic, assign, readonly) NSNumber *port;
 
--(void *)start:(NSNumber *)port;
+-(void *)start;
 -(void *)startListener;
 -(void *)startUicLoop;
 -(NSString *)handleDataRequest:(NSDictionary *)params;

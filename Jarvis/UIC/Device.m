@@ -22,6 +22,7 @@ static NSNumber *_level;
 static BOOL _isLoggedIn;
 static BOOL _shouldExit;
 
+// Device information
 -(NSString *)uuid {
     return _uuid;
 }
@@ -38,6 +39,7 @@ static BOOL _shouldExit;
     return _multiplier;
 }
 
+// Device account settings
 -(NSString *)username {
     return _username;
 }
