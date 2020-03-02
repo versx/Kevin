@@ -23,6 +23,7 @@ static NSNumber *_maxNoQuestCount;
 static NSNumber *_maxWarningTimeRaid;
 static NSNumber *_minDelayLogout;
 static BOOL _ultraQuests;
+static BOOL _deployEggs;
 
 static NSString *plistFileName = @"uic.plist";
 
@@ -69,6 +70,9 @@ static NSString *plistFileName = @"uic.plist";
 -(BOOL)ultraQuests {
     return _ultraQuests;
 }
+-(BOOL)deployEggs {
+    return _deployEggs;
+}
 
 +(Settings *)sharedInstance
 {
@@ -89,6 +93,7 @@ static NSString *plistFileName = @"uic.plist";
         _maxWarningTimeRaid = [_config objectForKey:@"maxWarningTimeRaid"] ?: @432000;
         _minDelayLogout = [_config objectForKey:@"minDelayLogout"] ?: @180.0;
         _ultraQuests = [_config objectForKey:@"ultraQuests"] ?: false;
+        _deployEggs = [_config objectForKey:@"deployEggs"] ?: false;
     });
     return sharedInstance;
 }

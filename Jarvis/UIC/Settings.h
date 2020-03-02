@@ -25,5 +25,6 @@
 -(NSNumber *)maxWarningTimeRaid;
 -(NSNumber *)minDelayLogout;
 -(BOOL)ultraQuests;
+-(BOOL)deployEggs;
 
 @end

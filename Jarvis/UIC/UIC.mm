@@ -23,7 +23,6 @@
 using namespace std;
 
 // TODO: Remote config
-// TODO: Move UicSettings to its own class.
 // TODO: Move device/account specific settings to its own class.
 // TODO: PTFakeTouch
 // TODO: KIF library
@@ -552,6 +551,18 @@ static GCDAsyncSocket *_listenSocket;
     return @"";
 }
 
+-(BOOL)eggDeploy
+{
+    // TODO: EggDeploy
+    return false;
+}
+
+-(BOOL)getToMainScreen
+{
+    // TODO: getToMainScreen
+    return false;
+}
+
 -(void)handleQuestJob:(NSDictionary *)data hasWarning:(BOOL)hasWarning {
     _delayQuest = true;
     NSNumber *lat = [data objectForKey:@"lat"];
@@ -567,28 +578,29 @@ static GCDAsyncSocket *_listenSocket;
         [self logout];
     }
     
-    /*
     // TODO: EggDeploy
-    if ([_uicSettings objectForKey:@"deployEggs"] ?: false && eggStart < [NSDate date] && [_level intValue] >= 9 && [_level intValue] < 30) {
-        NSNumber *i = [NSNumber random:in[0...60]];
+    if ([[Settings sharedInstance] deployEggs] &&
+        _eggStart < [NSDate date] &&
+        [[[Device sharedInstance] level] intValue] >= 9 &&
+        [[[Device sharedInstance] level] intValue] < 30) {
+        NSNumber *i = @(arc4random_uniform(60));
         [NSThread sleepForTimeInterval:2];
-        if (getToMainScreen()) {
+        if ([self getToMainScreen]) {
             NSLog(@"[UIC] Deploying an egg");
-            if (eggDeploy()) {
+            if ([self eggDeploy]) {
                 // If an egg was found, set the timer to 31 minutes.
-                eggStart = [[NSDate date] initWithTimeInterval:1860+i sinceDate:[NSDate date]];
+                _eggStart = [[NSDate date] initWithTimeInterval:(1860 + [i intValue]) sinceDate:[NSDate date]];
             } else {
                 // If no egg was used, set the timer to 16 minutes so it rechecks.
                 // Useful if you get more eggs from leveling up.
-                eggStart = [[NSDate date] initWithTimeInterval:960+i sinceDate:[NSDate date]];
+                _eggStart = [[NSDate date] initWithTimeInterval:(960 + [i intValue]) sinceDate:[NSDate date]];
             }
-            NSLog(@"[UIC] Egg timer set to %@ UTC for a recheck.", eggStart);
+            NSLog(@"[UIC] Egg timer set to %@ UTC for a recheck.", _eggStart);
         } else {
-            eggStart = [[NSDate date] initWithTimeInterval:960+i sinceDate:[NSDate date]];
+            _eggStart = [[NSDate date] initWithTimeInterval:(960 + [i intValue]) sinceDate:[NSDate date]];
         }
-        NSLog(@"[UIC] Egg timer set to %@ UTC for a recheck.", eggStart);
+        NSLog(@"[UIC] Egg timer set to %@ UTC for a recheck.", _eggStart);
     }
-    */
     
     if (delay >= [[Settings sharedInstance] minDelayLogout] &&
                  [[Settings sharedInstance] enableAccountManager]) {
@@ -708,11 +720,6 @@ static GCDAsyncSocket *_listenSocket;
             }
         }
     }
-}
-
--(NSNumber *)incrementInt:(NSNumber *)value
-{
-    return [NSNumber numberWithInt:[value intValue] + 1];
 }
 
 -(void)handleRaidJob:(NSDictionary *)data hasWarning:(BOOL)hasWarning {
@@ -1265,6 +1272,11 @@ static GCDAsyncSocket *_listenSocket;
                           verticalAccuracy:_baseVerticalAccuracy
                                  timestamp:[NSDate date]];
     return location;
+}
+
+-(NSNumber *)incrementInt:(NSNumber *)value
+{
+    return [NSNumber numberWithInt:[value intValue] + 1];
 }
 
 @end
