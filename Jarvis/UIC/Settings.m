@@ -10,10 +10,15 @@
 @implementation Settings
 
 static NSDictionary *_config;
+static BOOL _enableAccountManager;
 static NSString *plistFileName = @"uic.plist";
 
 -(NSDictionary *)config {
     return _config;
+}
+
+-(BOOL)enableAccountManager {
+    return _enableAccountManager;
 }
 
 +(Settings *)sharedInstance
@@ -23,6 +28,7 @@ static NSString *plistFileName = @"uic.plist";
     dispatch_once(&onceToken, ^{
         sharedInstance = [[Settings alloc] init];
         _config = [sharedInstance loadSettings];
+        _enableAccountManager = [_config objectForKey:@""] ?: false;
     });
     return sharedInstance;
 }

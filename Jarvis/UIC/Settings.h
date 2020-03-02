@@ -11,5 +11,6 @@
 
 // TODO: Individual settings
 -(NSDictionary *)config;
+-(BOOL)enableAccountManager;
 
 @end

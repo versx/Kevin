@@ -24,6 +24,11 @@
 using namespace std;
 
 // TODO: Remote config
+// TODO: Move UicSettings to its own class.
+// TODO: Move device/account specific settings to its own class.
+// TODO: PTFakeTouch
+// TODO: KIF library
+// TODO: StateManager class
 
 static BOOL _firststart = true;
 static BOOL _startup = true;
@@ -62,6 +67,9 @@ static BOOL _newPlayerButton = false;
 static BOOL _bannedScreen = false;
 static BOOL _invalidScreen = false;
 
+static NSNumber *_failedGetJobCount;
+static NSNumber *_failedCount;
+
 static NSNumber *_startupLat = @0.0;
 static NSNumber *_startupLon = @0.0;
 static CLLocation *_startupLocation;
@@ -70,7 +78,9 @@ static NSNumber *_lastEncounterLon = @0.0;
 static NSDate *_lastUpdate;
 static BOOL _delayQuest = false;
 static BOOL _gotQuestEarly = false;
-static NSString *_friendName = @"";
+
+// Mizu Leveling
+static BOOL _isQuestInit = false;
 
 // TODO: UIC properties
 static BOOL _shouldExit;
@@ -82,6 +92,7 @@ static BOOL _newCreated;
 static BOOL _needsLogout;
 static NSNumber *_minLevel = @0;
 static NSNumber *_maxLevel = @(29);
+static NSDate *_eggStart;
 
 static NSString *_response_200 = @"HTTP/1.1 200 OK\nContent-Type: text/json; charset=utf-8\n\n";
 static NSString *_response_400 = @"HTTP/1.1 400 Bad Request\nContent-Type: text/json; charset=utf-8\n\n";
@@ -138,7 +149,7 @@ static GCDAsyncSocket *_listenSocket;
                 NSLog(@"[UIC] Fatal error, failed to start server: %@. Try (%@/5)", exception, startTryCount);
                 
                 NSLog(@"[UIC] Failed to start server: %@. Try (%@/5). Trying again in 5 seconds.", exception, startTryCount);
-                startTryCount = [NSNumber numberWithInt:[startTryCount intValue] + 1];
+                startTryCount = [self incrementInt:startTryCount];
                 [NSThread sleepForTimeInterval:5];
             }
         }
@@ -192,7 +203,7 @@ static GCDAsyncSocket *_listenSocket;
 
 -(void *)startUicLoop {
     NSLog(@"[UIC] startUicLoop");
-    NSDate *eggStart = [NSDate date]; //Date(timeInterval:-1860, since: Date());
+    _eggStart = [[NSDate date] initWithTimeInterval:-1860 sinceDate:[NSDate date]];
     // Init AI
     //initJarvis();
     
@@ -200,8 +211,14 @@ static GCDAsyncSocket *_listenSocket;
           [[Device sharedInstance] model],
           [[Device sharedInstance] multiplier]
     );
-    dispatch_queue_t heatbeatQueue = dispatch_queue_create("state_queue", NULL);
-    dispatch_async(heatbeatQueue, ^{
+    [self loginStateHandler];
+    
+    return 0;
+}
+
+-(void *)loginStateHandler {
+    dispatch_queue_t loginStateQueue = dispatch_queue_create("login_state_queue", NULL);
+    dispatch_async(loginStateQueue, ^{
         NSNumber *startupCount = 0;
         while (_startup) {
             if (!_firststart) {
@@ -218,7 +235,7 @@ static GCDAsyncSocket *_listenSocket;
                         NSNumber *ptcTryCount = 0;
                         while (!ptcButton) {
                             ptcButton = [self clickButton:@"TrainerClubButton"];
-                            ptcTryCount = [NSNumber numberWithInt:[ptcTryCount intValue] + 1];
+                            ptcTryCount = [self incrementInt:ptcTryCount];
                             if ([ptcTryCount intValue] > 10) {
                                 _newPlayerButton = [self clickButton:@"NewPlayerButton"];
                                 ptcTryCount = 0;
@@ -302,7 +319,7 @@ static GCDAsyncSocket *_listenSocket;
                         NSLog(@"");
                         [self logout];
                     }
-                    startupCount = [NSNumber numberWithInt:[startupCount intValue] + 1];
+                    startupCount = [self incrementInt:startupCount];
                 }
                 
                 [NSThread sleepForTimeInterval:1];
@@ -318,13 +335,225 @@ static GCDAsyncSocket *_listenSocket;
             }
         }
     });
-    
+    //dispatch_release(loginStateQueue);
+    return 0;
+}
+
+-(void *)gameStateHandler {
+    // TODO: qos: background dispatch
+    dispatch_queue_t gameStateQueue = dispatch_queue_create("game_state_queue", NULL);
+    dispatch_async(gameStateQueue, ^{
+        bool hasWarning = false;
+        _failedGetJobCount = 0;
+        _failedCount = 0;
+        _emptyGmoCount = 0;
+        _noEncounterCount = 0;
+        _noQuestCount = 0;
+        
+        NSDictionary *initData = @{
+            @"uuid": [[Device sharedInstance] uuid],
+            @"username": _username,
+            @"type": @"init"
+        };
+        [self postRequest:_backendControllerUrl dict:initData blocking:true completion:^(NSDictionary *result) {
+            if (result == nil) {
+                NSLog(@"[UIC] Failed to connect to backend!");
+                [NSThread sleepForTimeInterval:5];
+                [self restart];
+            } else if (![([result objectForKey:@"status"] ?: @"fail") isEqualToString:@"ok"]) {
+                NSString *error = [result objectForKey:@"error"] ?: @"? (No error sent)";
+                NSLog(@"[UIC] Backend returned error: %@", error);
+                _shouldExit = true;
+            }
+            
+            NSDictionary *data = [result objectForKey:@"data"];
+            if (data == nil) {
+                NSLog(@"[UIC] Backend did not include data in response.");
+                _shouldExit = true;
+            }
+            
+            if (!([data objectForKey:@"assigned"] ?: false)) {
+                NSLog(@"[UIC] Device is not assigned to an instance!");
+                _shouldExit = true;
+            }
+            
+            NSNumber *firstWarningTimestamp = [data objectForKey:@"first_warning_timestamp"];
+            if (firstWarningTimestamp != nil) {
+                _firstWarningDate = [NSDate dateWithTimeIntervalSince1970:[firstWarningTimestamp doubleValue]];
+            }
+            
+            NSLog(@"[UIC] Connected to backend successfully!");
+            _shouldExit = false;
+        }];
+        
+        if (_shouldExit) {
+            _shouldExit = false;
+            [NSThread sleepForTimeInterval:5];
+            [self restart];
+        }
+        
+        if ((_username == nil || [_username isEqualToString:@"fail"]) && [_uicSettings objectForKey:@"enableAccountManager"] ?: false) {
+            NSDictionary *getAccountData = @{
+                @"uuid": [[Device sharedInstance] uuid],
+                @"username": _username,
+                @"min_level": _minLevel,
+                @"max_level": _maxLevel,
+                @"type": @"get_account"
+            };
+            [self postRequest:_backendControllerUrl dict:getAccountData blocking:true completion:^(NSDictionary *result) {
+                NSDictionary *data = [result objectForKey:@"data"];
+                if (data != nil) {
+                    NSString *username = [data objectForKey:@"username"];
+                    NSString *password = [data objectForKey:@"password"];
+                    NSNumber *level = [data objectForKey:@"level"];
+                    NSDictionary *job = [data objectForKey:@"job"];
+                    NSNumber *startLat = [job objectForKey:@"lat"];
+                    NSNumber *startLon = [job objectForKey:@"lon"];
+                    NSNumber *lastLat = [data objectForKey:@"last_encounter_lat"];
+                    NSNumber *lastLon = [data objectForKey:@"last_encounter_lon"];
+                    
+                    if (username != nil) {
+                        NSLog(@"[UIC] Got account %@ level %@ from backend.", username, level);
+                    } else {
+                        NSLog(@"[UIC] Failed to get account and not logged in.");
+                        _shouldExit = true;
+                    }
+                    _username = username;
+                    _password = password;
+                    _level = level;
+                    _isLoggedIn = false;
+                    if ([startLat doubleValue] != 0.0 && [startLon doubleValue] != 0.0) {
+                        _startupLocation = [self createCoordinate:[startLat doubleValue] lon:[startLon doubleValue]];
+                    } else if ([lastLat doubleValue] != 0.0 && [lastLon doubleValue] != 0.0) {
+                        _startupLocation = [self createCoordinate:[lastLat doubleValue] lon:[lastLon doubleValue]];
+                    } else {
+                        _startupLocation = [self createCoordinate:[startLat doubleValue] lon:[startLon doubleValue]];
+                    }
+                    _currentLocation = _startupLocation;
+                    NSLog(@"[UIC] StartupLocation: %@", _startupLocation);
+                    NSNumber *firstWarningTimestamp = [data objectForKey:@"first_warning_timestamp"];
+                    if (firstWarningTimestamp != nil) {
+                        _firstWarningDate = [NSDate dateWithTimeIntervalSince1970:[firstWarningTimestamp doubleValue]];
+                    }
+                } else {
+                    NSLog(@"[UIC] Failed to get account and not logged in.");
+                    _minLevel = @1; // Never set to 0 until we can complete tutorials.
+                    _maxLevel = @29;
+                    [NSThread sleepForTimeInterval:1];
+                    NSUserDefaults *defaults = [[NSUserDefaults alloc] init];
+                    [defaults removeObjectForKey:@"60b01025-clea-422c-9b0e-d70bf489de7f"];
+                    [NSThread sleepForTimeInterval:5];
+                    _isLoggedIn = false;
+                    [self restart];
+                }
+            }];
+        }
+        
+        while (!_shouldExit) {
+            while (!_startup) {
+                if (_needsLogout) {
+                    //self.lock.lock();
+                    _currentLocation = _startupLocation;
+                    //self.lock.unlock();
+                    [self logout];
+                }
+                NSDictionary *getJobData = @{
+                    @"uuid": [[Device sharedInstance] uuid],
+                    @"username": _username,
+                    @"type": @"get_job"
+                };
+                [self postRequest:_backendControllerUrl dict:getJobData blocking:true completion:^(NSDictionary *result) {
+                    if (result == nil) {
+                        if ([_failedGetJobCount intValue] == 10) {
+                            NSLog(@"[UIC] Failed to get job 10 times in a row. Exiting...");
+                            _shouldExit = true;
+                        } else {
+                            NSLog(@"[UIC] Failed to get a job.");
+                        }
+                    } else if ([[Settings sharedInstance] enableAccountManager]) {
+                        NSDictionary *data = [result objectForKey:@"data"];
+                        if (data != nil) {
+                            NSNumber *minLevel = [data objectForKey:@"min_level"];
+                            NSNumber *maxLevel = [data objectForKey:@"max_level"];
+                            _minLevel = minLevel;
+                            _maxLevel = maxLevel;
+                            if (_level != 0 && (_level < minLevel || _level > maxLevel)) {
+                                NSLog(@"[UIC] Account is outside min/max level. Current: %@ Min/Max: %@/%@. Logging out!", _level, minLevel, maxLevel);
+                                //self.lock.lock();
+                                _currentLocation = _startupLocation;
+                                [self logout];
+                                //self.lock.unlock();
+                            }
+                        }
+                    }
+                    
+                    _failedGetJobCount = 0;
+                    NSDictionary *data = [result objectForKey:@"data"];
+                    if (data != nil) {
+                        NSString *action = [data objectForKey:@"action"];
+                        _action = action;
+                        if ([action isEqualToString:@"scan_pokemon"]) {
+                            NSLog(@"[UIC][STATUS] Pokemon");
+                            [self handlePokemonJob:data hasWarning:hasWarning];
+                        } else if ([action isEqualToString:@"scan_raid"]) {
+                            NSLog(@"[UIC][STATUS] Raid");
+                            [self handleRaidJob:data hasWarning:hasWarning];
+                        } else if ([action isEqualToString:@"scan_quest"]) {
+                            NSLog(@"[UIC][STATUS] Quest/Leveling");
+                            [self handleQuestJob:data hasWarning:hasWarning];
+                        } else if ([action isEqualToString:@"switch_account"]) {
+                            NSLog(@"[UIC][STATUS] Switching Accounts");
+                            _username = nil;
+                            _isLoggedIn = false;
+                            _isQuestInit = false;
+                            // TODO: UserDefaults.synchronize
+                            [self logout];
+                        } else if ([action isEqualToString:@"scan_iv"]) {
+      
+                        } else if ([action isEqualToString:@"gather_token"]) {
+                            NSLog(@"[UIC][STATUS] Token");
+                            if (_menuButton) {
+                                _menuButton = false;
+                                NSDictionary *tokenData = @{
+                                    @"uuid": [[Device sharedInstance] uuid],
+                                    @"username": _username,
+                                    @"ptcToken": _ptcToken,
+                                    @"type": @"ptcToken"
+                                };
+                                [self postRequest:_backendControllerUrl dict:tokenData blocking:true completion:^(NSDictionary *result) {}];
+                                NSLog(@"[UIC][Jarvis] Received ptcToken, swapping account...");
+                                [self logout];
+                            }
+      
+                        } else {
+                            NSLog(@"[UIC] Unknown Action: %@", action);
+                        }
+                        
+                        if (_emptyGmoCount >= [_uicSettings objectForKey:@"maxEmptyGMO"] ?: 50) {
+                            NSLog(@"[UIC] Got Empty GMO %@ times in a row. Restarting...", _emptyGmoCount);
+                            [self restart];
+                        }
+                        
+                        if (_failedCount >= [_uicSettings objectForKey:@"maxFailedCount"] ?: 5) {
+                            NSLog(@"[UIC] Failed %@ times in a row. Restarting...", _failedCount);
+                            [self restart];
+                        }
+                    } else {
+                        _failedGetJobCount = 0;
+                        NSLog(@"[UIC] No job left (Result: %@)", result);
+                        [NSThread sleepForTimeInterval:5];
+                    }
+                }];
+            }
+        }
+    });
+    //dispatch_release(gameStateQueue);
     return 0;
 }
 
 -(BOOL)clickButton:(NSString *)buttonName
 {
-    // TODO: Parse button name, check coordinates list, simulate touch.
+    // TODO: clickButton
     return YES;
 }
 
@@ -336,7 +565,269 @@ static GCDAsyncSocket *_listenSocket;
 
 -(NSString *)getMenuButton
 {
+    // TODO: getMenuButton
     return @"";
+}
+
+-(void)handleQuestJob:(NSDictionary *)data hasWarning:(BOOL)hasWarning {
+    _delayQuest = true;
+    NSNumber *lat = [data objectForKey:@"lat"];
+    NSNumber *lon = [data objectForKey:@"lon"];
+    NSNumber *delay = [data objectForKey:@"delay"];
+    NSLog(@"[UIC] Scanning for Quest at %@ %@ in %@ seconds", lat, lon, delay);
+    
+    if (hasWarning && _firstWarningDate != nil && [NSDate date]) {
+        NSLog(@"[UIC] Account has a warning and is over maxWarningTimeRaid. Logging out!");
+        //self.lock.lock();
+        _currentLocation = _startupLocation;
+        //self.lock.unlock();
+        [self logout];
+    }
+    
+    /*
+    // TODO: EggDeploy
+    if ([_uicSettings objectForKey:@"deployEggs"] ?: false && eggStart < [NSDate date] && [_level intValue] >= 9 && [_level intValue] < 30) {
+        NSNumber *i = [NSNumber random:in[0...60]];
+        [NSThread sleepForTimeInterval:2];
+        if (getToMainScreen()) {
+            NSLog(@"[UIC] Deploying an egg");
+            if (eggDeploy()) {
+                // If an egg was found, set the timer to 31 minutes.
+                eggStart = [[NSDate date] initWithTimeInterval:1860+i sinceDate:[NSDate date]];
+            } else {
+                // If no egg was used, set the timer to 16 minutes so it rechecks.
+                // Useful if you get more eggs from leveling up.
+                eggStart = [[NSDate date] initWithTimeInterval:960+i sinceDate:[NSDate date]];
+            }
+            NSLog(@"[UIC] Egg timer set to %@ UTC for a recheck.", eggStart);
+        } else {
+            eggStart = [[NSDate date] initWithTimeInterval:960+i sinceDate:[NSDate date]];
+        }
+        NSLog(@"[UIC] Egg timer set to %@ UTC for a recheck.", eggStart);
+    }
+    */
+    
+    if (delay >= [_uicSettings objectForKey:@"minDelayLogout"] ?: @180.0 && [[Settings sharedInstance] enableAccountManager]) {
+        NSLog(@"[UIC] Switching account. Delay too large.");
+        NSDictionary *questData = @{
+            @"uuid": [[Device sharedInstance] uuid],
+            @"action": _action,
+            @"lat": lat,
+            @"lon": lon,
+            @"type": @"job_failed"
+        };
+        [self postRequest:_backendControllerUrl dict:questData blocking:true completion:^(NSDictionary *result) {}];
+        //self.lock.lock();
+        _currentLocation = _startupLocation;
+        //self.lock.unlock();
+        [self logout];
+    }
+    
+    _newCreated = false;
+    
+    //self.lock.lock();
+    _currentLocation = [self createCoordinate:[lat doubleValue] lon:[lon doubleValue]];
+    _waitRequiresPokemon = false;
+    _pokemonEncounterId = nil;
+    _targetMaxDistance = [_uicSettings objectForKey:@"targetMaxDistance"] ?: @250.0;
+    _waitForData = true;
+    //self.lock.unlock();
+    NSLog(@"[UIC] Scanning prepared");
+    
+    NSDate *start = [NSDate date];
+    BOOL success = false;
+    BOOL locked = true;
+    BOOL found = false;
+    while (locked) {
+        usleep(100000);
+        NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:start];
+        if (timeIntervalSince <= 5) {
+            continue;
+        }
+        if (!found && (timeIntervalSince <= [delay doubleValue])) {
+            NSNumber *left = @([delay doubleValue] - timeIntervalSince);
+            //NSNumber *delayDouble = [NSNumber numberWithDouble:[delay doubleValue]];
+            //NSDate *end = [[NSDate date] initWithTimeIntervalSince1970:[delayDouble doubleValue]];
+            NSLog(@"[UIC] Delaying by %@ seconds.", left);
+
+            while (!found && (timeIntervalSince <= [delay doubleValue])) {
+                //self.lock.lock();
+                locked = _gotQuestEarly;
+                //self.lock.unlock();
+                if (locked) {
+                    usleep(100000);
+                } else {
+                    found = true;
+                }
+            }
+            continue;
+        }
+        //self.lock.lock();
+        NSNumber *raidMaxTime = [_uicSettings objectForKey:@"raidMaxTime"] ?: @25.0;
+        NSNumber *totalDelay = @([raidMaxTime doubleValue] + [delay doubleValue]);
+        if (!found && timeIntervalSince >= [totalDelay doubleValue]) {
+            locked = false;
+            _waitForData = false;
+            _failedCount = [self incrementInt:_failedCount];
+            NSLog(@"[UIC] Pokestop loading timed out.");
+            // TODO: Pass 'action' to method, don't use global _action incase of race condition.
+            NSDictionary *failedData = @{
+                @"uuid": [[Device sharedInstance] uuid],
+                @"action": _action,
+                @"lat": lat,
+                @"lon": lon,
+                @"type": @"job_failed"
+            };
+            [self postRequest:_backendControllerUrl dict:failedData blocking:true completion:^(NSDictionary *result) {}];
+        } else {
+            locked = _waitForData;
+            if (!locked) {
+                _delayQuest = true;
+                success = true;
+                _failedCount = 0;
+                NSLog(@"[UIC] Pokestop loaded after %f", timeIntervalSince);
+            }
+        }
+        //self.lock.unlock();
+    }
+
+    if ([_action isEqualToString:@"scan_quest"]) {
+        //self.lock.lock();
+        if (_gotQuest) {
+            _noQuestCount = 0;
+        } else {
+            _noQuestCount = [self incrementInt:_noQuestCount];
+        }
+        _gotQuest = false;
+        
+        if (_noQuestCount >= ([_uicSettings objectForKey:@"maxNoQuestCount"] ?: @5)) {
+            //self.lock.unlock();
+            NSLog(@"[UIC] Stuck somewhere. Restarting...");
+            [self logout];
+        }
+        
+        //self.lock.unlock();
+        if (success) {
+            NSNumber *attempts = 0;
+            while ([attempts intValue] < 5) {
+                attempts = [self incrementInt:attempts];
+                //self.lock.lock();
+                NSLog(@"[UIC] Got quest data: %@", _gotQuest ? @"Yes" : @"No");
+                if (!_gotQuest) {
+                    NSLog(@"[UIC] UltraQuests pokestop re-attempt: %@", attempts);
+                    //self.lock.unlock();
+                    [NSThread sleepForTimeInterval:2];
+                } else {
+                    //self.lock.unlock();
+                    //break;
+                }
+            }
+        }
+    }
+}
+
+-(NSNumber *)incrementInt:(NSNumber *)value
+{
+    return [NSNumber numberWithInt:[value intValue] + 1];
+}
+
+-(void)handleRaidJob:(NSDictionary *)data hasWarning:(BOOL)hasWarning {
+    NSTimeInterval timeSince = [[NSDate date] timeIntervalSinceDate:_firstWarningDate];
+    NSNumber *maxWarningTimeRaid = ([_uicSettings objectForKey:@"maxWarningTimeRaid"] ?: @432000);
+    if (hasWarning && _firstWarningDate != nil && timeSince >= [maxWarningTimeRaid intValue] && [[Settings sharedInstance] enableAccountManager]) {
+        NSLog(@"[UIC] Account has warning and is over maxWarningTimeRaid (%@). Logging out!", maxWarningTimeRaid);
+        //self.lock.lock();
+        _currentLocation = _startupLocation;
+        [self logout];
+        //self.lock.unlock();
+    }
+    
+    NSNumber *lat = [data objectForKey:@"lat"] ?: 0;
+    NSNumber *lon = [data objectForKey:@"lon"] ?: 0;
+    NSLog(@"[UIC] Scanning for Raid at %@ %@", lat, lon);
+    
+    NSDate *start = [NSDate date];
+    //self.lock.lock();
+    _currentLocation = [self createCoordinate:[lat doubleValue] lon:[lon doubleValue]];
+    _waitRequiresPokemon = false;
+    _targetMaxDistance = [_uicSettings objectForKey:@"targetMaxDistance"] ?: @250.0;
+    _waitForData = true;
+    //self.lock.unlock();
+    NSLog(@"[UIC] Scanning prepared.");
+    
+    BOOL locked = true;
+    NSNumber *raidMaxTime = [_uicSettings objectForKey:@"raidMaxTime"] ?: @25.0;
+    while (locked) {
+        //self.lock.lock();
+        NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:start];
+        if (timeIntervalSince >= [raidMaxTime intValue]) {
+            locked = false;
+            _waitForData = false;
+            _failedCount = [self incrementInt:_failedCount];
+            NSLog(@"[UIC] Raids loading timed out.");
+            NSDictionary *raidData = @{
+                @"uuid": [[Device sharedInstance] uuid],
+                @"action": @"scan_raid",
+                @"lat": lat,
+                @"lon": lon,
+                @"type": @"job_failed"
+            };
+            [self postRequest:_backendControllerUrl dict:raidData blocking:true completion:^(NSDictionary *result) {}];
+        } else {
+            locked = _waitForData;
+            if (!locked) {
+                _failedCount = 0;
+                NSLog(@"[UIC] Raids loaded after %f", timeIntervalSince);
+            }
+        }
+        //self.lock.unlock();
+    }
+}
+
+-(void)handlePokemonJob:(NSDictionary *)data hasWarning:(BOOL)hasWarning {
+    if (hasWarning && [[Settings sharedInstance] enableAccountManager]) {
+        NSLog(@"[UIC] Account has a warning and tried to scan for Pokemon. Logging out!");
+        //self.lock.lock();
+        _currentLocation = _startupLocation;
+        [self logout];
+        //self.lock.unlock();
+    }
+    
+    NSNumber *lat = [data objectForKey:@"lat"];
+    NSNumber *lon = [data objectForKey:@"lon"];
+    NSLog(@"[UIC] Scanning for Pokemon at %@ %@", lat, lon);
+    
+    NSDate *start = [NSDate date];
+    //self.lock.lock();
+    _waitRequiresPokemon = true;
+    _pokemonEncounterId = nil;
+    _targetMaxDistance = [_uicSettings objectForKey:@"targetMaxDistance"] ?: @250.0;
+    _currentLocation = [self createCoordinate:[lat doubleValue] lon:[lon doubleValue]];
+    _waitForData = true;
+    //self.lock.unlock();
+    NSLog(@"[UIC] Scanning prepared");
+    
+    BOOL locked = true;
+    while (locked) {
+        [NSThread sleepForTimeInterval:1];
+        //self.lock.lock();
+        NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:start];
+        if (timeIntervalSince >= 30) {
+            locked = false;
+            _waitForData = false;
+            _failedCount = [self incrementInt:_failedCount];
+            NSLog(@"[UIC] Pokemon loading timed out.");
+            NSDictionary *failedData = @{
+                @"uuid": [[Device sharedInstance] uuid],
+                @"username": _username,
+                @"action": @"scan_pokemon",
+                @"lat": lat,
+                @"lon": lon,
+                @"type": @"job_failed"
+            };
+            [self postRequest:_backendControllerUrl dict:failedData blocking:true completion:^(NSDictionary *result) {}];
+        }
+    }
 }
 
 #pragma GCDAsyncSocket
@@ -572,7 +1063,7 @@ static GCDAsyncSocket *_listenSocket;
                     _waitForData = false;
                 }
             } else if (onlyEmptyGmos && !_startup) {
-                _emptyGmoCount = [NSNumber numberWithInt:[_emptyGmoCount intValue] + 1];
+                _emptyGmoCount = [self incrementInt:_emptyGmoCount];
                 toPrint = @"[UIC] Got Empty Data";
             } else {
                 _emptyGmoCount = 0;
