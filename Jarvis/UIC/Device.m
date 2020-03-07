@@ -15,7 +15,7 @@ static NSString *_osName;
 static NSString *_osVersion;
 static NSNumber *_multiplier;
 
-static NSString *_username;
+static NSString *_username = @"";
 static NSString *_password;
 static NSString *_ptcToken;
 static NSNumber *_level;
@@ -43,6 +43,10 @@ static BOOL _shouldExit;
 
 // Device account settings
 -(NSString *)username {
+    if ([_username isEqualToString:@""]) {
+        NSLog(@"[UIC] USERNAME IS NULL");
+        //return @"FAIL";
+    }
     return _username;
 }
 -(NSString *)password {

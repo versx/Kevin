@@ -6,7 +6,6 @@
 //
 
 #import "Jarvis__.h"
-#import "../UIC/UIC.h"
 
 @implementation Jarvis__
 
@@ -17,7 +16,7 @@
     {
         NSLog(@"[Jarvis] initializing...");
         UIC2 *uic = [[UIC2 alloc] init];
-        [uic start:@8080];
+        [uic start];
         NSLog(@"[Jarvis] started...");
     }
     

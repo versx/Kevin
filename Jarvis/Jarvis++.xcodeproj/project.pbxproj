@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C0025AA52414170C007813F7 /* HttpServer.m in Sources */ = {isa = PBXBuildFile; fileRef = C0025AA42414170C007813F7 /* HttpServer.m */; };
+		C0025AA72414171C007813F7 /* HttpServer.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AA62414171C007813F7 /* HttpServer.h */; };
+		C0025AAB2414175C007813F7 /* HttpServerProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AAA2414175C007813F7 /* HttpServerProtocol.h */; };
+		C0025AAE241421E9007813F7 /* Utils.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AAD241421E9007813F7 /* Utils.h */; };
+		C0025AB0241421F4007813F7 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = C0025AAF241421F4007813F7 /* Utils.m */; };
+		C0025AB224143917007813F7 /* DeviceState.m in Sources */ = {isa = PBXBuildFile; fileRef = C0025AB124143917007813F7 /* DeviceState.m */; };
+		C0025AB424143923007813F7 /* DeviceState.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AB324143923007813F7 /* DeviceState.h */; };
+		C0025AB7241447F3007813F7 /* HttpResponseCode.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AB6241447F3007813F7 /* HttpResponseCode.h */; };
 		C0132B56240B5DEC00719452 /* GCDAsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = C0132B52240B5DEC00719452 /* GCDAsyncUdpSocket.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		C0132B57240B5DEC00719452 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = C0132B53240B5DEC00719452 /* GCDAsyncSocket.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		C0132B58240B5DEC00719452 /* GCDAsyncUdpSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = C0132B54240B5DEC00719452 /* GCDAsyncUdpSocket.h */; };
@@ -25,8 +33,23 @@
 		C0AC1CF4240BB37C008F4DFB /* Device.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1CF3240BB37C008F4DFB /* Device.h */; };
 		C0AC1CF6240BB96C008F4DFB /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1CF5240BB96C008F4DFB /* Settings.m */; };
 		C0AC1CF8240BB97A008F4DFB /* Settings.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1CF7240BB97A008F4DFB /* Settings.h */; };
-		C0AC1D00240CA4FA008F4DFB /* RequestController.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1CFF240CA4FA008F4DFB /* RequestController.m */; };
-		C0AC1D02240CA50A008F4DFB /* RequestController.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1D01240CA50A008F4DFB /* RequestController.h */; };
+		C0AC1D3C240DA4C1008F4DFB /* PTFakeTouch.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1D29240DA4C1008F4DFB /* PTFakeTouch.h */; };
+		C0AC1D3D240DA4C1008F4DFB /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0AC1D2A240DA4C1008F4DFB /* IOKit.framework */; };
+		C0AC1D3E240DA4C1008F4DFB /* IOHIDEvent+KIF.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1D2C240DA4C1008F4DFB /* IOHIDEvent+KIF.h */; };
+		C0AC1D3F240DA4C1008F4DFB /* UIApplication-KIFAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1D2D240DA4C1008F4DFB /* UIApplication-KIFAdditions.h */; };
+		C0AC1D40240DA4C1008F4DFB /* UIWindow-KIFAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1D2E240DA4C1008F4DFB /* UIWindow-KIFAdditions.m */; };
+		C0AC1D41240DA4C1008F4DFB /* UITouch-KIFAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1D2F240DA4C1008F4DFB /* UITouch-KIFAdditions.m */; };
+		C0AC1D42240DA4C1008F4DFB /* UIView-KIFAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1D30240DA4C1008F4DFB /* UIView-KIFAdditions.h */; };
+		C0AC1D43240DA4C1008F4DFB /* UIEvent+KIFAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1D31240DA4C1008F4DFB /* UIEvent+KIFAdditions.h */; };
+		C0AC1D44240DA4C1008F4DFB /* UIWindow-KIFAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1D32240DA4C1008F4DFB /* UIWindow-KIFAdditions.h */; };
+		C0AC1D45240DA4C1008F4DFB /* UIApplication-KIFAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1D33240DA4C1008F4DFB /* UIApplication-KIFAdditions.m */; };
+		C0AC1D46240DA4C1008F4DFB /* FixCategoryBug.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1D34240DA4C1008F4DFB /* FixCategoryBug.h */; };
+		C0AC1D47240DA4C1008F4DFB /* IOHIDEvent+KIF.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1D35240DA4C1008F4DFB /* IOHIDEvent+KIF.m */; };
+		C0AC1D48240DA4C1008F4DFB /* UIView-KIFAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1D36240DA4C1008F4DFB /* UIView-KIFAdditions.m */; };
+		C0AC1D49240DA4C1008F4DFB /* UITouch-KIFAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1D37240DA4C1008F4DFB /* UITouch-KIFAdditions.h */; };
+		C0AC1D4A240DA4C1008F4DFB /* UIEvent+KIFAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1D38240DA4C1008F4DFB /* UIEvent+KIFAdditions.m */; };
+		C0AC1D4B240DA4C1008F4DFB /* LoadableCategory.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1D39240DA4C1008F4DFB /* LoadableCategory.h */; };
+		C0AC1D4C240DA4C1008F4DFB /* PTFakeTouch.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1D3A240DA4C1008F4DFB /* PTFakeTouch.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -43,6 +66,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C0025AA42414170C007813F7 /* HttpServer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HttpServer.m; sourceTree = "<group>"; };
+		C0025AA62414171C007813F7 /* HttpServer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HttpServer.h; sourceTree = "<group>"; };
+		C0025AAA2414175C007813F7 /* HttpServerProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HttpServerProtocol.h; sourceTree = "<group>"; };
+		C0025AAD241421E9007813F7 /* Utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
+		C0025AAF241421F4007813F7 /* Utils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Utils.m; sourceTree = "<group>"; };
+		C0025AB124143917007813F7 /* DeviceState.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceState.m; sourceTree = "<group>"; };
+		C0025AB324143923007813F7 /* DeviceState.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceState.h; sourceTree = "<group>"; };
+		C0025AB6241447F3007813F7 /* HttpResponseCode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HttpResponseCode.h; sourceTree = "<group>"; };
 		C0132B52240B5DEC00719452 /* GCDAsyncUdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncUdpSocket.m; sourceTree = "<group>"; };
 		C0132B53240B5DEC00719452 /* GCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
 		C0132B54240B5DEC00719452 /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
@@ -68,8 +99,24 @@
 		C0AC1CF5240BB96C008F4DFB /* Settings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Settings.m; sourceTree = "<group>"; };
 		C0AC1CF7240BB97A008F4DFB /* Settings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Settings.h; sourceTree = "<group>"; };
 		C0AC1CF9240BDAC6008F4DFB /* uic.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = uic.plist; sourceTree = "<group>"; };
-		C0AC1CFF240CA4FA008F4DFB /* RequestController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RequestController.m; sourceTree = "<group>"; };
-		C0AC1D01240CA50A008F4DFB /* RequestController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RequestController.h; sourceTree = "<group>"; };
+		C0AC1D29240DA4C1008F4DFB /* PTFakeTouch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTFakeTouch.h; sourceTree = "<group>"; };
+		C0AC1D2A240DA4C1008F4DFB /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = IOKit.framework; sourceTree = "<group>"; };
+		C0AC1D2C240DA4C1008F4DFB /* IOHIDEvent+KIF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IOHIDEvent+KIF.h"; sourceTree = "<group>"; };
+		C0AC1D2D240DA4C1008F4DFB /* UIApplication-KIFAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIApplication-KIFAdditions.h"; sourceTree = "<group>"; };
+		C0AC1D2E240DA4C1008F4DFB /* UIWindow-KIFAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIWindow-KIFAdditions.m"; sourceTree = "<group>"; };
+		C0AC1D2F240DA4C1008F4DFB /* UITouch-KIFAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITouch-KIFAdditions.m"; sourceTree = "<group>"; };
+		C0AC1D30240DA4C1008F4DFB /* UIView-KIFAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView-KIFAdditions.h"; sourceTree = "<group>"; };
+		C0AC1D31240DA4C1008F4DFB /* UIEvent+KIFAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIEvent+KIFAdditions.h"; sourceTree = "<group>"; };
+		C0AC1D32240DA4C1008F4DFB /* UIWindow-KIFAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIWindow-KIFAdditions.h"; sourceTree = "<group>"; };
+		C0AC1D33240DA4C1008F4DFB /* UIApplication-KIFAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIApplication-KIFAdditions.m"; sourceTree = "<group>"; };
+		C0AC1D34240DA4C1008F4DFB /* FixCategoryBug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FixCategoryBug.h; sourceTree = "<group>"; };
+		C0AC1D35240DA4C1008F4DFB /* IOHIDEvent+KIF.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "IOHIDEvent+KIF.m"; sourceTree = "<group>"; };
+		C0AC1D36240DA4C1008F4DFB /* UIView-KIFAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView-KIFAdditions.m"; sourceTree = "<group>"; };
+		C0AC1D37240DA4C1008F4DFB /* UITouch-KIFAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITouch-KIFAdditions.h"; sourceTree = "<group>"; };
+		C0AC1D38240DA4C1008F4DFB /* UIEvent+KIFAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIEvent+KIFAdditions.m"; sourceTree = "<group>"; };
+		C0AC1D39240DA4C1008F4DFB /* LoadableCategory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoadableCategory.h; sourceTree = "<group>"; };
+		C0AC1D3A240DA4C1008F4DFB /* PTFakeTouch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTFakeTouch.m; sourceTree = "<group>"; };
+		C0AC1D3B240DA4C1008F4DFB /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +129,7 @@
 				C0132B62240B630000719452 /* CFNetwork.framework in Frameworks */,
 				C01B4983240AD01E00633B45 /* CoreLocation.framework in Frameworks */,
 				C01B4965240ACF5D00633B45 /* Foundation.framework in Frameworks */,
+				C0AC1D3D240DA4C1008F4DFB /* IOKit.framework in Frameworks */,
 				C01B4967240ACF5D00633B45 /* UIKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -89,6 +137,35 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C0025AA3241416DE007813F7 /* Net */ = {
+			isa = PBXGroup;
+			children = (
+				C0025AA62414171C007813F7 /* HttpServer.h */,
+				C0025AA42414170C007813F7 /* HttpServer.m */,
+				C0025AAA2414175C007813F7 /* HttpServerProtocol.h */,
+				C0025AB6241447F3007813F7 /* HttpResponseCode.h */,
+			);
+			path = Net;
+			sourceTree = "<group>";
+		};
+		C0025AAC241421D5007813F7 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				C0025AAD241421E9007813F7 /* Utils.h */,
+				C0025AAF241421F4007813F7 /* Utils.m */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		C0025AB52414393B007813F7 /* States */ = {
+			isa = PBXGroup;
+			children = (
+				C0025AB324143923007813F7 /* DeviceState.h */,
+				C0025AB124143917007813F7 /* DeviceState.m */,
+			);
+			path = States;
+			sourceTree = "<group>";
+		};
 		C0132B50240B5DEC00719452 /* GCD */ = {
 			isa = PBXGroup;
 			children = (
@@ -103,10 +180,14 @@
 		C01B4957240ACF5D00633B45 = {
 			isa = PBXGroup;
 			children = (
-				C0AC1CF9240BDAC6008F4DFB /* uic.plist */,
+				C0025AB52414393B007813F7 /* States */,
+				C0025AA3241416DE007813F7 /* Net */,
+				C0AC1D28240DA4C1008F4DFB /* PTFakeTouch */,
 				C0132B50240B5DEC00719452 /* GCD */,
-				C01B4968240ACF5D00633B45 /* Jarvis++ */,
 				C01B497D240ACF9400633B45 /* UIC */,
+				C01B4968240ACF5D00633B45 /* Jarvis++ */,
+				C0025AAC241421D5007813F7 /* Utilities */,
+				C0AC1CF9240BDAC6008F4DFB /* uic.plist */,
 				C01B4963240ACF5D00633B45 /* Frameworks */,
 				C01B4962240ACF5D00633B45 /* Products */,
 			);
@@ -196,10 +277,41 @@
 				C0AC1CF1240BB365008F4DFB /* Device.m */,
 				C0AC1CF7240BB97A008F4DFB /* Settings.h */,
 				C0AC1CF5240BB96C008F4DFB /* Settings.m */,
-				C0AC1D01240CA50A008F4DFB /* RequestController.h */,
-				C0AC1CFF240CA4FA008F4DFB /* RequestController.m */,
 			);
 			path = UIC;
+			sourceTree = "<group>";
+		};
+		C0AC1D28240DA4C1008F4DFB /* PTFakeTouch */ = {
+			isa = PBXGroup;
+			children = (
+				C0AC1D29240DA4C1008F4DFB /* PTFakeTouch.h */,
+				C0AC1D2A240DA4C1008F4DFB /* IOKit.framework */,
+				C0AC1D2B240DA4C1008F4DFB /* head */,
+				C0AC1D3A240DA4C1008F4DFB /* PTFakeTouch.m */,
+				C0AC1D3B240DA4C1008F4DFB /* Info.plist */,
+			);
+			path = PTFakeTouch;
+			sourceTree = "<group>";
+		};
+		C0AC1D2B240DA4C1008F4DFB /* head */ = {
+			isa = PBXGroup;
+			children = (
+				C0AC1D2C240DA4C1008F4DFB /* IOHIDEvent+KIF.h */,
+				C0AC1D2D240DA4C1008F4DFB /* UIApplication-KIFAdditions.h */,
+				C0AC1D2E240DA4C1008F4DFB /* UIWindow-KIFAdditions.m */,
+				C0AC1D2F240DA4C1008F4DFB /* UITouch-KIFAdditions.m */,
+				C0AC1D30240DA4C1008F4DFB /* UIView-KIFAdditions.h */,
+				C0AC1D31240DA4C1008F4DFB /* UIEvent+KIFAdditions.h */,
+				C0AC1D32240DA4C1008F4DFB /* UIWindow-KIFAdditions.h */,
+				C0AC1D33240DA4C1008F4DFB /* UIApplication-KIFAdditions.m */,
+				C0AC1D34240DA4C1008F4DFB /* FixCategoryBug.h */,
+				C0AC1D35240DA4C1008F4DFB /* IOHIDEvent+KIF.m */,
+				C0AC1D36240DA4C1008F4DFB /* UIView-KIFAdditions.m */,
+				C0AC1D37240DA4C1008F4DFB /* UITouch-KIFAdditions.h */,
+				C0AC1D38240DA4C1008F4DFB /* UIEvent+KIFAdditions.m */,
+				C0AC1D39240DA4C1008F4DFB /* LoadableCategory.h */,
+			);
+			path = head;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -210,10 +322,23 @@
 			buildActionMask = 2147483647;
 			files = (
 				C01B4980240ACF9400633B45 /* UIC.h in Headers */,
+				C0AC1D3C240DA4C1008F4DFB /* PTFakeTouch.h in Headers */,
+				C0AC1D3E240DA4C1008F4DFB /* IOHIDEvent+KIF.h in Headers */,
+				C0AC1D46240DA4C1008F4DFB /* FixCategoryBug.h in Headers */,
+				C0AC1D49240DA4C1008F4DFB /* UITouch-KIFAdditions.h in Headers */,
+				C0025AAB2414175C007813F7 /* HttpServerProtocol.h in Headers */,
 				C0AC1CF8240BB97A008F4DFB /* Settings.h in Headers */,
+				C0AC1D42240DA4C1008F4DFB /* UIView-KIFAdditions.h in Headers */,
+				C0AC1D3F240DA4C1008F4DFB /* UIApplication-KIFAdditions.h in Headers */,
 				C0132B58240B5DEC00719452 /* GCDAsyncUdpSocket.h in Headers */,
+				C0025AB7241447F3007813F7 /* HttpResponseCode.h in Headers */,
 				C01B4971240ACF5D00633B45 /* Jarvis__.h in Headers */,
-				C0AC1D02240CA50A008F4DFB /* RequestController.h in Headers */,
+				C0AC1D4B240DA4C1008F4DFB /* LoadableCategory.h in Headers */,
+				C0025AAE241421E9007813F7 /* Utils.h in Headers */,
+				C0AC1D44240DA4C1008F4DFB /* UIWindow-KIFAdditions.h in Headers */,
+				C0025AA72414171C007813F7 /* HttpServer.h in Headers */,
+				C0AC1D43240DA4C1008F4DFB /* UIEvent+KIFAdditions.h in Headers */,
+				C0025AB424143923007813F7 /* DeviceState.h in Headers */,
 				C0AC1CF4240BB37C008F4DFB /* Device.h in Headers */,
 				C0132B59240B5DEC00719452 /* GCDAsyncSocket.h in Headers */,
 			);
@@ -279,10 +404,19 @@
 				C0132B57240B5DEC00719452 /* GCDAsyncSocket.m in Sources */,
 				C01B4973240ACF5D00633B45 /* Jarvis__.m in Sources */,
 				C0AC1CF6240BB96C008F4DFB /* Settings.m in Sources */,
+				C0025AB0241421F4007813F7 /* Utils.m in Sources */,
+				C0AC1D48240DA4C1008F4DFB /* UIView-KIFAdditions.m in Sources */,
 				C0132B56240B5DEC00719452 /* GCDAsyncUdpSocket.m in Sources */,
 				C0AC1CF2240BB365008F4DFB /* Device.m in Sources */,
-				C0AC1D00240CA4FA008F4DFB /* RequestController.m in Sources */,
+				C0AC1D40240DA4C1008F4DFB /* UIWindow-KIFAdditions.m in Sources */,
+				C0AC1D4A240DA4C1008F4DFB /* UIEvent+KIFAdditions.m in Sources */,
+				C0025AB224143917007813F7 /* DeviceState.m in Sources */,
+				C0AC1D47240DA4C1008F4DFB /* IOHIDEvent+KIF.m in Sources */,
 				C01B4981240ACF9400633B45 /* UIC.mm in Sources */,
+				C0AC1D41240DA4C1008F4DFB /* UITouch-KIFAdditions.m in Sources */,
+				C0AC1D4C240DA4C1008F4DFB /* PTFakeTouch.m in Sources */,
+				C0025AA52414170C007813F7 /* HttpServer.m in Sources */,
+				C0AC1D45240DA4C1008F4DFB /* UIApplication-KIFAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -350,11 +484,19 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_PREFIX = lib;
-				FRAMEWORK_SEARCH_PATHS = "$(SDKROOT)/System/Library/PrivateFrameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/System/Library/PrivateFrameworks",
+					"$(PROJECT_DIR)/PTFakeTouch",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Jarvis++/Jarvis++-Prefix.pch";
 				INSTALL_PATH = "@rpath/";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+					"$(inherited)",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
 				USER_HEADER_SEARCH_PATHS = "$(PROJECTDIR)/**";
@@ -381,11 +523,19 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				EXECUTABLE_PREFIX = lib;
-				FRAMEWORK_SEARCH_PATHS = "$(SDKROOT)/System/Library/PrivateFrameworks";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/System/Library/PrivateFrameworks",
+					"$(PROJECT_DIR)/PTFakeTouch",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Jarvis++/Jarvis++-Prefix.pch";
 				INSTALL_PATH = "@rpath/";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+					"$(inherited)",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
 				SYSTEM_FRAMEWORK_SEARCH_PATHS = "";

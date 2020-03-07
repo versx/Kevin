@@ -10,6 +10,8 @@
 
 #include <sys/utsname.h>
 
+#import "Settings.h"
+
 @interface Device : NSObject
 
 +(instancetype)sharedInstance;

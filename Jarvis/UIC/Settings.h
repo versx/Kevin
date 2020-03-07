@@ -9,7 +9,6 @@
 
 +(instancetype)sharedInstance;
 
-// TODO: Individual settings
 -(NSDictionary *)config;
 
 -(BOOL)enableAccountManager;
@@ -26,5 +25,7 @@
 -(NSNumber *)minDelayLogout;
 -(BOOL)ultraQuests;
 -(BOOL)deployEggs;
+
+-(NSDictionary *)loadSettings;
 
 @end

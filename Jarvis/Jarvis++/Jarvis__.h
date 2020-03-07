@@ -7,6 +7,8 @@
 
 #import <Foundation/Foundation.h>
 
+#import "../UIC/UIC.h"
+
 @interface Jarvis__ : NSObject
 
 @end
