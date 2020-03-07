@@ -12,7 +12,6 @@
 static double _baseHorizontalAccuracy = 200.0; // in meters
 static double _baseVerticalAccuracy = 200.0; // in meters
 
-
 +(NSNumber *)incrementInt:(NSNumber *)value
 {
     return [NSNumber numberWithInt:[value intValue] + 1];
@@ -36,11 +35,10 @@ static double _baseVerticalAccuracy = 200.0; // in meters
     return location;
 }
 
-+(void *)postRequest:(NSString *)urlString dict:(NSDictionary *)data blocking:(BOOL)blocking completion:(void (^)(NSDictionary* result))completion
++(void)postRequest:(NSString *)urlString dict:(NSDictionary *)data blocking:(BOOL)blocking completion:(void (^)(NSDictionary* result))completion
 {
-    //dispatch_queue_t socketQueue = [_listenSocket delegateQueue];
-    dispatch_async(dispatch_get_main_queue(), ^{
-        @autoreleasepool {
+    //dispatch_async(dispatch_get_main_queue(), ^{
+    //    @autoreleasepool {
     BOOL done = false;
     NSDictionary *resultDict;
     
@@ -49,13 +47,11 @@ static double _baseVerticalAccuracy = 200.0; // in meters
     NSURLSession *defaultSession = [NSURLSession sessionWithConfiguration:defaultSessionConfiguration];
 
     // Setup the request with URL
-    //NSLog(@"[UIC][HTTP] Sending request to %@ with params %@", urlString, data);
+    //NSLog(@"[Utils] Sending request to %@ with params %@", urlString, data);
     NSURL *url = [NSURL URLWithString:urlString];
-    NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url];
-
-    // Convert POST string parameters to data using UTF8 Encoding
-    //NSString *postParams = @"api_key=APIKEY&email=example@example.com&password=password";
-    //NSData *postData = [postParams dataUsingEncoding:NSUTF8StringEncoding];
+    NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url
+                                                              cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                                          timeoutInterval:-1]; // 0.5
 
     NSError *error;
     NSData *postData = [NSJSONSerialization dataWithJSONObject:data options:0 error:&error];
@@ -100,9 +96,8 @@ static double _baseVerticalAccuracy = 200.0; // in meters
         }
         completion(resultDict);
     }
-        }
-    });
-    return 0;
+    //    }
+    //});
 }
 
 +(NSString *)buildResponse:(NSString *)data withResponseCode:(enum HttpResponseCode)responseCode
@@ -121,7 +116,7 @@ static double _baseVerticalAccuracy = 200.0; // in meters
                                                          error:&error];
 
     if (!jsonData) {
-        NSLog(@"%s: error: %@", __func__, error.localizedDescription);
+        NSLog(@"[Utils] %s: error: %@", __func__, error.localizedDescription);
         return @"{}";
     }
 

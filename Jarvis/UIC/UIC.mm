@@ -80,6 +80,12 @@ static HttpServer *_httpServer;
     return self;
 }
 
+-(void)dealloc {
+    [super dealloc];
+    _httpServer.delegate = nil;
+    _httpServer = nil;
+}
+
 #pragma App Management
 
 -(void)start
@@ -92,6 +98,9 @@ static HttpServer *_httpServer;
     NSLog(@"[UIC] Device OS Version: %@", [[Device sharedInstance] osVersion]);
     NSLog(@"-----------------------------");
     [[Settings sharedInstance] config];
+    
+    //UIColor *color = [Utils getPixelColor:0 withY:0];
+    //NSLog(@"[UIC] PixelColor: %@", color);
     
     //NSLog(@"Testing RESTART in 3 seconds...");
     //[NSThread sleepForTimeInterval:3];
@@ -110,13 +119,13 @@ static HttpServer *_httpServer;
 {
     bool heatbeatRunning = true;
     NSLog(@"[UIC] Starting heatbeat dispatch queue...");
+    NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
+    data[@"uuid"] = [[Device sharedInstance] uuid];
+    data[@"username"] = [[Device sharedInstance] username];
+    data[@"type"] = @"heartbeat";
+    [Utils postRequest:[[Settings sharedInstance] backendControllerUrl] dict:data blocking:false completion:^(NSDictionary *result) {}];
     dispatch_queue_t heatbeatQueue = dispatch_queue_create("heatbeat_queue", NULL);
     dispatch_async(heatbeatQueue, ^{
-        NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
-        data[@"uuid"] = [[Device sharedInstance] uuid];
-        data[@"username"] = [[Device sharedInstance] username];
-        data[@"type"] = @"heartbeat";
-        [Utils postRequest:[[Settings sharedInstance] backendControllerUrl] dict:data blocking:false completion:^(NSDictionary *result) {}];
         while (heatbeatRunning) {
             // Check if time since last checking was within 2 minutes, if not reboot device.
             [NSThread sleepForTimeInterval:15];

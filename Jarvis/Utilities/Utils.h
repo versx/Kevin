@@ -23,7 +23,7 @@
          withHorizontalAccuracy:(double)baseHorizontalAccuracy
                verticalAccuracy:(double)baseVerticalAccuracy;
 
-+(void *)postRequest:(NSString *)urlString
++(void)postRequest:(NSString *)urlString
                 dict:(NSDictionary *)data
             blocking:(BOOL)blocking
           completion:(void (^)(NSDictionary* result))completion;

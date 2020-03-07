@@ -31,6 +31,13 @@ static bool _isListening;
     return self;
 }
 
+-(void)dealloc {
+    [super dealloc];
+    self.delegate = nil;
+    _listenSocket = nil;
+    _isListening = false;
+}
+
 -(void)listen
 {
     NSLog(@"[HTTP] listen");
