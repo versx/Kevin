@@ -6,17 +6,7 @@
 //
 
 enum HttpResponseCode {
-//typedef enum {
     Success,
     BadRequest,
     NotFound
 };
-//} HttpResponseCode;
-
-/*
-enum httpResponseCode {
-    Success,
-    BadRequest,
-    NotFound
-};
-*/

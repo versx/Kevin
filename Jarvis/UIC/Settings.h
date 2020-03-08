@@ -14,6 +14,7 @@
 -(BOOL)enableAccountManager;
 -(NSString *)backendControllerUrl;
 -(NSString *)backendRawUrl;
+-(NSString *)token;
 -(NSNumber *)port;
 -(NSNumber *)targetMaxDistance;
 -(NSNumber *)pokemonMaxTime;

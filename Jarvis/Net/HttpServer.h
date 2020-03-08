@@ -8,11 +8,12 @@
 #import <CoreLocation/CoreLocation.h>
 #import <Foundation/Foundation.h>
 
-#import "../UIC/Device.h"
 #import "../GCD/GCDAsyncSocket.h"
 #import "HttpResponseCode.h"
 #import "HttpServer.h"
 #import "HttpServerProtocol.h"
+#import "../States/DeviceState.h"
+#import "../UIC/Device.h"
 #import "../UIC/Settings.h"
 #import "../Utilities/Utils.h"
 
@@ -26,6 +27,6 @@
 
 -(void)listen;
 -(void)stop;
--(void)sendData:(GCDAsyncSocket *)socket data:(NSString *)data;
+//-(void)sendData:(GCDAsyncSocket *)socket data:(NSString *)data;
 
 @end

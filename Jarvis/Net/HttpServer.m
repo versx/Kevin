@@ -13,6 +13,16 @@ static GCDAsyncSocket *_listenSocket;
 static bool _isListening;
 //static NSArray *_validHttpVersions;
 
++(HttpServer *)sharedInstance
+{
+    static HttpServer *sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[HttpServer alloc] init];
+    });
+    return sharedInstance;
+}
+
 -(id)init
 {
     NSLog(@"[HTTP] init");
@@ -32,9 +42,12 @@ static bool _isListening;
 }
 
 -(void)dealloc {
+    self.delegate = nil;
     [self.delegate release];
-    //self.delegate = nil;
+    
     _listenSocket = nil;
+    [_listenSocket release];
+    
     _isListening = false;
     [super dealloc];
 }
@@ -90,16 +103,6 @@ static bool _isListening;
     return 0;
 }
 
-+(HttpServer *)sharedInstance
-{
-    static HttpServer *sharedInstance = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        sharedInstance = [[HttpServer alloc] init];
-    });
-    return sharedInstance;
-}
-
 #pragma GCDAsyncSocket
 
 -(void)socket:(GCDAsyncSocket *)sender didAcceptNewSocket:(nonnull GCDAsyncSocket *)newSocket
@@ -136,7 +139,8 @@ static bool _isListening;
     if (msg) {
         NSLog(@"[UIC] Received data: %@", msg);
         NSArray *split = [msg componentsSeparatedByString:@" "];
-        if ([split count] == 3) {
+        [msg release];
+        if (split.count == 3) {
             NSString *method = split[0];
             NSString *query = split[1];
             NSString *httpProtocol = split[2];
@@ -146,37 +150,38 @@ static bool _isListening;
                 NSString *response;
                 if ([query hasPrefix:@"/data"]) {
                     NSArray *querySplit = [query componentsSeparatedByString:@"?"];
-                    NSMutableDictionary *params = [self parseUrlQueryParameters:querySplit[1]];
-                    response = [self.delegate handleDataRequest:params];
+                    if (querySplit.count == 2) {
+                        NSDictionary *params = [self parseUrlQueryParameters:querySplit[1]];
+                        response = [self.delegate handleDataRequest:params];
+                    }
                 } else if ([query hasPrefix:@"/loc"]) {
                     NSArray *querySplit = [query componentsSeparatedByString:@"?"];
-                    NSMutableDictionary *params = [self parseUrlQueryParameters:querySplit[1]];
-                    response = [self.delegate handleLocationRequest:params];
+                    if (querySplit.count == 2) {
+                        NSDictionary *params = [self parseUrlQueryParameters:querySplit[1]];
+                        response = [self.delegate handleLocationRequest:params];
+                    }
                 } else if ([query hasPrefix:@"/restart"]) {
                     NSLog(@"[UIC] Restart endpoint called, restarting...");
-                    // TODO: [self restart];
+                    [DeviceState restart];
                 } else if ([query hasPrefix:@"/config"]) {
                     NSMutableString *text = [[NSMutableString alloc] init];
                     NSDictionary *config = [[Settings alloc] loadSettings];
-                    for (id key in config) {
-                        [text appendFormat:@"%@=%@\n", key, [config objectForKey:key]];
+                    if (config != nil) {
+                        for (id key in config) {
+                            [text appendFormat:@"%@=%@\n", key, [config objectForKey:key]];
+                        }
                     }
                     response = [Utils buildResponse:text withResponseCode:Success];
-                    //resposne = [NSString stringWithFormat:@"%@%@", _response_200, text];
                 } else if ([query hasPrefix:@"/touch"]) {
                     response = [Utils buildResponse:@":)" withResponseCode:Success];
-                    //response = [NSString stringWithFormat:@"%@%@", _response_200, @":)"];
                 } else if ([query hasPrefix:@"/type"]) {
                     response = [Utils buildResponse:@":)" withResponseCode:Success];
-                    //response = [NSString stringWithFormat:@"%@%@", _response_200, @":)"];
                 } else if ([query hasPrefix:@"/screen"]) {
                     //UIImage *screenshot = [self takeScreenshot];
                     response = [Utils buildResponse:@":)" withResponseCode:Success];
-                    //response = [NSString stringWithFormat:@"%@%@", _response_200, @":)"];
                 } else {
                     NSLog(@"[UIC] Invalid request endpoint.");
                     response = [Utils buildResponse:@"" withResponseCode:NotFound];
-                    //response = _response_404;
                 }
                 //NSLog(@"[HTTP] Response: %@", response);
                 [sender writeData:[response dataUsingEncoding:NSUTF8StringEncoding] withTimeout:-1 tag:0];
@@ -192,6 +197,7 @@ static bool _isListening;
 
 #pragma HTTP Listener
 
+/*
 -(void)sendData:(GCDAsyncSocket *)socket data:(NSString *)data
 {
     NSString *dataCTRL = [NSString stringWithFormat:@"%@\r\n", data];
@@ -199,8 +205,9 @@ static bool _isListening;
     NSLog(@"[UIC] Sending data: %@", dataCTRL);
     [socket writeData:msg withTimeout:-1 tag:0];
 }
+*/
 
--(NSMutableDictionary *)parseUrlQueryParameters:(NSString *)queryParameters
+-(NSDictionary *)parseUrlQueryParameters:(NSString *)queryParameters
 {
     NSMutableDictionary *queryStringDictionary = [[NSMutableDictionary alloc] init];
     NSArray *components = [queryParameters componentsSeparatedByString:@"&"];
@@ -212,7 +219,7 @@ static bool _isListening;
 
         [queryStringDictionary setObject:value forKey:key];
     }
-    return queryStringDictionary;
+    return (NSDictionary *)queryStringDictionary;
 }
 
 @end

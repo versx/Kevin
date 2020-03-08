@@ -44,8 +44,8 @@ static double _baseVerticalAccuracy = 200.0; // in meters
 {
     //dispatch_async(dispatch_get_main_queue(), ^{
     //    @autoreleasepool {
-    BOOL done = false;
-    NSDictionary *resultDict;
+    __block BOOL done = false;
+    __block NSDictionary *resultDict;
     
     // Create the URLSession on the default configuration
     NSURLSessionConfiguration *defaultSessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
@@ -63,9 +63,11 @@ static double _baseVerticalAccuracy = 200.0; // in meters
     [urlRequest setHTTPBody:postData];
     [urlRequest setValue:[NSString stringWithFormat:@"%lu", (unsigned long)[postData length]] forHTTPHeaderField:@"Content-Length"];
 
-    //if ([[Settings uuid] isEqualToString:@"test"]) {
-    //    [urlRequest addValue:@"Bearer \(token)" forHTTPHeaderField:@"Authorization");
-    //}
+    if ([[Settings sharedInstance] token] != nil &&
+        ![[[Settings sharedInstance] token] isEqualToString:@""]) {
+        NSString *token = [NSString stringWithFormat:@"Bearer %@", [[Settings sharedInstance] token]];
+        [urlRequest addValue:token forHTTPHeaderField:@"Authorization"];
+    }
     
     // Convert POST string parameters to data using UTF8 Encoding
     [urlRequest setHTTPMethod:@"POST"];
@@ -75,22 +77,23 @@ static double _baseVerticalAccuracy = 200.0; // in meters
     // Create dataTask
     NSURLSessionDataTask *dataTask = [defaultSession dataTaskWithRequest:urlRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         NSString *responseData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        NSLog(@"[UIC] postRequest response: %@", responseData);
+        NSLog(@"[Utils] postRequest response: %@", responseData);
+        [responseData release];
         if (data != nil) { // TODO: Check if json parsed
             NSError *jsonError;
             NSDictionary *resultJson = [NSJSONSerialization JSONObjectWithData:data
                                                                        options:NSJSONReadingMutableContainers
                                                                          error:&jsonError];
-            // TODO: Variable is not assignable (missing __block type specifier) resultDict = resultJson;
+            resultDict = resultJson;
             if (!blocking) {
-                completion(resultJson);//resultDict);
+                completion(resultDict);
             }
         } else {
             if (!blocking) {
                 completion(nil);
             }
         }
-        // TODO: Variable is not assignable (missing __block type specifier) done = true;
+        done = true;
     }];
 
     // Fire the request
@@ -132,7 +135,10 @@ static double _baseVerticalAccuracy = 200.0; // in meters
 +(void)touch:(int)x withY:(int)y
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        NSInteger point = [PTFakeTouch fakeTouchId:[PTFakeTouch getAvailablePointId] AtPoint:CGPointMake(x, y) withTouchPhase:UITouchPhaseBegan];
+        NSInteger point = [PTFakeTouch fakeTouchId:[PTFakeTouch getAvailablePointId]
+                                           AtPoint:CGPointMake(x, y)
+                                    withTouchPhase:UITouchPhaseBegan
+        ];
         [PTFakeTouch fakeTouchId:point AtPoint:CGPointMake(x, y) withTouchPhase:UITouchPhaseEnded];
     });
 }
@@ -148,23 +154,18 @@ static double _baseVerticalAccuracy = 200.0; // in meters
     return image;
 }
 
-+(UIColor *)getPixelColor:(int)x withY:(int)y
-{
-    return nil;
-}
-
 +(NSString *)responseCodeToString:(enum HttpResponseCode)responseCode
 {
     NSString *result = nil;
     switch (responseCode) {
         case Success:
-            result = @"HTTP/1.1 200 OK\nContent-Type: application/json; charset=utf-8\n\n";
+            result = HTTP_200_RESPONSE;
             break;
         case BadRequest:
-            result = @"HTTP/1.1 400 OK\nContent-Type: application/json; charset=utf-8\n\n";
+            result = HTTP_400_RESPONSE;
             break;
         case NotFound:
-            result = @"HTTP/1.1 404 OK\nContent-Type: application/json; charset=utf-8\n\n";
+            result = HTTP_404_RESPONSE;
             break;
         default:
             [NSException raise:NSGenericException format:@"Unexpected HttpResponseCode."];

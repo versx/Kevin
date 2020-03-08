@@ -9,94 +9,8 @@
 
 @implementation Device
 
-static NSString *_uuid;
-static NSString *_model;
-static NSString *_osName;
-static NSString *_osVersion;
-static NSNumber *_multiplier;
+#pragma mark Properties
 
-static NSString *_username = @"";
-static NSString *_password;
-static NSString *_ptcToken;
-static NSNumber *_level;
-static NSNumber *_minLevel;
-static NSNumber *_maxLevel;
-static BOOL _isLoggedIn;
-static BOOL _shouldExit;
-
-// Device information
--(NSString *)uuid {
-    return _uuid;
-}
--(NSString *)model {
-    return _model;
-}
--(NSString *)osName {
-    return _osName;
-}
--(NSString *)osVersion {
-    return _osVersion;
-}
--(NSNumber *)multiplier {
-    return _multiplier;
-}
-
-// Device account settings
--(NSString *)username {
-    if ([_username isEqualToString:@""]) {
-        NSLog(@"[UIC] USERNAME IS NULL");
-        //return @"FAIL";
-    }
-    return _username;
-}
--(NSString *)password {
-    return _password;
-}
--(NSString *)ptcToken {
-    return _ptcToken;
-}
--(NSNumber *)level {
-    return _level;
-}
--(NSNumber *)minLevel {
-    return _minLevel;
-}
--(NSNumber *)maxLevel {
-    return _maxLevel;
-}
--(BOOL)isLoggedIn {
-    return _isLoggedIn;
-}
--(BOOL)shouldExit {
-    return _shouldExit;
-}
-
--(void)setUsername:(NSString *)username {
-    _username = username;
-}
--(void)setPassword:(NSString *)password {
-    _password = password;
-}
--(void)setPtcToken:(NSString *)ptcToken {
-    _ptcToken = ptcToken;
-}
--(void)setLevel:(NSNumber *)level {
-    _level = level;
-}
--(void)setMinLevel:(NSNumber *)minLevel {
-    _minLevel = minLevel;
-}
--(void)setMaxLevel:(NSNumber *)maxLevel {
-    _maxLevel = maxLevel;
-}
--(void)setIsLoggedIn:(BOOL)isLoggedIn {
-    _isLoggedIn = isLoggedIn;
-}
--(void)setShouldExit:(BOOL)shouldExit {
-    _shouldExit = shouldExit;
-}
-
-/*
 @synthesize uuid;
 @synthesize model;
 @synthesize osName;
@@ -111,7 +25,22 @@ static BOOL _shouldExit;
 @synthesize maxLevel;
 @synthesize isLoggedIn;
 @synthesize shouldExit;
-*/
+
+-(id)init
+{
+    NSLog(@"[Device] init");
+    if ((self = [super init]))
+    {
+        username = @"";
+        password = @"";
+        ptcToken = @"";
+        level = 0;
+        minLevel = 1;
+        maxLevel = 29;
+    }
+    
+    return self;
+}
 
 +(Device *)sharedInstance
 {
@@ -119,9 +48,11 @@ static BOOL _shouldExit;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [[Device alloc] init];
-        /*
+        
         [sharedInstance setUuid:[[UIDevice currentDevice] name]];
-        [sharedInstance setModel:getNameFromModelIdentifier(getModelIdentifier())];
+        NSString *identifier = getModelIdentifier();
+        NSString *modelName = getNameFromModelIdentifier(identifier);
+        [sharedInstance setModel:modelName];
         [sharedInstance setOsName:[[UIDevice currentDevice] systemName]];
         [sharedInstance setOsVersion:[[UIDevice currentDevice] systemVersion]];
         if ([[sharedInstance model] isEqualToString:@"iPhone 5s"] ||
@@ -133,21 +64,6 @@ static BOOL _shouldExit;
         }
         [sharedInstance setMinLevel:1];
         [sharedInstance setMaxLevel:29];
-        */
-        _uuid = [[UIDevice currentDevice] name];
-        _model = getModelIdentifier(); //[[UIDevice currentDevice] localizedModel];
-        _model = getNameFromModelIdentifier(_model);
-        _osName = [[UIDevice currentDevice] systemName];
-        _osVersion = [[UIDevice currentDevice] systemVersion];
-        if ([_model isEqualToString:@"iPhone 5s"] ||
-            [_model isEqualToString:@"iPhone 6"] ||
-            [_model isEqualToString:@"iPhone 6 Plus"]) {
-            _multiplier = @45;
-        } else {
-            _multiplier = @5;
-        }
-        _minLevel = @1;
-        _maxLevel = @29;
     });
     return sharedInstance;
 }

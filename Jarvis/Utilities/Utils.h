@@ -10,6 +10,8 @@
 
 #import "../Net/HttpResponseCode.h"
 #import "../PTFakeTouch/PTFakeTouch.h"
+#import "../UIC/Consts.h"
+#import "../UIC/Settings.h"
 
 @interface Utils : NSObject
 
@@ -37,6 +39,6 @@
 
 +(UIImage *)takeScreenshot;
 
-+(UIColor *)getPixelColor:(int)x withY:(int)y;
+//+(UIColor *)getPixelColor:(int)x withY:(int)y;
 
 @end

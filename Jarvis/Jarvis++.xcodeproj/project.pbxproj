@@ -54,6 +54,8 @@
 		C0AC1D4A240DA4C1008F4DFB /* UIEvent+KIFAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1D38240DA4C1008F4DFB /* UIEvent+KIFAdditions.m */; };
 		C0AC1D4B240DA4C1008F4DFB /* LoadableCategory.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1D39240DA4C1008F4DFB /* LoadableCategory.h */; };
 		C0AC1D4C240DA4C1008F4DFB /* PTFakeTouch.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1D3A240DA4C1008F4DFB /* PTFakeTouch.m */; };
+		C0B68E022414C33E009B5970 /* Consts.h in Headers */ = {isa = PBXBuildFile; fileRef = C0B68E012414C33E009B5970 /* Consts.h */; };
+		C0B68E042414C632009B5970 /* Consts.m in Sources */ = {isa = PBXBuildFile; fileRef = C0B68E032414C632009B5970 /* Consts.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -65,7 +67,6 @@
 		C0025AB124143917007813F7 /* DeviceState.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceState.m; sourceTree = "<group>"; };
 		C0025AB324143923007813F7 /* DeviceState.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceState.h; sourceTree = "<group>"; };
 		C0025AB6241447F3007813F7 /* HttpResponseCode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HttpResponseCode.h; sourceTree = "<group>"; };
-		C0025AB8241479FC007813F7 /* XcodeKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XcodeKit.framework; path = Library/Frameworks/XcodeKit.framework; sourceTree = DEVELOPER_DIR; };
 		C0025ABD241483B7007813F7 /* UIImage+Pixels.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+Pixels.h"; sourceTree = "<group>"; };
 		C0025ABF241483C6007813F7 /* UIImage+Pixels.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "UIImage+Pixels.mm"; sourceTree = "<group>"; };
 		C0025AC22414846B007813F7 /* JobController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JobController.h; sourceTree = "<group>"; };
@@ -113,6 +114,8 @@
 		C0AC1D39240DA4C1008F4DFB /* LoadableCategory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoadableCategory.h; sourceTree = "<group>"; };
 		C0AC1D3A240DA4C1008F4DFB /* PTFakeTouch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTFakeTouch.m; sourceTree = "<group>"; };
 		C0AC1D3B240DA4C1008F4DFB /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C0B68E012414C33E009B5970 /* Consts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Consts.h; sourceTree = "<group>"; };
+		C0B68E032414C632009B5970 /* Consts.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Consts.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -220,7 +223,6 @@
 		C01B4963240ACF5D00633B45 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				C0025AB8241479FC007813F7 /* XcodeKit.framework */,
 				C0AC1CDC240BAD44008F4DFB /* CoreGraphics.framework */,
 				C0132B63240B631700719452 /* Security.framework */,
 				C0132B61240B630000719452 /* CFNetwork.framework */,
@@ -288,12 +290,14 @@
 		C01B497D240ACF9400633B45 /* UIC */ = {
 			isa = PBXGroup;
 			children = (
-				C01B497E240ACF9400633B45 /* UIC.h */,
-				C01B497F240ACF9400633B45 /* UIC.mm */,
+				C0B68E012414C33E009B5970 /* Consts.h */,
+				C0B68E032414C632009B5970 /* Consts.m */,
 				C0AC1CF3240BB37C008F4DFB /* Device.h */,
 				C0AC1CF1240BB365008F4DFB /* Device.m */,
 				C0AC1CF7240BB97A008F4DFB /* Settings.h */,
 				C0AC1CF5240BB96C008F4DFB /* Settings.m */,
+				C01B497E240ACF9400633B45 /* UIC.h */,
+				C01B497F240ACF9400633B45 /* UIC.mm */,
 			);
 			path = UIC;
 			sourceTree = "<group>";
@@ -349,6 +353,7 @@
 				C0AC1D3F240DA4C1008F4DFB /* UIApplication-KIFAdditions.h in Headers */,
 				C0132B58240B5DEC00719452 /* GCDAsyncUdpSocket.h in Headers */,
 				C0025AB7241447F3007813F7 /* HttpResponseCode.h in Headers */,
+				C0B68E022414C33E009B5970 /* Consts.h in Headers */,
 				C0025ABE241483B7007813F7 /* UIImage+Pixels.h in Headers */,
 				C01B4971240ACF5D00633B45 /* Jarvis__.h in Headers */,
 				C0AC1D4B240DA4C1008F4DFB /* LoadableCategory.h in Headers */,
@@ -435,6 +440,7 @@
 				C01B4981240ACF9400633B45 /* UIC.mm in Sources */,
 				C0AC1D41240DA4C1008F4DFB /* UITouch-KIFAdditions.m in Sources */,
 				C0AC1D4C240DA4C1008F4DFB /* PTFakeTouch.m in Sources */,
+				C0B68E042414C632009B5970 /* Consts.m in Sources */,
 				C0025AA52414170C007813F7 /* HttpServer.m in Sources */,
 				C0AC1D45240DA4C1008F4DFB /* UIApplication-KIFAdditions.m in Sources */,
 			);

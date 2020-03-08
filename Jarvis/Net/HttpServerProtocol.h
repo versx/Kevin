@@ -8,7 +8,7 @@
 @protocol HttpServerProtocolDelegate <NSObject>
 
 @required
-- (NSString *)handleDataRequest:(NSMutableDictionary *)params;
-- (NSString *)handleLocationRequest:(NSMutableDictionary *)params;
+- (NSString *)handleDataRequest:(NSDictionary *)params;
+- (NSString *)handleLocationRequest:(NSDictionary *)params;
 
 @end

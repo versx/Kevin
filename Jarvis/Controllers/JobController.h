@@ -7,6 +7,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import "../Jarvis++/Jarvis__.h"
 #import "../States/DeviceState.h"
 #import "../UIC/Device.h"
 #import "../UIC/Settings.h"

@@ -5,9 +5,10 @@
 //  Created by versx on 2/29/20.
 //
 
+#import "Consts.h"
 #import "Device.h"
 #import "Settings.h"
-#import "../Controllers/JobController.h";
+#import "../Controllers/JobController.h"
 #import "../GCD/GCDAsyncSocket.h"
 #import "../Net/HttpServer.h"
 #import "../Utilities/Utils.h"
@@ -25,8 +26,6 @@
 
 -(void)start;
 -(void)startUicLoop;
--(void)logout;
--(void)restart;
 
 -(NSString *)handleDataRequest:(NSDictionary *)params;
 -(NSString *)handleLocationRequest:(NSDictionary *)params;
