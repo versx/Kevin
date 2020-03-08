@@ -16,7 +16,9 @@
 -(NSString *)backendRawUrl;
 -(NSNumber *)port;
 -(NSNumber *)targetMaxDistance;
+-(NSNumber *)pokemonMaxTime;
 -(NSNumber *)raidMaxTime;
+-(NSNumber *)encounterDelay;
 -(NSNumber *)jitterValue;
 -(NSNumber *)maxEmptyGMO;
 -(NSNumber *)maxFailedCount;

@@ -17,6 +17,11 @@ static double _baseVerticalAccuracy = 200.0; // in meters
     return [NSNumber numberWithInt:[value intValue] + 1];
 }
 
++(NSNumber *)decrementInt:(NSNumber *)value
+{
+    return [NSNumber numberWithInt:[value intValue] - 1];
+}
+
 +(CLLocation *)createCoordinate:(double)lat lon:(double)lon
 {
     return [Utils createCoordinate:lat

@@ -15,7 +15,9 @@ static NSString *_backendControllerUrl;
 static NSString *_backendRawUrl;
 static NSNumber *_port;
 static NSNumber *_targetMaxDistance;
+static NSNumber *_pokemonMaxTime;
 static NSNumber *_raidMaxTime;
+static NSNumber *_encounterDelay;
 static NSNumber *_jitterValue;
 static NSNumber *_maxEmptyGMO;
 static NSNumber *_maxFailedCount;
@@ -46,8 +48,14 @@ static NSString *plistFileName = @"uic.plist";
 -(NSNumber *)targetMaxDistance {
     return _targetMaxDistance;
 }
+-(NSNumber *)pokemonMaxTime {
+    return _pokemonMaxTime;
+}
 -(NSNumber *)raidMaxTime {
     return _raidMaxTime;
+}
+-(NSNumber *)encounterDelay {
+    return _encounterDelay;
 }
 -(NSNumber *)jitterValue {
     return _jitterValue;
@@ -86,7 +94,9 @@ static NSString *plistFileName = @"uic.plist";
         _backendRawUrl = [_config objectForKey:@"backendRawURL"];
         _port = [_config objectForKey:@"port"] ?: @8080;
         _targetMaxDistance = [_config objectForKey:@"targetMaxDistance"] ?: @250.0;
+        _pokemonMaxTime = [_config objectForKey:@"pokemonMaxTime"] ?: @25.0;
         _raidMaxTime = [_config objectForKey:@"raidMaxTime"] ?: @25.0;
+        _encounterDelay = [_config objectForKey:@"encounterDelay"] ?: @0.0;
         _maxEmptyGMO = [_config objectForKey:@"maxEmptyGMO"] ?: @50;
         _maxFailedCount = [_config objectForKey:@"maxEmptyGMO"] ?: @5;
         _maxNoQuestCount = [_config objectForKey:@"maxNoQuestCount"] ?: @5;

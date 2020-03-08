@@ -16,6 +16,7 @@
 //+(instancetype)sharedInstance;
 
 +(NSNumber *)incrementInt:(NSNumber *)value;
++(NSNumber *)decrementInt:(NSNumber *)value;
 
 +(CLLocation *)createCoordinate:(double)lat lon:(double)lon;
 +(CLLocation *)createCoordinate:(double)lat

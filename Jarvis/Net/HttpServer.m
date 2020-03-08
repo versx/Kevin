@@ -130,60 +130,60 @@ static bool _isListening;
         @"HTTP/2",
         @"HTTP/3"
     ];
-            NSData *strData = [data subdataWithRange:NSMakeRange(0, [data length] - 2)];
-            NSString *msg = [[NSString alloc] initWithData:strData encoding:NSUTF8StringEncoding];
-            if (msg) {
-                NSLog(@"[UIC] Received data: %@", msg);
-                NSArray *split = [msg componentsSeparatedByString:@" "];
-                if ([split count] == 3) {
-                    NSString *method = split[0];
-                    NSString *query = split[1];
-                    NSString *httpProtocol = split[2];
-                    bool isValidHttpProtocol = [validHttpVersions containsObject:httpProtocol];
-                    bool isValidMethod = ([method isEqualToString:@"GET"] || [method isEqualToString:@"POST"]);
-                    if (isValidMethod && isValidHttpProtocol) {
-                        NSString *response;
-                        if ([query hasPrefix:@"/data"]) {
-                            NSArray *querySplit = [query componentsSeparatedByString:@"?"];
-                            NSMutableDictionary *params = [self parseUrlQueryParameters:querySplit[1]];
-                            response = [self.delegate handleDataRequest:params];
-                        } else if ([query hasPrefix:@"/loc"]) {
-                            NSArray *querySplit = [query componentsSeparatedByString:@"?"];
-                            NSMutableDictionary *params = [self parseUrlQueryParameters:querySplit[1]];
-                            response = [self.delegate handleLocationRequest:params];
-                        } else if ([query hasPrefix:@"/restart"]) {
-                            NSLog(@"[UIC] Restart endpoint called, restarting...");
-                            // TODO: [self restart];
-                        } else if ([query hasPrefix:@"/config"]) {
-                            NSMutableString *text = [[NSMutableString alloc] init];
-                            NSDictionary *config = [[Settings alloc] loadSettings];
-                            for (id key in config) {
-                                [text appendFormat:@"%@=%@\n", key, [config objectForKey:key]];
-                            }
-                            response = [Utils buildResponse:text withResponseCode:Success];
-                            //resposne = [NSString stringWithFormat:@"%@%@", _response_200, text];
-                        } else if ([query hasPrefix:@"/touch"]) {
-                            response = [Utils buildResponse:@":)" withResponseCode:Success];
-                            //response = [NSString stringWithFormat:@"%@%@", _response_200, @":)"];
-                        } else if ([query hasPrefix:@"/type"]) {
-                            response = [Utils buildResponse:@":)" withResponseCode:Success];
-                            //response = [NSString stringWithFormat:@"%@%@", _response_200, @":)"];
-                        } else if ([query hasPrefix:@"/screen"]) {
-                            //UIImage *screenshot = [self takeScreenshot];
-                            response = [Utils buildResponse:@":)" withResponseCode:Success];
-                            //response = [NSString stringWithFormat:@"%@%@", _response_200, @":)"];
-                        } else {
-                            NSLog(@"[UIC] Invalid request endpoint.");
-                            response = [Utils buildResponse:@"" withResponseCode:NotFound];
-                            //response = _response_404;
-                        }
-                        //NSLog(@"[HTTP] Response: %@", response);
-                        [sender writeData:[response dataUsingEncoding:NSUTF8StringEncoding] withTimeout:-1 tag:0];
+    NSData *strData = [data subdataWithRange:NSMakeRange(0, [data length] - 2)];
+    NSString *msg = [[NSString alloc] initWithData:strData encoding:NSUTF8StringEncoding];
+    if (msg) {
+        NSLog(@"[UIC] Received data: %@", msg);
+        NSArray *split = [msg componentsSeparatedByString:@" "];
+        if ([split count] == 3) {
+            NSString *method = split[0];
+            NSString *query = split[1];
+            NSString *httpProtocol = split[2];
+            bool isValidHttpProtocol = [validHttpVersions containsObject:httpProtocol];
+            bool isValidMethod = ([method isEqualToString:@"GET"] || [method isEqualToString:@"POST"]);
+            if (isValidMethod && isValidHttpProtocol) {
+                NSString *response;
+                if ([query hasPrefix:@"/data"]) {
+                    NSArray *querySplit = [query componentsSeparatedByString:@"?"];
+                    NSMutableDictionary *params = [self parseUrlQueryParameters:querySplit[1]];
+                    response = [self.delegate handleDataRequest:params];
+                } else if ([query hasPrefix:@"/loc"]) {
+                    NSArray *querySplit = [query componentsSeparatedByString:@"?"];
+                    NSMutableDictionary *params = [self parseUrlQueryParameters:querySplit[1]];
+                    response = [self.delegate handleLocationRequest:params];
+                } else if ([query hasPrefix:@"/restart"]) {
+                    NSLog(@"[UIC] Restart endpoint called, restarting...");
+                    // TODO: [self restart];
+                } else if ([query hasPrefix:@"/config"]) {
+                    NSMutableString *text = [[NSMutableString alloc] init];
+                    NSDictionary *config = [[Settings alloc] loadSettings];
+                    for (id key in config) {
+                        [text appendFormat:@"%@=%@\n", key, [config objectForKey:key]];
                     }
+                    response = [Utils buildResponse:text withResponseCode:Success];
+                    //resposne = [NSString stringWithFormat:@"%@%@", _response_200, text];
+                } else if ([query hasPrefix:@"/touch"]) {
+                    response = [Utils buildResponse:@":)" withResponseCode:Success];
+                    //response = [NSString stringWithFormat:@"%@%@", _response_200, @":)"];
+                } else if ([query hasPrefix:@"/type"]) {
+                    response = [Utils buildResponse:@":)" withResponseCode:Success];
+                    //response = [NSString stringWithFormat:@"%@%@", _response_200, @":)"];
+                } else if ([query hasPrefix:@"/screen"]) {
+                    //UIImage *screenshot = [self takeScreenshot];
+                    response = [Utils buildResponse:@":)" withResponseCode:Success];
+                    //response = [NSString stringWithFormat:@"%@%@", _response_200, @":)"];
+                } else {
+                    NSLog(@"[UIC] Invalid request endpoint.");
+                    response = [Utils buildResponse:@"" withResponseCode:NotFound];
+                    //response = _response_404;
                 }
-            } else {
-                NSLog(@"[UIC] Error converting received data into UTF-8 String");
+                //NSLog(@"[HTTP] Response: %@", response);
+                [sender writeData:[response dataUsingEncoding:NSUTF8StringEncoding] withTimeout:-1 tag:0];
             }
+        }
+    } else {
+        NSLog(@"[UIC] Error converting received data into UTF-8 String");
+    }
     //    }
     //});
     //[sender readDataToData:[GCDAsyncSocket CRLFData] withTimeout:-1 tag:0];
