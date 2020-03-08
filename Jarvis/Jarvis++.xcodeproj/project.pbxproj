@@ -15,6 +15,10 @@
 		C0025AB224143917007813F7 /* DeviceState.m in Sources */ = {isa = PBXBuildFile; fileRef = C0025AB124143917007813F7 /* DeviceState.m */; };
 		C0025AB424143923007813F7 /* DeviceState.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AB324143923007813F7 /* DeviceState.h */; };
 		C0025AB7241447F3007813F7 /* HttpResponseCode.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AB6241447F3007813F7 /* HttpResponseCode.h */; };
+		C0025ABE241483B7007813F7 /* UIImage+Pixels.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025ABD241483B7007813F7 /* UIImage+Pixels.h */; };
+		C0025AC0241483C6007813F7 /* UIImage+Pixels.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0025ABF241483C6007813F7 /* UIImage+Pixels.mm */; };
+		C0025AC32414846B007813F7 /* JobController.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AC22414846B007813F7 /* JobController.h */; };
+		C0025AC524148477007813F7 /* JobController.m in Sources */ = {isa = PBXBuildFile; fileRef = C0025AC424148477007813F7 /* JobController.m */; };
 		C0132B56240B5DEC00719452 /* GCDAsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = C0132B52240B5DEC00719452 /* GCDAsyncUdpSocket.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		C0132B57240B5DEC00719452 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = C0132B53240B5DEC00719452 /* GCDAsyncSocket.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		C0132B58240B5DEC00719452 /* GCDAsyncUdpSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = C0132B54240B5DEC00719452 /* GCDAsyncUdpSocket.h */; };
@@ -52,19 +56,6 @@
 		C0AC1D4C240DA4C1008F4DFB /* PTFakeTouch.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1D3A240DA4C1008F4DFB /* PTFakeTouch.m */; };
 /* End PBXBuildFile section */
 
-/* Begin PBXCopyFilesBuildPhase section */
-		C0AC1C7E240BA8CD008F4DFB /* Embed Frameworks */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 12;
-			dstPath = "";
-			dstSubfolderSpec = 10;
-			files = (
-			);
-			name = "Embed Frameworks";
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXCopyFilesBuildPhase section */
-
 /* Begin PBXFileReference section */
 		C0025AA42414170C007813F7 /* HttpServer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HttpServer.m; sourceTree = "<group>"; };
 		C0025AA62414171C007813F7 /* HttpServer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HttpServer.h; sourceTree = "<group>"; };
@@ -74,6 +65,11 @@
 		C0025AB124143917007813F7 /* DeviceState.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceState.m; sourceTree = "<group>"; };
 		C0025AB324143923007813F7 /* DeviceState.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceState.h; sourceTree = "<group>"; };
 		C0025AB6241447F3007813F7 /* HttpResponseCode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HttpResponseCode.h; sourceTree = "<group>"; };
+		C0025AB8241479FC007813F7 /* XcodeKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XcodeKit.framework; path = Library/Frameworks/XcodeKit.framework; sourceTree = DEVELOPER_DIR; };
+		C0025ABD241483B7007813F7 /* UIImage+Pixels.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+Pixels.h"; sourceTree = "<group>"; };
+		C0025ABF241483C6007813F7 /* UIImage+Pixels.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "UIImage+Pixels.mm"; sourceTree = "<group>"; };
+		C0025AC22414846B007813F7 /* JobController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JobController.h; sourceTree = "<group>"; };
+		C0025AC424148477007813F7 /* JobController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JobController.m; sourceTree = "<group>"; };
 		C0132B52240B5DEC00719452 /* GCDAsyncUdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncUdpSocket.m; sourceTree = "<group>"; };
 		C0132B53240B5DEC00719452 /* GCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
 		C0132B54240B5DEC00719452 /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
@@ -166,6 +162,24 @@
 			path = States;
 			sourceTree = "<group>";
 		};
+		C0025ABC241483A2007813F7 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				C0025ABD241483B7007813F7 /* UIImage+Pixels.h */,
+				C0025ABF241483C6007813F7 /* UIImage+Pixels.mm */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		C0025AC124148455007813F7 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				C0025AC22414846B007813F7 /* JobController.h */,
+				C0025AC424148477007813F7 /* JobController.m */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
 		C0132B50240B5DEC00719452 /* GCD */ = {
 			isa = PBXGroup;
 			children = (
@@ -180,6 +194,8 @@
 		C01B4957240ACF5D00633B45 = {
 			isa = PBXGroup;
 			children = (
+				C0025AC124148455007813F7 /* Controllers */,
+				C0025ABC241483A2007813F7 /* Extensions */,
 				C0025AB52414393B007813F7 /* States */,
 				C0025AA3241416DE007813F7 /* Net */,
 				C0AC1D28240DA4C1008F4DFB /* PTFakeTouch */,
@@ -204,6 +220,7 @@
 		C01B4963240ACF5D00633B45 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C0025AB8241479FC007813F7 /* XcodeKit.framework */,
 				C0AC1CDC240BAD44008F4DFB /* CoreGraphics.framework */,
 				C0132B63240B631700719452 /* Security.framework */,
 				C0132B61240B630000719452 /* CFNetwork.framework */,
@@ -332,12 +349,14 @@
 				C0AC1D3F240DA4C1008F4DFB /* UIApplication-KIFAdditions.h in Headers */,
 				C0132B58240B5DEC00719452 /* GCDAsyncUdpSocket.h in Headers */,
 				C0025AB7241447F3007813F7 /* HttpResponseCode.h in Headers */,
+				C0025ABE241483B7007813F7 /* UIImage+Pixels.h in Headers */,
 				C01B4971240ACF5D00633B45 /* Jarvis__.h in Headers */,
 				C0AC1D4B240DA4C1008F4DFB /* LoadableCategory.h in Headers */,
 				C0025AAE241421E9007813F7 /* Utils.h in Headers */,
 				C0AC1D44240DA4C1008F4DFB /* UIWindow-KIFAdditions.h in Headers */,
 				C0025AA72414171C007813F7 /* HttpServer.h in Headers */,
 				C0AC1D43240DA4C1008F4DFB /* UIEvent+KIFAdditions.h in Headers */,
+				C0025AC32414846B007813F7 /* JobController.h in Headers */,
 				C0025AB424143923007813F7 /* DeviceState.h in Headers */,
 				C0AC1CF4240BB37C008F4DFB /* Device.h in Headers */,
 				C0132B59240B5DEC00719452 /* GCDAsyncSocket.h in Headers */,
@@ -354,7 +373,6 @@
 				C01B495C240ACF5D00633B45 /* Sources */,
 				C01B495D240ACF5D00633B45 /* Frameworks */,
 				C01B495E240ACF5D00633B45 /* Headers */,
-				C0AC1C7E240BA8CD008F4DFB /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -404,9 +422,11 @@
 				C0132B57240B5DEC00719452 /* GCDAsyncSocket.m in Sources */,
 				C01B4973240ACF5D00633B45 /* Jarvis__.m in Sources */,
 				C0AC1CF6240BB96C008F4DFB /* Settings.m in Sources */,
+				C0025AC524148477007813F7 /* JobController.m in Sources */,
 				C0025AB0241421F4007813F7 /* Utils.m in Sources */,
 				C0AC1D48240DA4C1008F4DFB /* UIView-KIFAdditions.m in Sources */,
 				C0132B56240B5DEC00719452 /* GCDAsyncUdpSocket.m in Sources */,
+				C0025AC0241483C6007813F7 /* UIImage+Pixels.mm in Sources */,
 				C0AC1CF2240BB365008F4DFB /* Device.m in Sources */,
 				C0AC1D40240DA4C1008F4DFB /* UIWindow-KIFAdditions.m in Sources */,
 				C0AC1D4A240DA4C1008F4DFB /* UIEvent+KIFAdditions.m in Sources */,

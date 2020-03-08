@@ -6,9 +6,10 @@
 //
 
 #import "Device.h"
+#import "Settings.h"
+#import "../Controllers/JobController.h";
 #import "../GCD/GCDAsyncSocket.h"
 #import "../Net/HttpServer.h"
-#import "Settings.h"
 #import "../Utilities/Utils.h"
 
 #import <Foundation/Foundation.h>

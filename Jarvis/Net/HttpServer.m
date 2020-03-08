@@ -32,10 +32,11 @@ static bool _isListening;
 }
 
 -(void)dealloc {
-    [super dealloc];
-    self.delegate = nil;
+    [self.delegate release];
+    //self.delegate = nil;
     _listenSocket = nil;
     _isListening = false;
+    [super dealloc];
 }
 
 -(void)listen

@@ -6,15 +6,18 @@
 //
 
 #import "UIC.h"
+//#import <XCTest/XCTest.h>
+//@import XCTest;
 
-using namespace std;
+//using namespace std;
 
 // TODO: Remote config
-// TODO: Move device/account specific settings to its own class.
 // TODO: KIF library
 // TODO: StateManager class
 // TODO: Pixel checks
-// TODO: Mizu leveling
+// TODO: CocoaPods
+
+#pragma mark Global Variables
 
 static NSString *TokenUserDefaultsKey = @"5750bac0-483c-4131-80fd-6b047b2ca7b4";
 static NSString *LoginUserDefaultsKey = @"60b01025-clea-422c-9b0e-d70bf489de7f";
@@ -22,21 +25,21 @@ static NSString *LoginUserDefaultsKey = @"60b01025-clea-422c-9b0e-d70bf489de7f";
 static BOOL _firststart = true;
 static BOOL _startup = true;
 //static BOOL _started = false;
-static CLLocation *_currentLocation;
-static BOOL _waitRequiresPokemon = false;
-static BOOL _waitForData = false;
+//static CLLocation *_currentLocation;
+//static BOOL _waitRequiresPokemon = false;
+//static BOOL _waitForData = false;
 //static NSLock *_lock = [[NSLock alloc] init];
-static NSDate *_firstWarningDate;
+//static NSDate *_firstWarningDate;
 static NSNumber *_jitterCorner = @0;
-static BOOL _gotQuest = false;
-static BOOL _gotIV = false;
+//static BOOL _gotQuest = false;
+//static BOOL _gotIV = false;
 static NSNumber *_noQuestCount = @0;
 static NSNumber *_noEncounterCount = @0;
 static NSNumber *_emptyGmoCount = @0;
 static NSString *_pokemonEncounterId;
 static NSString *_action;
 static NSNumber *_encounterDistance = @0.0;
-static NSNumber *_encounterDelay = @0.0;
+//static NSNumber *_encounterDelay = @0.0;
 //static UIImage *_image;
 static NSString *_ptcToken = [[NSUserDefaults standardUserDefaults] valueForKey:TokenUserDefaultsKey];
 
@@ -61,7 +64,7 @@ static BOOL _gotQuestEarly = false;
 static BOOL _isQuestInit = false;
 static NSString *_targetFortId;
 static CLLocation *_lastQuestLocation;
-static CLLocation *_lastLocation;
+//static CLLocation *_lastLocation;
 static BOOL _gotItems = false;
 static NSNumber *_noItemsCount = @0;
 static BOOL _skipSpin = false;
@@ -79,6 +82,9 @@ static NSDate *_eggStart;
 @implementation UIC2
 
 static HttpServer *_httpServer;
+static JobController *_jobController;
+
+#pragma mark Constructor/Deconstructor
 
 -(id)init
 {
@@ -90,10 +96,10 @@ static HttpServer *_httpServer;
     return self;
 }
 
--(void)dealloc {
+-(void)dealloc
+{
+    [_httpServer release];
     [super dealloc];
-    _httpServer.delegate = nil;
-    _httpServer = nil;
 }
 
 #pragma App Management
@@ -115,6 +121,8 @@ static HttpServer *_httpServer;
     //NSLog(@"Testing RESTART in 3 seconds...");
     //[NSThread sleepForTimeInterval:3];
     //[self restart];
+    
+    _jobController = [[JobController alloc] init];
     
     _httpServer = [[HttpServer alloc] init];
     _httpServer.delegate = self;
@@ -141,7 +149,7 @@ static HttpServer *_httpServer;
             [NSThread sleepForTimeInterval:15];
             NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:_lastUpdate];
             if (timeIntervalSince >= 120) {
-                NSLog(@"[UIC][Jarvis] HTTP SERVER DIED. Restarting...");
+                NSLog(@"[UIC] [Jarvis] HTTP SERVER DIED. Restarting...");
                 [self restart];
             } else {
                 NSLog(@"[UIC] Last data %f We Good", timeIntervalSince);
@@ -171,15 +179,18 @@ static HttpServer *_httpServer;
 
 -(void)restart
 {
-    NSLog(@"[UIC][Jarvis] Restarting...");
-    /*
+    NSLog(@"[UIC] [Jarvis] Restarting...");
+    //UIControl *ui = [[UIControl alloc] init];
+    //UIApplication *app = [UIApplication sharedApplication];
+    //SEL selector = @selector([NSXPCConnection superclass]:invalidate:);
+    //[ui sendAction:selector to:[UIApplication sharedApplication] forEvent:nil];
     // TODO: Restart
+    return;
     while (true) { // TODO: Uhh this doesn't look safe. ;-|
-        [[UIControl self] sendAction:@selector(NSXPCConnection:invalidate:) to:[UIApplication sharedApplication] forEvent:nil];
+        //[[[UIControl alloc] init] sendAction:@selector(NSXPCConnection:invalidate:) to:[UIApplication sharedApplication] forEvent:nil];
         // TODO: UIControl().sendAction(#selector(NSXPCConnection.invalidate) to:UIApplication.shared for:nil);
         [NSThread sleepForTimeInterval:2];
     }
-    */
 }
 
 -(void)logout
@@ -224,11 +235,14 @@ static HttpServer *_httpServer;
                     _startupLocation = [Utils createCoordinate:[startLat doubleValue] lon:[startLon doubleValue]];
                 }
             
-                _currentLocation = _startupLocation;
+                CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
+                [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
                 NSLog(@"[UIC] StartupLocation: %@", _startupLocation);
-                NSNumber *firstWarningTimestamp = [data objectForKey:@"first_warning_timestamp"];
+                
+                NSNumber *firstWarningTimestamp = data[@"first_warning_timestamp"];
                 if (firstWarningTimestamp != nil) {
-                    _firstWarningDate = [NSDate dateWithTimeIntervalSince1970:[firstWarningTimestamp doubleValue]];
+                    NSDate *firstWarningDate = [NSDate dateWithTimeIntervalSince1970:[firstWarningTimestamp doubleValue]];
+                    [[DeviceState sharedInstance] setFirstWarningDate:firstWarningDate];
                 }
                 if (username != nil && ptcToken != nil && ![ptcToken isEqualToString:@""]) {
                     NSLog(@"[UIC] Got token %@ level %@ from backend.", ptcToken, level);
@@ -241,7 +255,7 @@ static HttpServer *_httpServer;
                     [[NSUserDefaults standardUserDefaults] setValue:ptcToken forKey:TokenUserDefaultsKey];
                     [[NSUserDefaults standardUserDefaults] synchronize];
                 } else {
-                    NSLog(@"[UIC][Jarvis] Failed to get account with token. Restarting for normal login.");
+                    NSLog(@"[UIC] [Jarvis] Failed to get account with token. Restarting for normal login.");
                     [[NSUserDefaults standardUserDefaults] synchronize];
                     [[NSUserDefaults standardUserDefaults] removeObjectForKey:LoginUserDefaultsKey];
                     [[Device sharedInstance] setUsername:username];
@@ -252,7 +266,7 @@ static HttpServer *_httpServer;
                     [[Device sharedInstance] setShouldExit:true];
                 }
             } else {
-                NSLog(@"[UIC][Jarvis] Failed to get account, restarting.");
+                NSLog(@"[UIC] [Jarvis] Failed to get account, restarting.");
                 [NSThread sleepForTimeInterval:1];
                 [[Device sharedInstance] setMinLevel:@1]; // Never set to 0 until we can do tutorials.
                 [[Device sharedInstance] setMaxLevel:@29];
@@ -279,13 +293,13 @@ static HttpServer *_httpServer;
         NSNumber *startupCount = @0;
         while (_startup) {
             if (!_firststart) {
-                NSLog(@"[UIC][Jarvis] App still in startup...");
+                NSLog(@"[UIC] [Jarvis] App still in startup...");
                 while (!_menuButton) {
                     _newPlayerButton = [self clickButton:@"NewPlayerButton"];
                     if (_newPlayerButton) {
                         [[NSUserDefaults standardUserDefaults] removeObjectForKey:TokenUserDefaultsKey];
                         _newPlayerButton = false;
-                        NSLog(@"[UIC][Jarvis] Started at Login Screen");
+                        NSLog(@"[UIC] [Jarvis] Started at Login Screen");
                         [NSThread sleepForTimeInterval:1];
                         bool ptcButton = false;
                         NSNumber *ptcTryCount = @0;
@@ -332,8 +346,8 @@ static HttpServer *_httpServer;
                     _bannedScreen = [self findButton:@"BannedScreen"];
                     if (_bannedScreen) {
                         _bannedScreen = false;
-                        NSLog(@"[UIC][Jarvis] Account banned, switching accounts.");
-                        NSLog(@"[UIC][Jarvis] Username: %@", [[Device sharedInstance] username]);
+                        NSLog(@"[UIC] [Jarvis] Account banned, switching accounts.");
+                        NSLog(@"[UIC] [Jarvis] Username: %@", [[Device sharedInstance] username]);
                         NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
                         data[@"uuid"] = [[Device sharedInstance] uuid];
                         data[@"username"] = [[Device sharedInstance] username];
@@ -345,7 +359,7 @@ static HttpServer *_httpServer;
                     _invalidScreen = [self findButton:@"WrongUser"];
                     if (_invalidScreen) {
                         _invalidScreen = false;
-                        NSLog(@"[UIC][Jarvis] Wrong username, switching accounts.");
+                        NSLog(@"[UIC] [Jarvis] Wrong username, switching accounts.");
                         NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
                         data[@"uuid"] = [[Device sharedInstance] uuid];
                         data[@"username"] = [[Device sharedInstance] username];
@@ -370,7 +384,7 @@ static HttpServer *_httpServer;
                     
                     [NSThread sleepForTimeInterval:5];
                     if ([startupCount intValue] > 10) {
-                        NSLog(@"[UIC][Jarvis] Stuck somewhere logging out and restarting...");
+                        NSLog(@"[UIC] [Jarvis] Stuck somewhere logging out and restarting...");
                         [self logout];
                     }
                     startupCount = [Utils incrementInt:startupCount];
@@ -383,7 +397,7 @@ static HttpServer *_httpServer;
                 tokenData[@"ptcToken"] = _ptcToken;
                 tokenData[@"type"] = @"ptcToken";
                 [Utils postRequest:[[Settings sharedInstance] backendControllerUrl] dict:tokenData blocking:true completion:^(NSDictionary *result) {}];
-                NSLog(@"[UIC][Jarvis] App in Main Screen stopping detection.");
+                NSLog(@"[UIC] [Jarvis] App in Main Screen stopping detection.");
                 [self clickButton:@"TrackerButton"];
                 _startup = false;
             } else {
@@ -436,7 +450,8 @@ static HttpServer *_httpServer;
             
             NSNumber *firstWarningTimestamp = [data objectForKey:@"first_warning_timestamp"];
             if (firstWarningTimestamp != nil) {
-                _firstWarningDate = [NSDate dateWithTimeIntervalSince1970:[firstWarningTimestamp doubleValue]];
+                NSDate *firstWarningDate = [NSDate dateWithTimeIntervalSince1970:[firstWarningTimestamp doubleValue]];
+                [[DeviceState sharedInstance] setFirstWarningDate:firstWarningDate];
             }
             
             NSLog(@"[UIC] Connected to backend successfully!");
@@ -487,11 +502,13 @@ static HttpServer *_httpServer;
                     } else {
                         _startupLocation = [Utils createCoordinate:[startLat doubleValue] lon:[startLon doubleValue]];
                     }
-                    _currentLocation = _startupLocation;
+                    CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
+                    [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
                     NSLog(@"[UIC] StartupLocation: %@", _startupLocation);
                     NSNumber *firstWarningTimestamp = [data objectForKey:@"first_warning_timestamp"];
                     if (firstWarningTimestamp != nil) {
-                        _firstWarningDate = [NSDate dateWithTimeIntervalSince1970:[firstWarningTimestamp doubleValue]];
+                        NSDate *firstWarningDate = [NSDate dateWithTimeIntervalSince1970:[firstWarningTimestamp doubleValue]];
+                        [[DeviceState sharedInstance] setFirstWarningDate:firstWarningDate];
                     }
                 } else {
                     NSLog(@"[UIC] Failed to get account and not logged in.");
@@ -510,7 +527,8 @@ static HttpServer *_httpServer;
             while (!_startup) {
                 if (_needsLogout) {
                     //self.lock.lock();
-                    _currentLocation = _startupLocation;
+                    CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
+                    [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
                     //self.lock.unlock();
                     [self logout];
                 }
@@ -537,7 +555,8 @@ static HttpServer *_httpServer;
                             if (currentLevel != 0 && (currentLevel < minLevel || currentLevel > maxLevel)) {
                                 NSLog(@"[UIC] Account is outside min/max level. Current: %@ Min/Max: %@/%@. Logging out!", currentLevel, minLevel, maxLevel);
                                 //self.lock.lock();
-                                _currentLocation = _startupLocation;
+                                CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
+                                [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
                                 [self logout];
                                 //self.lock.unlock();
                             }
@@ -550,27 +569,33 @@ static HttpServer *_httpServer;
                         NSString *action = [data objectForKey:@"action"];
                         _action = action;
                         if ([action isEqualToString:@"scan_pokemon"]) {
-                            NSLog(@"[UIC][STATUS] Pokemon");
-                            [self handlePokemonJob:action withData:data hasWarning:hasWarning];
+                            NSLog(@"[UIC] [STATUS] Pokemon");
+                            //[self handlePokemonJob:action withData:data hasWarning:hasWarning];
+                            [_jobController handlePokemonJob:action withData:data hasWarning:hasWarning];
                         } else if ([action isEqualToString:@"scan_raid"]) {
-                            NSLog(@"[UIC][STATUS] Raid");
-                            [self handleRaidJob:action withData:data hasWarning:hasWarning];
+                            NSLog(@"[UIC] [STATUS] Raid");
+                            //[self handleRaidJob:action withData:data hasWarning:hasWarning];
+                            [_jobController handleRaidJob:action withData:data hasWarning:hasWarning];
                         } else if ([action isEqualToString:@"scan_quest"]) {
-                            NSLog(@"[UIC][STATUS] Quest/Leveling");
-                            [self handleQuestJob:action withData:data hasWarning:hasWarning];
+                            NSLog(@"[UIC] [STATUS] Quest/Leveling");
+                            //[self handleQuestJob:action withData:data hasWarning:hasWarning];
+                            [_jobController handleQuestJob:action withData:data hasWarning:hasWarning];
                         } else if ([action isEqualToString:@"switch_account"]) {
-                            NSLog(@"[UIC][STATUS] Switching Accounts");
-                            [self handleSwitchAccount:action withData:data hasWarning:hasWarning];
+                            NSLog(@"[UIC] [STATUS] Switching Accounts");
+                            //[self handleSwitchAccount:action withData:data hasWarning:hasWarning];
+                            [_jobController handleSwitchAccount:action withData:data hasWarning:hasWarning];
                         } else if ([action isEqualToString:@"leveling"]) {
-                            NSLog(@"[UIC][STATUS] Leveling");
-                            [self handleLeveling:action withData:data hasWarning:hasWarning];
+                            NSLog(@"[UIC] [STATUS] Leveling");
+                            //[self handleLeveling:action withData:data hasWarning:hasWarning];
+                            [_jobController handleLeveling:action withData:data hasWarning:hasWarning];
                         } else if ([action isEqualToString:@"scan_iv"]) {
-                            NSLog(@"[UIC][STATUS] IV");
-                            [self handleIVJob:action withData:data hasWarning:hasWarning];
+                            NSLog(@"[UIC] [STATUS] IV");
+                            //[self handleIVJob:action withData:data hasWarning:hasWarning];
+                            [_jobController handleIVJob:action withData:data hasWarning:hasWarning];
                         } else if ([action isEqualToString:@"gather_token"]) {
-                            NSLog(@"[UIC][STATUS] Token");
-                            [self handleGatherToken:action withData:data hasWarning:hasWarning];
-      
+                            NSLog(@"[UIC] [STATUS] Token");
+                            //[self handleGatherToken:action withData:data hasWarning:hasWarning];
+                            [_jobController handleGatherToken:action withData:data hasWarning:hasWarning];
                         } else {
                             NSLog(@"[UIC] Unknown Action: %@", action);
                         }
@@ -633,6 +658,7 @@ static HttpServer *_httpServer;
 
 #pragma mark Job Handlers
 
+/*
 -(void)handlePokemonJob:(NSString *)action withData:(NSDictionary *)data hasWarning:(BOOL)hasWarning
 {
     if (hasWarning && [[Settings sharedInstance] enableAccountManager]) {
@@ -1104,7 +1130,7 @@ static HttpServer *_httpServer;
     //_targetMaxDisance = [[Settings sharedInstance] targetMaxDistance];
     _currentLocation = [Utils createCoordinate:[lat doubleValue] lon:[lon doubleValue]];
     _waitForData = true;
-    _encounterDelay = [[Settings sharedInstance] encounterDelay];
+    //_encounterDelay = [[Settings sharedInstance] encounterDelay];
     //self.lock.unlock();
     NSLog(@"[UIC] Scanning prepared");
     
@@ -1154,10 +1180,11 @@ static HttpServer *_httpServer;
         tokenData[@"ptcToken"] = _ptcToken;
         tokenData[@"type"] = @"ptcToken";
         [Utils postRequest:[[Settings sharedInstance] backendControllerUrl] dict:tokenData blocking:true completion:^(NSDictionary *result) {}];
-        NSLog(@"[UIC][Jarvis] Received ptcToken, swapping account...");
+        NSLog(@"[UIC] [Jarvis] Received ptcToken, swapping account...");
         [self logout];
     }
 }
+*/
 
 
 #pragma mark Request Handlers
@@ -1165,11 +1192,11 @@ static HttpServer *_httpServer;
 -(NSString *)handleLocationRequest:(NSMutableDictionary *)params
 {
     NSMutableDictionary *responseData = [[NSMutableDictionary alloc] init];
-    //self.lock.lock
-    CLLocation *currentLoc = _currentLocation;
+    //self.lock.lock();
+    CLLocation *currentLoc = [[DeviceState sharedInstance] currentLocation];
     if (currentLoc != nil) {
-        if (_waitRequiresPokemon) {
-            //self.lock.unlock
+        if ([[DeviceState sharedInstance] waitRequiresPokemon]) {
+            //self.lock.unlock();
             NSNumber *jitterValue = [[Settings sharedInstance] jitterValue];
             NSNumber *jitterLat;
             NSNumber *jitterLon;
@@ -1198,47 +1225,46 @@ static HttpServer *_httpServer;
 
             NSNumber *currentLat = @([[NSNumber numberWithDouble:currentLoc.coordinate.latitude] doubleValue] + [jitterLat doubleValue]);
             NSNumber *currentLon = @([[NSNumber numberWithDouble:currentLoc.coordinate.longitude] doubleValue] + [jitterLon doubleValue]);
-            [responseData setObject:currentLat forKey:@"latitude"];
-            [responseData setObject:currentLon forKey:@"longitude"];
-            [responseData setObject:currentLon forKey:@"lat"];
-            [responseData setObject:currentLon forKey:@"lng"];
+            responseData[@"latitude"] = currentLat;
+            responseData[@"longitude"] = currentLon;
+            responseData[@"lat"] = currentLat;
+            responseData[@"lon"] = currentLon;
 
             //"scan_iv", "scan_pokemon"
             if ([[[Device sharedInstance] level] intValue] >= 30) {
-                [responseData setObject:@[@"pokemon"] forKey:@"actions"];
+                responseData[@"actions"] = @[@"pokemon"];
             } else {
-                [responseData setObject:@[] forKey:@"actions"];
+                responseData[@"actions"] = @[];
             }
         } else {
             // raids, quests
-            //self.lock.unlock
+            //self.lock.unlock();
             NSNumber *currentLat = [NSNumber numberWithDouble:currentLoc.coordinate.latitude];
             NSNumber *currentLon = [NSNumber numberWithDouble:currentLoc.coordinate.longitude];
-            [responseData setObject:currentLat forKey:@"latitude"];
-            [responseData setObject:currentLon forKey:@"longitude"];
-            [responseData setObject:currentLon forKey:@"lat"];
-            [responseData setObject:currentLon forKey:@"lng"];
+            responseData[@"latitude"] = currentLat;
+            responseData[@"longitude"] = currentLon;
+            responseData[@"lat"] = currentLat;
+            responseData[@"lon"] = currentLon;
             
             bool ultraQuests = [[Settings sharedInstance] ultraQuests];
             if (ultraQuests && [_action isEqualToString:@"scan_quest"] && _delayQuest) {
                 // Auto-spinning should only happen when ultraQuests is
                 // set and the instance is scan_quest type
                 if ([[[Device sharedInstance] level] intValue] >= 30) {
-                    [responseData setObject:@[@"pokemon", @"pokestop"] forKey:@"actions"];
+                    responseData[@"actions"] = @[@"pokemon", @"pokestop"];
                 } else {
-                    [responseData setObject:@[@"pokestop"] forKey:@"actions"];
+                    responseData[@"actions"] = @[@"pokestop"];
                 }
             } else if ([_action isEqualToString:@"leveling"]) {
-                [responseData setObject:@[@"pokestop"] forKey:@"actions"];
+                responseData[@"actions"] = @[@"pokestop"];
             } else if ([_action isEqualToString:@"scan_raid"]) {
                 // Raid instances do not need IV encounters, Use scan_pokemon
                 // type if you want to encounter while scanning raids.
-                [responseData setObject:@[] forKey:@"actions"];
+                responseData[@"actions"] = @[];
             }
         }
     }
-    
-    // TODO: Serialize dict
+
     // response: "Content-Type" = "application/json";
     
     //NSString *response = [NSString stringWithFormat:@"%@\r\n%@", _response_200, responseData];
@@ -1249,41 +1275,40 @@ static HttpServer *_httpServer;
 
 -(NSString *)handleDataRequest:(NSMutableDictionary *)params
 {
-    if (_currentLocation == nil) {
+    CLLocation *currentLocation = [[DeviceState sharedInstance] currentLocation];
+    if (currentLocation == nil) {
         return [Utils buildResponse:@"" withResponseCode:BadRequest];
     }
     _lastUpdate = [NSDate date];
-    CLLocation *currentLoc = [Utils createCoordinate:_currentLocation.coordinate.latitude lon: _currentLocation.coordinate.longitude];
+    CLLocation *currentLoc = [Utils createCoordinate:currentLocation.coordinate.latitude lon: currentLocation.coordinate.longitude];
     //NSNumber *targetMaxDistance = _targetMaxDistance;
     NSString *pokemonEncounterId = _pokemonEncounterId;
-    [params setObject:@(currentLoc.coordinate.latitude) forKey:@"lat_target"];
-    [params setObject:@(currentLoc.coordinate.longitude) forKey:@"lon_target"];
-    [params setObject:[[Settings sharedInstance] targetMaxDistance] forKey:@"target_max_distance"];
-    [params setObject:[[Device sharedInstance] username] ?: @"" forKey:@"username"];
-    [params setObject:pokemonEncounterId ?: @"" forKey:@"pokemon_encounter_id"];
-    [params setObject:[[Device sharedInstance] uuid] forKey:@"uuid"];
-    [params setObject:_ptcToken ?: @"" forKey:@"ptcToken"];
-    //params[@""] = @"";
+    params[@"lat_target"] = @(currentLoc.coordinate.latitude);
+    params[@"lon_target"] = @(currentLoc.coordinate.longitude);
+    params[@"target_max_distance"] = [[Settings sharedInstance] targetMaxDistance];
+    params[@"username"] = [[Device sharedInstance] username] ?: @"";
+    params[@"pokemon_encounter_id"] = pokemonEncounterId ?: @"";
+    params[@"uuid"] = [[Device sharedInstance] uuid];
+    params[@"ptcToken"] = _ptcToken ?: @"";
 
     NSString *url = [[Settings sharedInstance] backendRawUrl];
     [Utils postRequest:url dict:params blocking:false completion:^(NSDictionary *result) {
         NSDictionary *data = [result objectForKey:@"data"];
         
-        // TODO: Check if works, might need to use objectForKey instead
-        bool inArea = [data objectForKey:@"in_area"] ?: false;
-        NSNumber *level = [data objectForKey:@"level"] ?: @0;
-        NSNumber *nearby = [data objectForKey:@"nearby"] ?: @0;
-        NSNumber *wild = [data objectForKey:@"wild"] ?: @0;
-        NSNumber *quests = [data objectForKey:@"quests"] ?: @0;
-        NSNumber *encounters = [data objectForKey:@"encounters"] ?: @0;
-        NSNumber *pokemonLat = [data objectForKey:@"pokemon_lat"] ?: @0.0;
-        NSNumber *pokemonLon = [data objectForKey:@"pokemon_lon"] ?: @0.0;
-        NSString *pokemonEncounterIdResult = [data objectForKey:@"pokemon_encounter_id"];
-        NSNumber *targetLat = [data objectForKey:@"target_lat"] ?: @0.0;
-        NSNumber *targetLon = [data objectForKey:@"target_lon"] ?: @0.0;
-        bool onlyEmptyGmos = [data objectForKey:@"only_empty_gmos"] ?: @true;
-        bool onlyInvalidGmos = [data objectForKey:@"only_invalid_gmos"] ?: false;
-        bool containsGmo = [data objectForKey:@"contains_gmos"] ?: @true;
+        bool inArea = data[@"in_area"] ?: false;
+        NSNumber *level = data[@"level"] ?: @0;
+        NSNumber *nearby = data[@"nearby"] ?: @0;
+        NSNumber *wild = data[@"wild"] ?: @0;
+        NSNumber *quests = data[@"quests"] ?: @0;
+        NSNumber *encounters = data[@"encounters"] ?: @0;
+        NSNumber *pokemonLat = data[@"pokemon_lat"] ?: @0.0;
+        NSNumber *pokemonLon = data[@"pokemon_lon"] ?: @0.0;
+        NSString *pokemonEncounterIdResult = data[@"pokemon_encounter_id"];
+        NSNumber *targetLat = data[@"target_lat"] ?: @0.0;
+        NSNumber *targetLon = data[@"target_lon"] ?: @0.0;
+        bool onlyEmptyGmos = data[@"only_empty_gmos"] ?: @(true);
+        bool onlyInvalidGmos = data[@"only_invalid_gmos"] ?: @(false);
+        bool containsGmo = data[@"contains_gmos"] ?: @(true);
         
         NSNumber *pokemonFoundCount = [NSNumber numberWithFloat:([wild intValue] + [nearby intValue])];
         [[Device sharedInstance] setLevel:level];
@@ -1294,9 +1319,9 @@ static HttpServer *_httpServer;
         NSNumber *diffLon = @([[NSNumber numberWithDouble:currentLoc.coordinate.longitude] doubleValue] - [targetLon doubleValue]);
         
         // TODO: MIZU tut stuff
-        NSString *spinFortId = [data objectForKey:@"spin_fort_id"] ?: @"";
-        NSNumber *spinFortLat = [data objectForKey:@"spin_fort_lat"] ?: @0.0;
-        NSNumber *spinFortLon = [data objectForKey:@"spin_fort_lon"] ?: @0.0;
+        NSString *spinFortId = data[@"spin_fort_id"] ?: @"";
+        NSNumber *spinFortLat = data[@"spin_fort_lat"] ?: @0.0;
+        NSNumber *spinFortLon = data[@"spin_fort_lon"] ?: @0.0;
         if ([level intValue] > 0) {
             if ([[Device sharedInstance] level] != level) {
                 NSArray *luckyEggLevels = @[ @9, @10, @15, @20, @25];
@@ -1314,13 +1339,12 @@ static HttpServer *_httpServer;
         NSNumber *itemDistance = @10000.0;
         if (([spinFortId isEqualToString:@""] || spinFortId == nil) && [spinFortLat doubleValue] != 0.0) {
             CLLocation *fortLocation = [Utils createCoordinate:[spinFortLat doubleValue] lon:[spinFortLon doubleValue]];
-            CLLocation *currentLocation = _currentLocation;
-            itemDistance = [NSNumber numberWithDouble:[fortLocation distanceFromLocation:currentLocation]];
+            itemDistance = [NSNumber numberWithDouble:[fortLocation distanceFromLocation:currentLoc]];
             NSLog(@"[UIC] [DEBUG] ItemDistance: %@", itemDistance);
         }
         
         if (onlyInvalidGmos) {
-            _waitForData = false;
+            [[DeviceState sharedInstance] setWaitForData:false];
             toPrint = @"[UIC] Got GMO but it was malformed. Skipping.";
         } else if (containsGmo) {
             if (inArea && [diffLat doubleValue] < 0.0001 && [diffLon doubleValue] < 0.0001) {
@@ -1328,13 +1352,13 @@ static HttpServer *_httpServer;
                 if (_pokemonEncounterId != nil) {
                     if ([pokemonFoundCount intValue] > 0) {
                         if (pokemonLat != 0 && pokemonLon != 0 && _pokemonEncounterId == pokemonEncounterIdResult) {
-                            _waitRequiresPokemon = false;
-                            CLLocation *oldLocation = _currentLocation;
-                            _currentLocation = [Utils createCoordinate:[pokemonLat doubleValue] lon:[pokemonLon doubleValue]];
-                            CLLocation *newLocation = _currentLocation;
+                            [[DeviceState sharedInstance] setWaitRequiresPokemon:false];
+                            CLLocation *oldLocation = [[DeviceState sharedInstance] currentLocation];
+                            [[DeviceState sharedInstance] setCurrentLocation:[Utils createCoordinate:[pokemonLat doubleValue] lon:[pokemonLon doubleValue]]];
+                            CLLocation *newLocation = [[DeviceState sharedInstance] currentLocation];
                             _encounterDistance = [NSNumber numberWithDouble:[newLocation distanceFromLocation:oldLocation]];
                             _pokemonEncounterId = nil;
-                            _waitForData = false;
+                            [[DeviceState sharedInstance] setWaitForData:false];
                             toPrint = @"[UIC] Got Data and found Pokemon";
                         } else {
                             toPrint = @"[UIC] Got Data but did not find Pokemon";
@@ -1342,16 +1366,16 @@ static HttpServer *_httpServer;
                     } else {
                         toPrint = @"[UIC] Got Data without Pokemon";
                     }
-                } else if (_waitRequiresPokemon) {
+                } else if ([[DeviceState sharedInstance] waitRequiresPokemon]) {
                     if ([pokemonFoundCount intValue] > 0) {
                         toPrint = @"[UIC] Got Data with Pokemon";
-                        _waitForData = false;
+                        [[DeviceState sharedInstance] setWaitForData:false];
                     } else {
                         toPrint = @"[UIC] Got Data without Pokemon";
                     }
                 } else {
                     toPrint = @"[UIC] Got Data";
-                    _waitForData = false;
+                    [[DeviceState sharedInstance] setWaitForData:false];
                 }
             } else if (onlyEmptyGmos && !_startup) {
                 _emptyGmoCount = [Utils incrementInt:_emptyGmoCount];
@@ -1364,19 +1388,17 @@ static HttpServer *_httpServer;
             toPrint = @"[UIC] Got Data without GMO";
         }
 
-        if (!_gotQuest && quests != 0) {
-            _gotQuest = true;
+        if (![[DeviceState sharedInstance] gotQuest] && quests != 0) {
+            [[DeviceState sharedInstance] setGotQuest:true];
             _gotQuestEarly = true;
         }
         
-        if (!_gotIV && encounters != 0) {
-            _gotIV = true;
+        if (![[DeviceState sharedInstance] gotIV] && encounters != 0) {
+            [[DeviceState sharedInstance] setGotIV:true];
         }
         
         NSLog(@"[UIC] Handle data response: %@", toPrint);
     }];
-    // TODO: Convert params to json
-    //NSString *response = [NSString stringWithFormat:@"%@\r\n%@", _response_200, params];
     NSString *body = [Utils toJsonString:params withPrettyPrint:false];
     NSString *response = [Utils buildResponse:body withResponseCode:Success];
     return response;
@@ -1384,33 +1406,23 @@ static HttpServer *_httpServer;
 
 @end
 
-@interface UIImage (Pixels)
+/*
+@interface XCTestCase (KIFFramework) <KIFTestActorDelegate>
 
-//-(UIColor *)getPixelColor:(CGFloat *)pos;
--(UIColor *)getPixelColor:(int)x withY:(int)y;
+//-(KIFUIViewTestActor)viewTester:(NSString *)file = #__FILE__ withLine:(NSInteger *)line = #__LINE__;
+//-(KIFSystemTextActor)system:(NSString *)file = #__FILE__ withLine:(NSInteger *)line = #__LINE__;
 
 @end
 
-@implementation UIImage (Pixels)
+@implementation XCodeTest (KIFFramework)
 
--(UIColor *)getPixelColor:(int)x withY:(int)y
+-(KIFUIViewTestActor)viewTest:(NSString *)file = #__FILE__ withLine:(NSInteger *)line = #__LINE__
 {
-    CFDataRef pixelData = CGDataProviderCopyData(CGImageGetDataProvider(self.CGImage));
-    const UInt8 *data = CFDataGetBytePtr(pixelData);
+}
 
-    int pixelInfo (((self.size.width * y) + x) * 4); // The image is png
-    UInt8 red = data[pixelInfo];
-    UInt8 green = data[pixelInfo + 1];
-    UInt8 blue = data[pixelInfo + 2];
-    UInt8 alpha = data[pixelInfo + 3];
-    CFRelease(pixelData);
-    
-    UIColor *color = [UIColor colorWithRed:red / 255.0f
-                                     green:green / 255.0f
-                                      blue:blue / 255.0f
-                                     alpha:alpha / 255.0f
-    ];
-    return color;
+-(KIFSystemTextActor)system:(NSString *)file = #__FILE__ withLine:(NSInteger *)line = #__LINE__
+{
 }
 
 @end
+*/

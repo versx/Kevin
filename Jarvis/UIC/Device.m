@@ -96,12 +96,44 @@ static BOOL _shouldExit;
     _shouldExit = shouldExit;
 }
 
+/*
+@synthesize uuid;
+@synthesize model;
+@synthesize osName;
+@synthesize osVersion;
+@synthesize multiplier;
+
+@synthesize username;
+@synthesize password;
+@synthesize ptcToken;
+@synthesize level;
+@synthesize minLevel;
+@synthesize maxLevel;
+@synthesize isLoggedIn;
+@synthesize shouldExit;
+*/
+
 +(Device *)sharedInstance
 {
     static Device *sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [[Device alloc] init];
+        /*
+        [sharedInstance setUuid:[[UIDevice currentDevice] name]];
+        [sharedInstance setModel:getNameFromModelIdentifier(getModelIdentifier())];
+        [sharedInstance setOsName:[[UIDevice currentDevice] systemName]];
+        [sharedInstance setOsVersion:[[UIDevice currentDevice] systemVersion]];
+        if ([[sharedInstance model] isEqualToString:@"iPhone 5s"] ||
+            [[sharedInstance model] isEqualToString:@"iPhone 6"] ||
+            [[sharedInstance model] isEqualToString:@"iPhone 6 Plus"]) {
+            [sharedInstance setMultiplier:45];
+        } else {
+            [sharedInstance setMultiplier:5];
+        }
+        [sharedInstance setMinLevel:1];
+        [sharedInstance setMaxLevel:29];
+        */
         _uuid = [[UIDevice currentDevice] name];
         _model = getModelIdentifier(); //[[UIDevice currentDevice] localizedModel];
         _model = getNameFromModelIdentifier(_model);
