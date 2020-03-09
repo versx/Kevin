@@ -8,11 +8,11 @@
 #import "UIC.h"
 //#import <XCTest/XCTest.h>
 
-// TODO: Remote config
 // TODO: KIF library
 // TODO: StateManager class
 // TODO: Pixel checks
 // TODO: CocoaPods
+// TODO: Pixel offsets in remote config
 
 #pragma mark Global Variables
 
@@ -34,6 +34,7 @@ static BOOL _newPlayerButton = false;
 static BOOL _bannedScreen = false;
 static BOOL _invalidScreen = false;
 
+
 @implementation UIC2
 
 static HttpServer *_httpServer;
@@ -46,6 +47,8 @@ static JobController *_jobController;
     NSLog(@"[UIC] init");
     if ((self = [super init]))
     {
+        //NSDictionary *config = [[Settings sharedInstance] fetchRemoteConfig:@"https://ver.sx/x/uic.plist"];
+        //NSLog(@"[UIC] Remote Config: %@", config);
     }
     
     return self;
@@ -57,7 +60,8 @@ static JobController *_jobController;
     [super dealloc];
 }
 
-#pragma App Management
+
+#pragma mark App Manager
 
 -(void)start
 {
@@ -137,6 +141,7 @@ static JobController *_jobController;
     );
     [self loginStateHandler];
 }
+
 
 #pragma mark State Managers
 

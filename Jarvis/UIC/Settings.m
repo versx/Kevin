@@ -28,7 +28,7 @@ static NSNumber *_minDelayLogout;
 static BOOL _ultraQuests;
 static BOOL _deployEggs;
 
-static NSString *plistFileName = @"uic.plist";
+static NSString *plistFileName = @"config.plist";
 
 -(NSDictionary *)config {
     return _config;
@@ -94,7 +94,8 @@ static NSString *plistFileName = @"uic.plist";
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [[Settings alloc] init];
-        _config = [sharedInstance loadSettings];
+        NSString *remoteConfigUrl = [sharedInstance getRemoteConfigUrl];
+        _config = [sharedInstance fetchRemoteConfig:remoteConfigUrl];//[sharedInstance loadSettings];
         _enableAccountManager = _config[@"enableAccountManager"] ?: false;
         _backendControllerUrl = _config[@"backendControllerURL"];
         _backendRawUrl = _config[@"backendRawURL"];
@@ -115,21 +116,54 @@ static NSString *plistFileName = @"uic.plist";
     return sharedInstance;
 }
 
--(NSDictionary *)loadSettings {
+/*
+-(NSDictionary *)loadSettings
+{
     NSString *bundlePath = [[NSBundle mainBundle] bundlePath];
     NSString *plistPath = [bundlePath stringByAppendingPathComponent:plistFileName];
     
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if (![fileManager fileExistsAtPath:plistPath]) {
-        NSLog(@"[UIC] uic.plist DOES NOT EXIST!");
+        NSLog(@"[Settings] uic.plist DOES NOT EXIST!");
         return nil;
     }
-    NSLog(@"[UIC] Loading uic.plist from %@", plistPath);
+    NSLog(@"[Settings] Loading uic.plist from %@", plistPath);
     NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:plistPath];
     for (id key in dict) {
         NSLog(@"key=%@ value=%@", key, dict[key]);
     }
     return dict;
+}
+*/
+
+-(NSString *)getRemoteConfigUrl
+{
+    NSString *bundlePath = [[NSBundle mainBundle] bundlePath];
+    NSString *plistPath = [bundlePath stringByAppendingPathComponent:plistFileName];
+    
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    if (![fileManager fileExistsAtPath:plistPath]) {
+        NSLog(@"[Settings] uic.plist DOES NOT EXIST!");
+        return nil;
+    }
+    NSLog(@"[Settings] Loading uic.plist from %@", plistPath);
+    NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:plistPath];
+    NSLog(@"[Settings] config.plist - %@", dict);
+    return dict[@"url"];
+}
+
+-(NSDictionary *)fetchRemoteConfig:(NSString *)urlString
+{
+    NSLog(@"[Settings] Fetching remote config from %@", urlString);
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSError *error = nil;
+    NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfURL:url error:&error];
+    if (error == nil) {
+        NSLog(@"[Settings] Remote Config: %@", dict);
+        return dict;
+    }
+    NSLog(@"[Settings] Failed to fetch remote config %@\r\nError: %@", urlString, error);
+    return nil;
 }
 
 @end

@@ -77,6 +77,7 @@
 		C0132B55240B5DEC00719452 /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
 		C0132B61240B630000719452 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		C0132B63240B631700719452 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		C019482824161E730094A2C8 /* config.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = config.plist; sourceTree = "<group>"; };
 		C01B4961240ACF5D00633B45 /* libJarvis++.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libJarvis++.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C01B4964240ACF5D00633B45 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		C01B4966240ACF5D00633B45 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
@@ -95,7 +96,6 @@
 		C0AC1CF3240BB37C008F4DFB /* Device.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Device.h; sourceTree = "<group>"; };
 		C0AC1CF5240BB96C008F4DFB /* Settings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Settings.m; sourceTree = "<group>"; };
 		C0AC1CF7240BB97A008F4DFB /* Settings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Settings.h; sourceTree = "<group>"; };
-		C0AC1CF9240BDAC6008F4DFB /* uic.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = uic.plist; sourceTree = "<group>"; };
 		C0AC1D29240DA4C1008F4DFB /* PTFakeTouch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTFakeTouch.h; sourceTree = "<group>"; };
 		C0AC1D2A240DA4C1008F4DFB /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = IOKit.framework; sourceTree = "<group>"; };
 		C0AC1D2C240DA4C1008F4DFB /* IOHIDEvent+KIF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IOHIDEvent+KIF.h"; sourceTree = "<group>"; };
@@ -197,7 +197,7 @@
 		C01B4957240ACF5D00633B45 = {
 			isa = PBXGroup;
 			children = (
-				C0AC1CF9240BDAC6008F4DFB /* uic.plist */,
+				C019482824161E730094A2C8 /* config.plist */,
 				C0025AC124148455007813F7 /* Controllers */,
 				C0025ABC241483A2007813F7 /* Extensions */,
 				C01B4963240ACF5D00633B45 /* Frameworks */,

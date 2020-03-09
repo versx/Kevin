@@ -165,7 +165,7 @@ static bool _isListening;
                     [DeviceState restart];
                 } else if ([query hasPrefix:@"/config"]) {
                     NSMutableString *text = [[NSMutableString alloc] init];
-                    NSDictionary *config = [[Settings alloc] loadSettings];
+                    NSDictionary *config = [[Settings sharedInstance] config];
                     if (config != nil) {
                         for (id key in config) {
                             [text appendFormat:@"%@=%@\n", key, config[key]];

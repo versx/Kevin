@@ -30,7 +30,6 @@
     [lastDeployTime release];
     [lastUpdate release];
     [pokemonEncounterId release];
-    [ptcToken release];
     [targetFortId release];
     
     [super dealloc];

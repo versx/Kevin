@@ -29,6 +29,7 @@
 -(BOOL)ultraQuests;
 -(BOOL)deployEggs;
 
--(NSDictionary *)loadSettings;
+//-(NSDictionary *)loadSettings;
+-(NSDictionary *)fetchRemoteConfig:(NSString *)urlString;
 
 @end
