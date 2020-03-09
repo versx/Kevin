@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C019482A2416216C0094A2C8 /* config.plist in Resources */ = {isa = PBXBuildFile; fileRef = C01948292416216C0094A2C8 /* config.plist */; };
 		C01B4940240ACF2400633B45 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C01B493F240ACF2400633B45 /* AppDelegate.m */; };
 		C01B4946240ACF2400633B45 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C01B4945240ACF2400633B45 /* ViewController.m */; };
 		C01B4949240ACF2400633B45 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C01B4947240ACF2400633B45 /* Main.storyboard */; };
@@ -16,7 +17,6 @@
 		C01B4986240AD1B500633B45 /* libJarvis++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = C01B4985240AD1B500633B45 /* libJarvis++.dylib */; };
 		C01B4989240AD9AA00633B45 /* libJarvis++.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = C01B4985240AD1B500633B45 /* libJarvis++.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		C01B498D240AE47200633B45 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C01B498C240AE47200633B45 /* SceneDelegate.m */; };
-		C0AC1CFE240BE0F9008F4DFB /* uic.plist in Resources */ = {isa = PBXBuildFile; fileRef = C0AC1CFC240BE0E7008F4DFB /* uic.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -34,6 +34,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C01948292416216C0094A2C8 /* config.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = config.plist; sourceTree = "<group>"; };
 		C01B493B240ACF2400633B45 /* TestApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C01B493E240ACF2400633B45 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		C01B493F240ACF2400633B45 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -47,7 +48,6 @@
 		C01B4985240AD1B500633B45 /* libJarvis++.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; path = "libJarvis++.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C01B498B240AE47200633B45 /* SceneDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
 		C01B498C240AE47200633B45 /* SceneDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
-		C0AC1CFC240BE0E7008F4DFB /* uic.plist */ = {isa = PBXFileReference; lastKnownFileType = file.bplist; path = uic.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -65,10 +65,10 @@
 		C01B4932240ACF2400633B45 = {
 			isa = PBXGroup;
 			children = (
-				C0AC1CFC240BE0E7008F4DFB /* uic.plist */,
-				C01B493D240ACF2400633B45 /* TestApp */,
-				C01B493C240ACF2400633B45 /* Products */,
+				C01948292416216C0094A2C8 /* config.plist */,
 				C01B4984240AD1B500633B45 /* Frameworks */,
+				C01B493C240ACF2400633B45 /* Products */,
+				C01B493D240ACF2400633B45 /* TestApp */,
 			);
 			sourceTree = "<group>";
 		};
@@ -83,17 +83,17 @@
 		C01B493D240ACF2400633B45 /* TestApp */ = {
 			isa = PBXGroup;
 			children = (
-				C01B498B240AE47200633B45 /* SceneDelegate.h */,
-				C01B498C240AE47200633B45 /* SceneDelegate.m */,
 				C01B493E240ACF2400633B45 /* AppDelegate.h */,
 				C01B493F240ACF2400633B45 /* AppDelegate.m */,
+				C01B494A240ACF2500633B45 /* Assets.xcassets */,
+				C01B494F240ACF2500633B45 /* Info.plist */,
+				C01B494C240ACF2500633B45 /* LaunchScreen.storyboard */,
+				C01B4950240ACF2500633B45 /* main.m */,
+				C01B4947240ACF2400633B45 /* Main.storyboard */,
+				C01B498B240AE47200633B45 /* SceneDelegate.h */,
+				C01B498C240AE47200633B45 /* SceneDelegate.m */,
 				C01B4944240ACF2400633B45 /* ViewController.h */,
 				C01B4945240ACF2400633B45 /* ViewController.m */,
-				C01B4947240ACF2400633B45 /* Main.storyboard */,
-				C01B494A240ACF2500633B45 /* Assets.xcassets */,
-				C01B494C240ACF2500633B45 /* LaunchScreen.storyboard */,
-				C01B494F240ACF2500633B45 /* Info.plist */,
-				C01B4950240ACF2500633B45 /* main.m */,
 			);
 			path = TestApp;
 			sourceTree = "<group>";
@@ -164,10 +164,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C0AC1CFE240BE0F9008F4DFB /* uic.plist in Resources */,
 				C01B494E240ACF2500633B45 /* LaunchScreen.storyboard in Resources */,
 				C01B494B240ACF2500633B45 /* Assets.xcassets in Resources */,
 				C01B4949240ACF2400633B45 /* Main.storyboard in Resources */,
+				C019482A2416216C0094A2C8 /* config.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

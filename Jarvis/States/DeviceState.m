@@ -41,6 +41,7 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [[DeviceState alloc] init];
+        [sharedInstance setLastUpdate:[NSDate date]];
         // TODO: Set Defaults? [sharedInstance setDelayQuest:false];
     });
     return sharedInstance;

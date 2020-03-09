@@ -96,22 +96,22 @@ static NSString *plistFileName = @"config.plist";
         sharedInstance = [[Settings alloc] init];
         NSString *remoteConfigUrl = [sharedInstance getRemoteConfigUrl];
         _config = [sharedInstance fetchRemoteConfig:remoteConfigUrl];//[sharedInstance loadSettings];
-        _enableAccountManager = _config[@"enableAccountManager"] ?: false;
+        _enableAccountManager = [_config[@"enableAccountManager"] boolValue] ?: DEFAULT_ENABLE_ACCOUNT_MANAGER;
         _backendControllerUrl = _config[@"backendControllerURL"];
         _backendRawUrl = _config[@"backendRawURL"];
         _token = _config[@"token"] ?: @"";
-        _port = _config[@"port"] ?: @8080;
-        _targetMaxDistance = _config[@"targetMaxDistance"] ?: @250.0;
-        _pokemonMaxTime = _config[@"pokemonMaxTime"] ?: @25.0;
-        _raidMaxTime = _config[@"raidMaxTime"] ?: @25.0;
-        _encounterDelay = _config[@"encounterDelay"] ?: @0.0;
-        _maxEmptyGMO = _config[@"maxEmptyGMO"] ?: @50;
-        _maxFailedCount = _config[@"maxEmptyGMO"] ?: @5;
-        _maxNoQuestCount = _config[@"maxNoQuestCount"] ?: @5;
-        _maxWarningTimeRaid = _config[@"maxWarningTimeRaid"] ?: @432000;
-        _minDelayLogout = _config[@"minDelayLogout"] ?: @180.0;
-        _ultraQuests = _config[@"ultraQuests"] ?: false;
-        _deployEggs = _config[@"deployEggs"] ?: false;
+        _port = _config[@"port"] ?: DEFAULT_PORT;
+        _targetMaxDistance = _config[@"targetMaxDistance"] ?: DEFAULT_TARGET_MAX_DISTANCE;
+        _pokemonMaxTime = _config[@"pokemonMaxTime"] ?: DEFAULT_POKEMON_MAX_TIME;
+        _raidMaxTime = _config[@"raidMaxTime"] ?: DEFAULT_RAID_MAX_TIME;
+        _encounterDelay = _config[@"encounterDelay"] ?: DEFAULT_ENCOUNTER_DELAY;
+        _maxEmptyGMO = _config[@"maxEmptyGMO"] ?: DEFAULT_MAX_EMPTY_GMO;
+        _maxFailedCount = _config[@"maxFailedCount"] ?: DEFAULT_MAX_FAILED_COUNT;
+        _maxNoQuestCount = _config[@"maxNoQuestCount"] ?: DEFAULT_MAX_NO_QUEST_COUNT;
+        _maxWarningTimeRaid = _config[@"maxWarningTimeRaid"] ?: DEFAULT_MAX_WARNING_TIME_RAID;
+        _minDelayLogout = _config[@"minDelayLogout"] ?: DEFAULT_MIN_DELAY_LOGOUT;
+        _ultraQuests = [_config[@"ultraQuests"] boolValue] ?: DEFAULT_ULTRA_QUESTS;
+        _deployEggs = [_config[@"deployEggs"] boolValue] ?: DEFAULT_DEPLOY_EGGS;
     });
     return sharedInstance;
 }
@@ -154,15 +154,15 @@ static NSString *plistFileName = @"config.plist";
 
 -(NSDictionary *)fetchRemoteConfig:(NSString *)urlString
 {
+    // TODO: Attempt to load again on failure
     NSLog(@"[Settings] Fetching remote config from %@", urlString);
     NSURL *url = [NSURL URLWithString:urlString];
-    NSError *error = nil;
-    NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfURL:url error:&error];
-    if (error == nil) {
+    NSDictionary *dict = [NSDictionary dictionaryWithContentsOfURL:url];
+    if (dict != nil) {
         NSLog(@"[Settings] Remote Config: %@", dict);
         return dict;
     }
-    NSLog(@"[Settings] Failed to fetch remote config %@\r\nError: %@", urlString, error);
+    NSLog(@"[Settings] Failed to fetch remote config %@", urlString);
     return nil;
 }
 

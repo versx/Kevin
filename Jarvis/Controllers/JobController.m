@@ -151,9 +151,9 @@
         [[[Device sharedInstance] level] intValue] < 30) {
         NSNumber *i = @(arc4random_uniform(60));
         [NSThread sleepForTimeInterval:2];
-        if (/* TODO: [self getToMainScreen] */ true) {
+        if ([Jarvis__ getToMainScreen]) {
             NSLog(@"[UIC] Deploying an egg");
-            if (/* TODO: [self eggDeploy] */ true) {
+            if ([Jarvis__ eggDeploy]) {
                 // If an egg was found, set the timer to 31 minutes.
                 //NSDate *eggStart = [[NSDate date] initWithTimeInterval:(1860 + [i intValue]) sinceDate:[NSDate date]];
                 NSDate *eggStart = [NSDate dateWithTimeInterval:(1860 + [i intValue]) sinceDate:[NSDate date]];
@@ -239,14 +239,16 @@
             NSNumber *failedCount = [[DeviceState sharedInstance] failedCount];
             [[DeviceState sharedInstance] setFailedCount:[Utils incrementInt:failedCount]];
             NSLog(@"[UIC] Pokestop loading timed out.");
-            // TODO: Pass 'action' to method, don't use global _action incase of race condition.
             NSMutableDictionary *failedData = [[NSMutableDictionary alloc] init];
             failedData[@"uuid"] = [[Device sharedInstance] uuid];
             failedData[@"action"] = action;
             failedData[@"lat"] = lat;
             failedData[@"lon"] = lon;
             failedData[@"type"] = @"job_failed";
-            [Utils postRequest:[[Settings sharedInstance] backendControllerUrl] dict:failedData blocking:true completion:^(NSDictionary *result) {}];
+            [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                          dict:failedData
+                      blocking:true
+                    completion:^(NSDictionary *result) {}];
         } else {
             locked = [[DeviceState sharedInstance] waitForData];
             if (!locked) {
@@ -297,7 +299,6 @@
 
 -(void)handleLeveling:(NSString *)action withData:(NSDictionary *)data hasWarning:(BOOL)hasWarning
 {
-    // TODO: Handle Mizu leveling jobs
     [[DeviceState sharedInstance] setDelayQuest:false];
     //degreePerMeter = 83267.0991559005
     NSNumber *lat = data[@"lat"] ?: 0;
@@ -568,7 +569,7 @@
         NSMutableDictionary *tokenData = [[NSMutableDictionary alloc] init];
         tokenData[@"uuid"] = [[Device sharedInstance] uuid];
         tokenData[@"username"] = [[Device sharedInstance] username];
-        tokenData[@"ptcToken"] = [[DeviceState sharedInstance] ptcToken];
+        tokenData[@"ptcToken"] = [[Device sharedInstance] ptcToken];
         tokenData[@"type"] = @"ptcToken";
         [Utils postRequest:[[Settings sharedInstance] backendControllerUrl] dict:tokenData blocking:true completion:^(NSDictionary *result) {}];
         NSLog(@"[UIC] [Jarvis] Received ptcToken, swapping account...");

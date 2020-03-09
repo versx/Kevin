@@ -5,6 +5,8 @@
 //  Created by versx on 3/1/20.
 //
 
+#import "Consts.h"
+
 @interface Settings : NSObject
 
 +(instancetype)sharedInstance;
