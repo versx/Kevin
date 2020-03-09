@@ -139,10 +139,10 @@
 		C0025AA3241416DE007813F7 /* Net */ = {
 			isa = PBXGroup;
 			children = (
+				C0025AB6241447F3007813F7 /* HttpResponseCode.h */,
 				C0025AA62414171C007813F7 /* HttpServer.h */,
 				C0025AA42414170C007813F7 /* HttpServer.m */,
 				C0025AAA2414175C007813F7 /* HttpServerProtocol.h */,
-				C0025AB6241447F3007813F7 /* HttpResponseCode.h */,
 			);
 			path = Net;
 			sourceTree = "<group>";
@@ -186,10 +186,10 @@
 		C0132B50240B5DEC00719452 /* GCD */ = {
 			isa = PBXGroup;
 			children = (
-				C0132B52240B5DEC00719452 /* GCDAsyncUdpSocket.m */,
+				C0132B55240B5DEC00719452 /* GCDAsyncSocket.h */,
 				C0132B53240B5DEC00719452 /* GCDAsyncSocket.m */,
 				C0132B54240B5DEC00719452 /* GCDAsyncUdpSocket.h */,
-				C0132B55240B5DEC00719452 /* GCDAsyncSocket.h */,
+				C0132B52240B5DEC00719452 /* GCDAsyncUdpSocket.m */,
 			);
 			path = GCD;
 			sourceTree = "<group>";
@@ -197,18 +197,18 @@
 		C01B4957240ACF5D00633B45 = {
 			isa = PBXGroup;
 			children = (
+				C0AC1CF9240BDAC6008F4DFB /* uic.plist */,
 				C0025AC124148455007813F7 /* Controllers */,
 				C0025ABC241483A2007813F7 /* Extensions */,
-				C0025AB52414393B007813F7 /* States */,
-				C0025AA3241416DE007813F7 /* Net */,
-				C0AC1D28240DA4C1008F4DFB /* PTFakeTouch */,
-				C0132B50240B5DEC00719452 /* GCD */,
-				C01B497D240ACF9400633B45 /* UIC */,
-				C01B4968240ACF5D00633B45 /* Jarvis++ */,
-				C0025AAC241421D5007813F7 /* Utilities */,
-				C0AC1CF9240BDAC6008F4DFB /* uic.plist */,
 				C01B4963240ACF5D00633B45 /* Frameworks */,
+				C0132B50240B5DEC00719452 /* GCD */,
+				C01B4968240ACF5D00633B45 /* Jarvis++ */,
+				C0025AA3241416DE007813F7 /* Net */,
 				C01B4962240ACF5D00633B45 /* Products */,
+				C0AC1D28240DA4C1008F4DFB /* PTFakeTouch */,
+				C0025AB52414393B007813F7 /* States */,
+				C01B497D240ACF9400633B45 /* UIC */,
+				C0025AAC241421D5007813F7 /* Utilities */,
 			);
 			sourceTree = "<group>";
 		};
@@ -305,11 +305,11 @@
 		C0AC1D28240DA4C1008F4DFB /* PTFakeTouch */ = {
 			isa = PBXGroup;
 			children = (
-				C0AC1D29240DA4C1008F4DFB /* PTFakeTouch.h */,
 				C0AC1D2A240DA4C1008F4DFB /* IOKit.framework */,
-				C0AC1D2B240DA4C1008F4DFB /* head */,
+				C0AC1D29240DA4C1008F4DFB /* PTFakeTouch.h */,
 				C0AC1D3A240DA4C1008F4DFB /* PTFakeTouch.m */,
 				C0AC1D3B240DA4C1008F4DFB /* Info.plist */,
+				C0AC1D2B240DA4C1008F4DFB /* head */,
 			);
 			path = PTFakeTouch;
 			sourceTree = "<group>";
@@ -317,20 +317,20 @@
 		C0AC1D2B240DA4C1008F4DFB /* head */ = {
 			isa = PBXGroup;
 			children = (
+				C0AC1D34240DA4C1008F4DFB /* FixCategoryBug.h */,
 				C0AC1D2C240DA4C1008F4DFB /* IOHIDEvent+KIF.h */,
+				C0AC1D35240DA4C1008F4DFB /* IOHIDEvent+KIF.m */,
+				C0AC1D39240DA4C1008F4DFB /* LoadableCategory.h */,
 				C0AC1D2D240DA4C1008F4DFB /* UIApplication-KIFAdditions.h */,
-				C0AC1D2E240DA4C1008F4DFB /* UIWindow-KIFAdditions.m */,
+				C0AC1D33240DA4C1008F4DFB /* UIApplication-KIFAdditions.m */,
+				C0AC1D31240DA4C1008F4DFB /* UIEvent+KIFAdditions.h */,
+				C0AC1D38240DA4C1008F4DFB /* UIEvent+KIFAdditions.m */,
+				C0AC1D37240DA4C1008F4DFB /* UITouch-KIFAdditions.h */,
 				C0AC1D2F240DA4C1008F4DFB /* UITouch-KIFAdditions.m */,
 				C0AC1D30240DA4C1008F4DFB /* UIView-KIFAdditions.h */,
-				C0AC1D31240DA4C1008F4DFB /* UIEvent+KIFAdditions.h */,
-				C0AC1D32240DA4C1008F4DFB /* UIWindow-KIFAdditions.h */,
-				C0AC1D33240DA4C1008F4DFB /* UIApplication-KIFAdditions.m */,
-				C0AC1D34240DA4C1008F4DFB /* FixCategoryBug.h */,
-				C0AC1D35240DA4C1008F4DFB /* IOHIDEvent+KIF.m */,
 				C0AC1D36240DA4C1008F4DFB /* UIView-KIFAdditions.m */,
-				C0AC1D37240DA4C1008F4DFB /* UITouch-KIFAdditions.h */,
-				C0AC1D38240DA4C1008F4DFB /* UIEvent+KIFAdditions.m */,
-				C0AC1D39240DA4C1008F4DFB /* LoadableCategory.h */,
+				C0AC1D32240DA4C1008F4DFB /* UIWindow-KIFAdditions.h */,
+				C0AC1D2E240DA4C1008F4DFB /* UIWindow-KIFAdditions.m */,
 			);
 			path = head;
 			sourceTree = "<group>";

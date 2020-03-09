@@ -30,8 +30,8 @@
         //self.lock.unlock();
     }
     
-    NSNumber *lat = [data objectForKey:@"lat"];
-    NSNumber *lon = [data objectForKey:@"lon"];
+    NSNumber *lat = data[@"lat"];
+    NSNumber *lon = data[@"lon"];
     NSLog(@"[UIC] Scanning for Pokemon at %@ %@", lat, lon);
     
     NSDate *start = [NSDate date];
@@ -84,8 +84,8 @@
         //self.lock.unlock();
     }
     
-    NSNumber *lat = [data objectForKey:@"lat"] ?: 0;
-    NSNumber *lon = [data objectForKey:@"lon"] ?: 0;
+    NSNumber *lat = data[@"lat"] ?: 0;
+    NSNumber *lon = data[@"lon"] ?: 0;
     NSLog(@"[UIC] Scanning for Raid at %@ %@", lat, lon);
     
     NSDate *start = [NSDate date];
@@ -130,9 +130,9 @@
 -(void)handleQuestJob:(NSString *)action withData:(NSDictionary *)data hasWarning:(BOOL)hasWarning
 {
     [[DeviceState sharedInstance] setDelayQuest:true];
-    NSNumber *lat = [data objectForKey:@"lat"];
-    NSNumber *lon = [data objectForKey:@"lon"];
-    NSNumber *delay = [data objectForKey:@"delay"];
+    NSNumber *lat = data[@"lat"];
+    NSNumber *lon = data[@"lon"];
+    NSNumber *delay = data[@"delay"];
     NSLog(@"[UIC] Scanning for Quest at %@ %@ in %@ seconds", lat, lon, delay);
     NSDate *firstWarningDate = [[DeviceState sharedInstance] firstWarningDate];
     
@@ -300,11 +300,11 @@
     // TODO: Handle Mizu leveling jobs
     [[DeviceState sharedInstance] setDelayQuest:false];
     //degreePerMeter = 83267.0991559005
-    NSNumber *lat = [data objectForKey:@"lat"] ?: 0;
-    NSNumber *lon = [data objectForKey:@"lon"] ?: 0;
+    NSNumber *lat = data[@"lat"] ?: 0;
+    NSNumber *lon = data[@"lon"] ?: 0;
     NSLog(@"[UIC] Scanning for IV at %@ %@", lat, lon);
-    NSNumber *delay = [data objectForKey:@"delay"] ?: @0.0;
-    NSString *fortType = [data objectForKey:@"fort_type"] ?: @"P";
+    NSNumber *delay = data[@"delay"] ?: @0.0;
+    NSString *fortType = data[@"fort_type"] ?: @"P";
     NSString *targetFortId = data[@"fort_id"] ?: @"";
     [[DeviceState sharedInstance] setTargetFortId:targetFortId];
     NSLog(@"[UIC] [RES1] Location: %@ %@ Delay: %@ FortType: %@ FortId: %@", lat, lon, delay, fortType, targetFortId);
@@ -509,8 +509,8 @@
         //self.lock.unlock();
     }
     
-    NSNumber *lat = [data objectForKey:@"lat"] ?: 0;
-    NSNumber *lon = [data objectForKey:@"lon"] ?: 0;
+    NSNumber *lat = data[@"lat"] ?: 0;
+    NSNumber *lon = data[@"lon"] ?: 0;
     NSLog(@"[UIC] Scanning for IV at %@ %@", lat, lon);
     
     NSDate *start = [NSDate date];

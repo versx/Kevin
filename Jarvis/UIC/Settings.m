@@ -95,22 +95,22 @@ static NSString *plistFileName = @"uic.plist";
     dispatch_once(&onceToken, ^{
         sharedInstance = [[Settings alloc] init];
         _config = [sharedInstance loadSettings];
-        _enableAccountManager = [_config objectForKey:@"enableAccountManager"] ?: false;
-        _backendControllerUrl = [_config objectForKey:@"backendControllerURL"];
-        _backendRawUrl = [_config objectForKey:@"backendRawURL"];
-        _token = [_config objectForKey:@"token"] ?: @"";
-        _port = [_config objectForKey:@"port"] ?: @8080;
-        _targetMaxDistance = [_config objectForKey:@"targetMaxDistance"] ?: @250.0;
-        _pokemonMaxTime = [_config objectForKey:@"pokemonMaxTime"] ?: @25.0;
-        _raidMaxTime = [_config objectForKey:@"raidMaxTime"] ?: @25.0;
-        _encounterDelay = [_config objectForKey:@"encounterDelay"] ?: @0.0;
-        _maxEmptyGMO = [_config objectForKey:@"maxEmptyGMO"] ?: @50;
-        _maxFailedCount = [_config objectForKey:@"maxEmptyGMO"] ?: @5;
-        _maxNoQuestCount = [_config objectForKey:@"maxNoQuestCount"] ?: @5;
-        _maxWarningTimeRaid = [_config objectForKey:@"maxWarningTimeRaid"] ?: @432000;
-        _minDelayLogout = [_config objectForKey:@"minDelayLogout"] ?: @180.0;
-        _ultraQuests = [_config objectForKey:@"ultraQuests"] ?: false;
-        _deployEggs = [_config objectForKey:@"deployEggs"] ?: false;
+        _enableAccountManager = _config[@"enableAccountManager"] ?: false;
+        _backendControllerUrl = _config[@"backendControllerURL"];
+        _backendRawUrl = _config[@"backendRawURL"];
+        _token = _config[@"token"] ?: @"";
+        _port = _config[@"port"] ?: @8080;
+        _targetMaxDistance = _config[@"targetMaxDistance"] ?: @250.0;
+        _pokemonMaxTime = _config[@"pokemonMaxTime"] ?: @25.0;
+        _raidMaxTime = _config[@"raidMaxTime"] ?: @25.0;
+        _encounterDelay = _config[@"encounterDelay"] ?: @0.0;
+        _maxEmptyGMO = _config[@"maxEmptyGMO"] ?: @50;
+        _maxFailedCount = _config[@"maxEmptyGMO"] ?: @5;
+        _maxNoQuestCount = _config[@"maxNoQuestCount"] ?: @5;
+        _maxWarningTimeRaid = _config[@"maxWarningTimeRaid"] ?: @432000;
+        _minDelayLogout = _config[@"minDelayLogout"] ?: @180.0;
+        _ultraQuests = _config[@"ultraQuests"] ?: false;
+        _deployEggs = _config[@"deployEggs"] ?: false;
     });
     return sharedInstance;
 }
@@ -127,7 +127,7 @@ static NSString *plistFileName = @"uic.plist";
     NSLog(@"[UIC] Loading uic.plist from %@", plistPath);
     NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:plistPath];
     for (id key in dict) {
-        NSLog(@"key=%@ value=%@", key, [dict objectForKey:key]);
+        NSLog(@"key=%@ value=%@", key, dict[key]);
     }
     return dict;
 }

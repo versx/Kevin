@@ -33,6 +33,8 @@
 @property (nonatomic, readwrite, assign) BOOL isQuestInit;
 @property (nonatomic, readwrite, assign) BOOL ultraQuestSpin;
 @property (nonatomic, readwrite, assign) BOOL newCreated;
+@property (nonatomic, readwrite, assign) BOOL needsLogout;
+//static BOOL _newLogIn;
 
 @property (nonatomic, readwrite, assign) NSNumber *failedGetJobCount;
 @property (nonatomic, readwrite, assign) NSNumber *failedCount;
@@ -45,9 +47,11 @@
 @property (nonatomic, readwrite, copy) NSDate *firstWarningDate;
 @property (nonatomic, readwrite, copy) NSDate *eggStart;
 @property (nonatomic, readwrite, copy) NSDate *lastDeployTime;
+@property (nonatomic, readwrite, copy) NSDate *lastUpdate;
 
+@property (nonatomic, readwrite, copy) NSString *lastAction;
 @property (nonatomic, readwrite, copy) NSString *pokemonEncounterId;
-@property (nonatomic, readwrite, copy) NSString *ptcToken;
+//@property (nonatomic, readwrite, copy) NSString *ptcToken;
 @property (nonatomic, readwrite, copy) NSString *targetFortId;
 
 

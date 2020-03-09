@@ -33,13 +33,29 @@ static UIC2 *_uic;
 +(BOOL)clickButton:(NSString *)buttonName
 {
     // TODO: clickButton
-    return YES;
+    if ([buttonName isEqualToString:@"NewPlayerButton"]) {
+    } else if ([buttonName isEqualToString:@"TrainerClubButton"]) {
+    } else if ([buttonName isEqualToString:@"NewPlayerButton"]) {
+    } else if ([buttonName isEqualToString:@"UsernameButton"]) {
+    } else if ([buttonName isEqualToString:@"PasswordButton"]) {
+    } else if ([buttonName isEqualToString:@"SignInButton"]) {
+    } else if ([buttonName isEqualToString:@"TrackerButton"]) {
+    }
+    return true;
 }
 
 +(BOOL)findButton:(NSString *)buttonName
 {
     // TODO: findButton
-    return YES;
+    if ([buttonName isEqualToString:@"NewPlayerButton"]) {
+    } else if ([buttonName isEqualToString:@"TrainerClubButton"]) {
+    } else if ([buttonName isEqualToString:@"NewPlayerButton"]) {
+    } else if ([buttonName isEqualToString:@"UsernameButton"]) {
+    } else if ([buttonName isEqualToString:@"PasswordButton"]) {
+    } else if ([buttonName isEqualToString:@"SignInButton"]) {
+    } else if ([buttonName isEqualToString:@"TrackerButton"]) {
+    }
+    return true;
 }
 
 +(NSString *)getMenuButton

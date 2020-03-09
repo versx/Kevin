@@ -10,6 +10,7 @@
 
 #include <sys/utsname.h>
 
+#import "Consts.h"
 #import "Settings.h"
 
 @interface Device : NSObject

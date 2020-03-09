@@ -33,7 +33,7 @@
     {
         username = @"";
         password = @"";
-        ptcToken = @"";
+        ptcToken = [[NSUserDefaults standardUserDefaults] valueForKey:TOKEN_USER_DEFAULT_KEY] ?: @"";
         level = 0;
         minLevel = 1;
         maxLevel = 29;

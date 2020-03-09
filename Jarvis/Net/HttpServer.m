@@ -168,7 +168,7 @@ static bool _isListening;
                     NSDictionary *config = [[Settings alloc] loadSettings];
                     if (config != nil) {
                         for (id key in config) {
-                            [text appendFormat:@"%@=%@\n", key, [config objectForKey:key]];
+                            [text appendFormat:@"%@=%@\n", key, config[key]];
                         }
                     }
                     response = [Utils buildResponse:text withResponseCode:Success];

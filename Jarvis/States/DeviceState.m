@@ -28,6 +28,7 @@
     [firstWarningDate release];
     [eggStart release];
     [lastDeployTime release];
+    [lastUpdate release];
     [pokemonEncounterId release];
     [ptcToken release];
     [targetFortId release];
@@ -62,6 +63,7 @@
 @synthesize isQuestInit;
 @synthesize ultraQuestSpin;
 @synthesize newCreated;
+@synthesize needsLogout;
 
 @synthesize failedGetJobCount;
 @synthesize failedCount;
@@ -74,9 +76,11 @@
 @synthesize firstWarningDate;
 @synthesize eggStart;
 @synthesize lastDeployTime;
+@synthesize lastUpdate;
 
+@synthesize lastAction;
 @synthesize pokemonEncounterId;
-@synthesize ptcToken;
+//@synthesize ptcToken;
 @synthesize targetFortId;
 
 
@@ -106,7 +110,11 @@
     dict[@"username"] = [[Device sharedInstance] username];
     dict[@"level"] = [[Device sharedInstance] level];
     dict[@"type"] = @"logged_out";
-    [Utils postRequest:[[Settings sharedInstance] backendControllerUrl] dict:dict blocking:true completion:^(NSDictionary *result) {}];
+    [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                  dict:dict
+              blocking:true
+            completion:^(NSDictionary *result) {}
+    ];
     [[Device sharedInstance] setUsername:nil];
     [[Device sharedInstance] setPassword:nil];
     [NSThread sleepForTimeInterval:0.5];
@@ -119,17 +127,17 @@
         payload[@"max_level"] = [[Device sharedInstance] maxLevel];
         payload[@"type"] = @"get_account";
         [Utils postRequest:[[Settings sharedInstance] backendControllerUrl] dict:payload blocking:true completion:^(NSDictionary *result) {
-            NSDictionary *data = [dict objectForKey:@"data"];
+            NSDictionary *data = dict[@"data"];
             if (data != nil) {
-                NSString *username = [data objectForKey:@"username"];
-                NSString *password = [data objectForKey:@"password"];
-                NSNumber *level = [data objectForKey:@"level"];
-                NSDictionary *job = [data objectForKey:@"job"];
-                NSNumber *startLat = [job objectForKey:@"lat"];
-                NSNumber *startLon = [job objectForKey:@"lon"];
-                NSNumber *lastLat = [data objectForKey:@"last_encounter_lat"];
-                NSNumber *lastLon = [data objectForKey:@"last_encounter_lon"];
-                NSString *ptcToken = [data objectForKey:@"ptcToken"]; // TODO: Change from camel casing.
+                NSString *username = data[@"username"];
+                NSString *password = data[@"password"];
+                NSNumber *level = data[@"level"];
+                NSDictionary *job = data[@"job"];
+                NSNumber *startLat = job[@"lat"];
+                NSNumber *startLon = job[@"lon"];
+                NSNumber *lastLat = data[@"last_encounter_lat"];
+                NSNumber *lastLon = data[@"last_encounter_lon"];
+                NSString *ptcToken = data[@"ptcToken"]; // TODO: Change from camel casing.
                 CLLocation *startupLocation;
                 if (![startLat isEqualToNumber:@0.0] && ![startLon isEqualToNumber:@0.0]) {
                     startupLocation = [Utils createCoordinate:[startLat doubleValue] lon:[startLon doubleValue]];
