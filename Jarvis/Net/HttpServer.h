@@ -8,7 +8,7 @@
 #import <CoreLocation/CoreLocation.h>
 #import <Foundation/Foundation.h>
 
-#import "../GCD/GCDAsyncSocket.h"
+#import <CocoaAsyncSocket/GCDAsyncSocket.h>
 #import "HttpResponseCode.h"
 #import "HttpServer.h"
 #import "HttpServerProtocol.h"

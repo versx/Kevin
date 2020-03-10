@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2C13B0C9FE415007BCA1950A /* Pods_Jarvis__.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1BB35D16B13E3593B7D5F26 /* Pods_Jarvis__.framework */; };
 		C0025AA52414170C007813F7 /* HttpServer.m in Sources */ = {isa = PBXBuildFile; fileRef = C0025AA42414170C007813F7 /* HttpServer.m */; };
 		C0025AA72414171C007813F7 /* HttpServer.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AA62414171C007813F7 /* HttpServer.h */; };
 		C0025AAB2414175C007813F7 /* HttpServerProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AAA2414175C007813F7 /* HttpServerProtocol.h */; };
@@ -19,10 +20,6 @@
 		C0025AC0241483C6007813F7 /* UIImage+Pixels.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0025ABF241483C6007813F7 /* UIImage+Pixels.mm */; };
 		C0025AC32414846B007813F7 /* JobController.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AC22414846B007813F7 /* JobController.h */; };
 		C0025AC524148477007813F7 /* JobController.m in Sources */ = {isa = PBXBuildFile; fileRef = C0025AC424148477007813F7 /* JobController.m */; };
-		C0132B56240B5DEC00719452 /* GCDAsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = C0132B52240B5DEC00719452 /* GCDAsyncUdpSocket.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
-		C0132B57240B5DEC00719452 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = C0132B53240B5DEC00719452 /* GCDAsyncSocket.m */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
-		C0132B58240B5DEC00719452 /* GCDAsyncUdpSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = C0132B54240B5DEC00719452 /* GCDAsyncUdpSocket.h */; };
-		C0132B59240B5DEC00719452 /* GCDAsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = C0132B55240B5DEC00719452 /* GCDAsyncSocket.h */; };
 		C0132B62240B630000719452 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0132B61240B630000719452 /* CFNetwork.framework */; };
 		C0132B64240B631700719452 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0132B63240B631700719452 /* Security.framework */; };
 		C01B4965240ACF5D00633B45 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01B4964240ACF5D00633B45 /* Foundation.framework */; };
@@ -59,6 +56,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		49861DD8B60D17E8116B0EE7 /* Pods-Jarvis++.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jarvis++.debug.xcconfig"; path = "Target Support Files/Pods-Jarvis++/Pods-Jarvis++.debug.xcconfig"; sourceTree = "<group>"; };
+		8070BC4A2C47606354FA2CF4 /* Pods-Jarvis++.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jarvis++.release.xcconfig"; path = "Target Support Files/Pods-Jarvis++/Pods-Jarvis++.release.xcconfig"; sourceTree = "<group>"; };
 		C0025AA42414170C007813F7 /* HttpServer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HttpServer.m; sourceTree = "<group>"; };
 		C0025AA62414171C007813F7 /* HttpServer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HttpServer.h; sourceTree = "<group>"; };
 		C0025AAA2414175C007813F7 /* HttpServerProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HttpServerProtocol.h; sourceTree = "<group>"; };
@@ -71,10 +70,6 @@
 		C0025ABF241483C6007813F7 /* UIImage+Pixels.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "UIImage+Pixels.mm"; sourceTree = "<group>"; };
 		C0025AC22414846B007813F7 /* JobController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JobController.h; sourceTree = "<group>"; };
 		C0025AC424148477007813F7 /* JobController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JobController.m; sourceTree = "<group>"; };
-		C0132B52240B5DEC00719452 /* GCDAsyncUdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncUdpSocket.m; sourceTree = "<group>"; };
-		C0132B53240B5DEC00719452 /* GCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
-		C0132B54240B5DEC00719452 /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
-		C0132B55240B5DEC00719452 /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
 		C0132B61240B630000719452 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		C0132B63240B631700719452 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		C019482824161E730094A2C8 /* config.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = config.plist; sourceTree = "<group>"; };
@@ -116,6 +111,7 @@
 		C0AC1D3B240DA4C1008F4DFB /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C0B68E012414C33E009B5970 /* Consts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Consts.h; sourceTree = "<group>"; };
 		C0B68E032414C632009B5970 /* Consts.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Consts.m; sourceTree = "<group>"; };
+		E1BB35D16B13E3593B7D5F26 /* Pods_Jarvis__.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Jarvis__.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,12 +126,22 @@
 				C01B4965240ACF5D00633B45 /* Foundation.framework in Frameworks */,
 				C0AC1D3D240DA4C1008F4DFB /* IOKit.framework in Frameworks */,
 				C01B4967240ACF5D00633B45 /* UIKit.framework in Frameworks */,
+				2C13B0C9FE415007BCA1950A /* Pods_Jarvis__.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		91E40CCDBD064A40A2555622 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				49861DD8B60D17E8116B0EE7 /* Pods-Jarvis++.debug.xcconfig */,
+				8070BC4A2C47606354FA2CF4 /* Pods-Jarvis++.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		C0025AA3241416DE007813F7 /* Net */ = {
 			isa = PBXGroup;
 			children = (
@@ -183,17 +189,6 @@
 			path = Controllers;
 			sourceTree = "<group>";
 		};
-		C0132B50240B5DEC00719452 /* GCD */ = {
-			isa = PBXGroup;
-			children = (
-				C0132B55240B5DEC00719452 /* GCDAsyncSocket.h */,
-				C0132B53240B5DEC00719452 /* GCDAsyncSocket.m */,
-				C0132B54240B5DEC00719452 /* GCDAsyncUdpSocket.h */,
-				C0132B52240B5DEC00719452 /* GCDAsyncUdpSocket.m */,
-			);
-			path = GCD;
-			sourceTree = "<group>";
-		};
 		C01B4957240ACF5D00633B45 = {
 			isa = PBXGroup;
 			children = (
@@ -201,7 +196,6 @@
 				C0025AC124148455007813F7 /* Controllers */,
 				C0025ABC241483A2007813F7 /* Extensions */,
 				C01B4963240ACF5D00633B45 /* Frameworks */,
-				C0132B50240B5DEC00719452 /* GCD */,
 				C01B4968240ACF5D00633B45 /* Jarvis++ */,
 				C0025AA3241416DE007813F7 /* Net */,
 				C01B4962240ACF5D00633B45 /* Products */,
@@ -209,6 +203,7 @@
 				C0025AB52414393B007813F7 /* States */,
 				C01B497D240ACF9400633B45 /* UIC */,
 				C0025AAC241421D5007813F7 /* Utilities */,
+				91E40CCDBD064A40A2555622 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -229,6 +224,7 @@
 				C01B4982240AD01E00633B45 /* CoreLocation.framework */,
 				C01B4964240ACF5D00633B45 /* Foundation.framework */,
 				C01B4966240ACF5D00633B45 /* UIKit.framework */,
+				E1BB35D16B13E3593B7D5F26 /* Pods_Jarvis__.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -351,7 +347,6 @@
 				C0AC1CF8240BB97A008F4DFB /* Settings.h in Headers */,
 				C0AC1D42240DA4C1008F4DFB /* UIView-KIFAdditions.h in Headers */,
 				C0AC1D3F240DA4C1008F4DFB /* UIApplication-KIFAdditions.h in Headers */,
-				C0132B58240B5DEC00719452 /* GCDAsyncUdpSocket.h in Headers */,
 				C0025AB7241447F3007813F7 /* HttpResponseCode.h in Headers */,
 				C0B68E022414C33E009B5970 /* Consts.h in Headers */,
 				C0025ABE241483B7007813F7 /* UIImage+Pixels.h in Headers */,
@@ -364,7 +359,6 @@
 				C0025AC32414846B007813F7 /* JobController.h in Headers */,
 				C0025AB424143923007813F7 /* DeviceState.h in Headers */,
 				C0AC1CF4240BB37C008F4DFB /* Device.h in Headers */,
-				C0132B59240B5DEC00719452 /* GCDAsyncSocket.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -375,9 +369,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C01B4979240ACF5D00633B45 /* Build configuration list for PBXNativeTarget "Jarvis++" */;
 			buildPhases = (
+				8DC0ACD71BEA65A66DB47500 /* [CP] Check Pods Manifest.lock */,
 				C01B495C240ACF5D00633B45 /* Sources */,
 				C01B495D240ACF5D00633B45 /* Frameworks */,
 				C01B495E240ACF5D00633B45 /* Headers */,
+				C0BAF09324174FAE003E2419 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -419,18 +415,58 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		8DC0ACD71BEA65A66DB47500 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Jarvis++-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C0BAF09324174FAE003E2419 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\noptool install -c load -p \"@executable_path/libJarvis++.dylib\" -t \"Payload/pokemongo.app/pokemongo\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		C01B495C240ACF5D00633B45 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C0132B57240B5DEC00719452 /* GCDAsyncSocket.m in Sources */,
 				C01B4973240ACF5D00633B45 /* Jarvis__.m in Sources */,
 				C0AC1CF6240BB96C008F4DFB /* Settings.m in Sources */,
 				C0025AC524148477007813F7 /* JobController.m in Sources */,
 				C0025AB0241421F4007813F7 /* Utils.m in Sources */,
 				C0AC1D48240DA4C1008F4DFB /* UIView-KIFAdditions.m in Sources */,
-				C0132B56240B5DEC00719452 /* GCDAsyncUdpSocket.m in Sources */,
 				C0025AC0241483C6007813F7 /* UIImage+Pixels.mm in Sources */,
 				C0AC1CF2240BB365008F4DFB /* Device.m in Sources */,
 				C0AC1D40240DA4C1008F4DFB /* UIWindow-KIFAdditions.m in Sources */,
@@ -468,7 +504,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "$(THEOS)/vendor/include/**";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LIBRARY_SEARCH_PATHS = "$(THEOS)/vendor/lib/**";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -489,7 +525,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "$(THEOS)/vendor/include/**";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LIBRARY_SEARCH_PATHS = "$(THEOS)/vendor/lib/**";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -500,22 +536,30 @@
 		};
 		C01B497A240ACF5D00633B45 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 49861DD8B60D17E8116B0EE7 /* Pods-Jarvis++.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ARCHS = arm64;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_BITCODE = NO;
 				EXECUTABLE_PREFIX = lib;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/System/Library/PrivateFrameworks",
 					"$(PROJECT_DIR)/PTFakeTouch",
+					"$(inherited)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Jarvis++/Jarvis++-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/CocoaAsyncSocket/CocoaAsyncSocket.framework/Headers\"/**",
+				);
 				INSTALL_PATH = "@rpath/";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -525,7 +569,7 @@
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
-				USER_HEADER_SEARCH_PATHS = "$(PROJECTDIR)/**";
+				USER_HEADER_SEARCH_PATHS = "";
 				VALID_ARCHS = arm64;
 				iOSOpenDevBuildPackageOnAnyBuild = NO;
 				iOSOpenDevCopyOnBuild = NO;
@@ -539,22 +583,30 @@
 		};
 		C01B497B240ACF5D00633B45 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 8070BC4A2C47606354FA2CF4 /* Pods-Jarvis++.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ARCHS = arm64;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_BITCODE = NO;
 				EXECUTABLE_PREFIX = lib;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/System/Library/PrivateFrameworks",
 					"$(PROJECT_DIR)/PTFakeTouch",
+					"$(inherited)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Jarvis++/Jarvis++-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/CocoaAsyncSocket/CocoaAsyncSocket.framework/Headers\"/**",
+				);
 				INSTALL_PATH = "@rpath/";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -565,7 +617,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
 				SYSTEM_FRAMEWORK_SEARCH_PATHS = "";
-				USER_HEADER_SEARCH_PATHS = "$(PROJECTDIR)/**";
+				USER_HEADER_SEARCH_PATHS = "";
 				VALID_ARCHS = arm64;
 				iOSOpenDevBuildPackageOnAnyBuild = NO;
 				iOSOpenDevCopyOnBuild = NO;

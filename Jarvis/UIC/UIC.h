@@ -9,9 +9,10 @@
 #import "Device.h"
 #import "Settings.h"
 #import "../Controllers/JobController.h"
-#import "../GCD/GCDAsyncSocket.h"
 #import "../Net/HttpServer.h"
 #import "../Utilities/Utils.h"
+
+#import <CocoaAsyncSocket/GCDAsyncSocket.h>
 
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
