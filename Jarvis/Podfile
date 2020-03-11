@@ -8,6 +8,7 @@ target 'Jarvis++' do
 
   # Pods for Jarvis++
   pod 'CocoaAsyncSocket'
+  pod 'PaperTrailLumberjack', :git => 'https://github.com/greenbits/papertrail-lumberjack-ios.git'
   #pod 'KIF'
 end
 

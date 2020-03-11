@@ -45,22 +45,28 @@ static void __attribute__((constructor)) initialize(void) {
             NSLog(@"[Jarvis] Took screenshot to check for pixel coord for button %@...", buttonName);
             if ([buttonName isEqualToString:@"NewPlayerButton"]) {
                 UIColor *color = [_image getPixelColor:400 withY:820];
+                [Utils touch:400 withY:820];
                 NSLog(@"[Jarvis] %@ Pixel Color: %@", buttonName, color);
             } else if ([buttonName isEqualToString:@"TrainerClubButton"]) {
                 UIColor *color = [_image getPixelColor:320 withY:800];
                 NSLog(@"[Jarvis] %@ Pixel Color: %@", buttonName, color);
+                [Utils touch:320 withY:800];
             } else if ([buttonName isEqualToString:@"NewPlayerButton"]) {
                 UIColor *color = [_image getPixelColor:320 withY:785];
                 NSLog(@"[Jarvis] %@ Pixel Color: %@", buttonName, color);
+                [Utils touch:320 withY:785];
             } else if ([buttonName isEqualToString:@"UsernameButton"]) {
                 UIColor *color = [_image getPixelColor:320 withY:500];
                 NSLog(@"[Jarvis] %@ Pixel Color: %@", buttonName, color);
+                [Utils touch:320 withY:500];
             } else if ([buttonName isEqualToString:@"PasswordButton"]) {
                 UIColor *color = [_image getPixelColor:320 withY:600];
                 NSLog(@"[Jarvis] %@ Pixel Color: %@", buttonName, color);
+                [Utils touch:320 withY:600];
             } else if ([buttonName isEqualToString:@"SignInButton"]) {
                 UIColor *color = [_image getPixelColor:375 withY:680];
                 NSLog(@"[Jarvis] %@ Pixel Color: %@", buttonName, color);
+                [Utils touch:375 withY:680];
             } else if ([buttonName isEqualToString:@"TrackerButton"]) {
                 //UIColor *color = [_image getPixelColor:320 withY:800];
                 //NSLog(@"[Jarvis] %@ Pixel Color: %@", buttonName, color);
@@ -80,22 +86,28 @@ static void __attribute__((constructor)) initialize(void) {
             NSLog(@"[Jarvis] Took screenshot to check for pixel coord for button %@...", buttonName);
             if ([buttonName isEqualToString:@"NewPlayerButton"]) {
                 UIColor *color = [_image getPixelColor:400 withY:820];
+                [Utils touch:400 withY:820];
                 NSLog(@"[Jarvis] %@ Pixel Color: %@", buttonName, color);
             } else if ([buttonName isEqualToString:@"TrainerClubButton"]) {
                 UIColor *color = [_image getPixelColor:320 withY:800];
                 NSLog(@"[Jarvis] %@ Pixel Color: %@", buttonName, color);
+                [Utils touch:320 withY:800];
             } else if ([buttonName isEqualToString:@"NewPlayerButton"]) {
                 UIColor *color = [_image getPixelColor:320 withY:785];
                 NSLog(@"[Jarvis] %@ Pixel Color: %@", buttonName, color);
+                [Utils touch:320 withY:785];
             } else if ([buttonName isEqualToString:@"UsernameButton"]) {
                 UIColor *color = [_image getPixelColor:320 withY:500];
                 NSLog(@"[Jarvis] %@ Pixel Color: %@", buttonName, color);
+                [Utils touch:320 withY:500];
             } else if ([buttonName isEqualToString:@"PasswordButton"]) {
                 UIColor *color = [_image getPixelColor:320 withY:600];
                 NSLog(@"[Jarvis] %@ Pixel Color: %@", buttonName, color);
+                [Utils touch:320 withY:600];
             } else if ([buttonName isEqualToString:@"SignInButton"]) {
                 UIColor *color = [_image getPixelColor:375 withY:680];
                 NSLog(@"[Jarvis] %@ Pixel Color: %@", buttonName, color);
+                [Utils touch:375 withY:680];
             } else if ([buttonName isEqualToString:@"TrackerButton"]) {
                 //UIColor *color = [_image getPixelColor:320 withY:800];
                 //NSLog(@"[Jarvis] %@ Pixel Color: %@", buttonName, color);

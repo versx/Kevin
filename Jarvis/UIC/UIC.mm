@@ -10,7 +10,8 @@
 
 // TODO: KIF library
 // TODO: StateManager class
-// TODO: Pixel checks// TODO: Pixel offsets in remote config
+// TODO: Pixel checks
+// TODO: Pixel offsets in remote config
 
 #pragma mark Global Variables
 
@@ -37,6 +38,7 @@ static BOOL _invalidScreen = false;
 
 static HttpServer *_httpServer;
 static JobController *_jobController;
+static RMPaperTrailLogger *_logger;
 
 #pragma mark Constructor/Deconstructor
 
@@ -45,8 +47,13 @@ static JobController *_jobController;
     NSLog(@"[Jarvis] [UIC] init");
     if ((self = [super init]))
     {
-        //NSDictionary *config = [[Settings sharedInstance] fetchRemoteConfig:@"https://ver.sx/x/uic.plist"];
-        //NSLog(@"[Jarvis] [UIC] Remote Config: %@", config);
+        _logger = [RMPaperTrailLogger sharedInstance];
+        _logger.host = [[Settings sharedInstance] loggingUrl];
+        _logger.port = [[[Settings sharedInstance] loggingPort] intValue];
+        _logger.debug = false; // Silences some NSLogging
+        _logger.useTcp = [[Settings sharedInstance] loggingTcp]; // TLS is on by default on OS X and ignored on iOS
+        _logger.useTLS = [[Settings sharedInstance] loggingTls]; // Use TLS
+        [DDLog addLogger:_logger];
     }
     
     return self;

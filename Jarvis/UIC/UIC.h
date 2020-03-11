@@ -13,6 +13,7 @@
 #import "../Utilities/Utils.h"
 
 #import <CocoaAsyncSocket/GCDAsyncSocket.h>
+#import <PaperTrailLumberjack/RMPaperTrailLogger.h>
 
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>

@@ -28,6 +28,11 @@ static NSNumber *_minDelayLogout;
 static BOOL _ultraQuests;
 static BOOL _deployEggs;
 
+static NSString *_loggingUrl;
+static NSNumber *_loggingPort;
+static BOOL _loggingTls;
+static BOOL _loggingTcp; // Use TCP, otherwise UDP protocol
+
 static NSString *plistFileName = @"config.plist";
 
 -(NSDictionary *)config {
@@ -88,6 +93,19 @@ static NSString *plistFileName = @"config.plist";
     return _deployEggs;
 }
 
+-(NSString *)loggingUrl {
+    return _loggingUrl;
+}
+-(NSNumber *)loggingPort {
+    return _loggingPort;
+}
+-(BOOL)loggingTls {
+    return _loggingTls;
+}
+-(BOOL)loggingTcp {
+    return _loggingTcp;
+}
+
 +(Settings *)sharedInstance
 {
     static Settings *sharedInstance = nil;
@@ -112,6 +130,11 @@ static NSString *plistFileName = @"config.plist";
         _minDelayLogout = _config[@"minDelayLogout"] ?: DEFAULT_MIN_DELAY_LOGOUT;
         _ultraQuests = [_config[@"ultraQuests"] boolValue] ?: DEFAULT_ULTRA_QUESTS;
         _deployEggs = [_config[@"deployEggs"] boolValue] ?: DEFAULT_DEPLOY_EGGS;
+        
+        _loggingUrl = _config[@"loggingUrl"] ?: @"";
+        _loggingPort = _config[@"loggingPort"] ?: @9999;
+        _loggingTls = [_config[@"loggingTls"] boolValue] ?: true;
+        _loggingTcp = [_config[@"loggingTcp"] boolValue] ?: true;
     });
     return sharedInstance;
 }

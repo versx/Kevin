@@ -1,16 +1,40 @@
 PODS:
   - CocoaAsyncSocket (7.6.4)
+  - CocoaLumberjack (2.2.0):
+    - CocoaLumberjack/Default (= 2.2.0)
+    - CocoaLumberjack/Extensions (= 2.2.0)
+  - CocoaLumberjack/Core (2.2.0)
+  - CocoaLumberjack/Default (2.2.0):
+    - CocoaLumberjack/Core
+  - CocoaLumberjack/Extensions (2.2.0):
+    - CocoaLumberjack/Default
+  - PaperTrailLumberjack (2.0.0):
+    - CocoaAsyncSocket
+    - CocoaLumberjack (~> 2.2.0)
 
 DEPENDENCIES:
   - CocoaAsyncSocket
+  - PaperTrailLumberjack (from `https://github.com/greenbits/papertrail-lumberjack-ios.git`)
 
 SPEC REPOS:
   trunk:
     - CocoaAsyncSocket
+    - CocoaLumberjack
+
+EXTERNAL SOURCES:
+  PaperTrailLumberjack:
+    :git: https://github.com/greenbits/papertrail-lumberjack-ios.git
+
+CHECKOUT OPTIONS:
+  PaperTrailLumberjack:
+    :commit: 0871cc694339d882a0a5c1ea8a4d12e5cb9e491d
+    :git: https://github.com/greenbits/papertrail-lumberjack-ios.git
 
 SPEC CHECKSUMS:
   CocoaAsyncSocket: 694058e7c0ed05a9e217d1b3c7ded962f4180845
+  CocoaLumberjack: 17fe8581f84914d5d7e6360f7c70022b173c3ae0
+  PaperTrailLumberjack: 3ff66ec8487bd2f68c894ba3040ae0c506a41a53
 
-PODFILE CHECKSUM: 8b4b48a58900d13e60c0e4e439b3ce331f0a821d
+PODFILE CHECKSUM: 70f85727dc216b7f231fae83523f77628720271b
 
 COCOAPODS: 1.9.0

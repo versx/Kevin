@@ -31,6 +31,12 @@
 -(BOOL)ultraQuests;
 -(BOOL)deployEggs;
 
+-(NSString *)loggingUrl;
+-(NSNumber *)loggingPort;
+-(BOOL)loggingTls;
+-(BOOL)loggingTcp;
+
+
 //-(NSDictionary *)loadSettings;
 -(NSDictionary *)fetchRemoteConfig:(NSString *)urlString;
 
