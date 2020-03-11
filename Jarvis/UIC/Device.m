@@ -28,7 +28,7 @@
 
 -(id)init
 {
-    NSLog(@"[Device] init");
+    NSLog(@"[Jarvis] [Device] init");
     if ((self = [super init]))
     {
         username = @"";

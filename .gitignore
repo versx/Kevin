@@ -43,3 +43,11 @@ Pods/
 *.xcworkspace
 
 .build/
+
+# No IPA files or Payload folders
+*.ipa
+*.zip
+Payload/
+
+# No dumb directory files
+__MACOSX/

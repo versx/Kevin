@@ -4,7 +4,6 @@ project 'Jarvis++.xcodeproj'
 workspace 'Jarvis'
 target 'Jarvis++' do
   # Comment the next line if you don't want to use dynamic frameworks
-  use_frameworks!
   inherit! :search_paths
 
   # Pods for Jarvis++

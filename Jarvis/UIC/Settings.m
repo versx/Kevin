@@ -143,26 +143,25 @@ static NSString *plistFileName = @"config.plist";
     
     NSFileManager *fileManager = [NSFileManager defaultManager];
     if (![fileManager fileExistsAtPath:plistPath]) {
-        NSLog(@"[Settings] uic.plist DOES NOT EXIST!");
+        NSLog(@"[Jarvis] [Settings] uic.plist DOES NOT EXIST!");
         return nil;
     }
-    NSLog(@"[Settings] Loading uic.plist from %@", plistPath);
     NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:plistPath];
-    NSLog(@"[Settings] config.plist - %@", dict);
+    NSLog(@"[Jarvis] [Settings] %@ - %@", plistPath, dict);
     return dict[@"url"];
 }
 
 -(NSDictionary *)fetchRemoteConfig:(NSString *)urlString
 {
     // TODO: Attempt to load again on failure
-    NSLog(@"[Settings] Fetching remote config from %@", urlString);
+    NSLog(@"[Jarvis] [Settings] Fetching remote config from %@", urlString);
     NSURL *url = [NSURL URLWithString:urlString];
     NSDictionary *dict = [NSDictionary dictionaryWithContentsOfURL:url];
     if (dict != nil) {
-        NSLog(@"[Settings] Remote Config: %@", dict);
+        NSLog(@"[Jarvis] [Settings] Remote Config: %@", dict);
         return dict;
     }
-    NSLog(@"[Settings] Failed to fetch remote config %@", urlString);
+    NSLog(@"[Jarvis] [Settings] Failed to fetch remote config %@", urlString);
     return nil;
 }
 

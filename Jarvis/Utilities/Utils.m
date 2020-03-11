@@ -52,7 +52,7 @@ static double _baseVerticalAccuracy = 200.0; // in meters
     NSURLSession *defaultSession = [NSURLSession sessionWithConfiguration:defaultSessionConfiguration];
 
     // Setup the request with URL
-    //NSLog(@"[Utils] Sending request to %@ with params %@", urlString, data);
+    //NSLog(@"[Jarvis] [Utils] Sending request to %@ with params %@", urlString, data);
     NSURL *url = [NSURL URLWithString:urlString];
     NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url
                                                               cachePolicy:NSURLRequestUseProtocolCachePolicy
@@ -77,7 +77,7 @@ static double _baseVerticalAccuracy = 200.0; // in meters
     // Create dataTask
     NSURLSessionDataTask *dataTask = [defaultSession dataTaskWithRequest:urlRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         NSString *responseData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        NSLog(@"[Utils] postRequest response: %@", responseData);
+        NSLog(@"[Jarvis] [Utils] postRequest response: %@", responseData);
         [responseData release];
         if (data != nil) { // TODO: Check if json parsed
             NSError *jsonError;
@@ -124,7 +124,7 @@ static double _baseVerticalAccuracy = 200.0; // in meters
                                                          error:&error];
 
     if (!jsonData) {
-        NSLog(@"[Utils] %s: error: %@", __func__, error.localizedDescription);
+        NSLog(@"[Jarvis] [Utils] %s: error: %@", __func__, error.localizedDescription);
         return @"{}";
     }
 

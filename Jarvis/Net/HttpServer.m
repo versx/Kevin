@@ -25,7 +25,7 @@ static bool _isListening;
 
 -(id)init
 {
-    NSLog(@"[HTTP] init");
+    NSLog(@"[Jarvis] [HTTP] init");
     if ((self = [super init]))
     {
         /*
@@ -54,7 +54,7 @@ static bool _isListening;
 
 -(void)listen
 {
-    NSLog(@"[HTTP] listen");
+    NSLog(@"[Jarvis] [HTTP] listen");
     bool started = false;
     NSNumber *startTryCount = @1;
     // Try to start the HTTP listener, attempt 5 times on failure.
@@ -64,9 +64,9 @@ static bool _isListening;
             started = true;
         } @catch(id exception) {
             if ([startTryCount intValue] > 5) {
-                NSLog(@"[UIC] Fatal error, failed to start server: %@. Try (%@/5)", exception, startTryCount);
+                NSLog(@"[Jarvis] [HTTP] Fatal error, failed to start server: %@. Try (%@/5)", exception, startTryCount);
                 
-                NSLog(@"[UIC] Failed to start server: %@. Try (%@/5). Trying again in 5 seconds.", exception, startTryCount);
+                NSLog(@"[Jarvis] [HTTP] Failed to start server: %@. Try (%@/5). Trying again in 5 seconds.", exception, startTryCount);
                 startTryCount = [Utils incrementInt:startTryCount];
                 [NSThread sleepForTimeInterval:5];
             }
@@ -76,18 +76,18 @@ static bool _isListening;
 
 -(void)stop
 {
-    NSLog(@"[HTTP] stop");
+    NSLog(@"[Jarvis] [HTTP] stop");
     [_listenSocket disconnect]; // TODO: Check for close/stop method or if disconnect is correct.
 }
 
 -(void *)startListener
 {
-    NSLog(@"[HTTP] startListener");
+    NSLog(@"[Jarvis] [HTTP] startListener");
     _listenSocket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:dispatch_get_main_queue()];
     NSError *error = nil;
     NSNumber *port = [[Settings sharedInstance] port];
     if (![_listenSocket acceptOnPort:[port intValue] error:&error]) {
-        NSLog(@"[HTTP] Failed to start webserver listener on port %@:\r\nError:%@", port, error);
+        NSLog(@"[Jarvis] [HTTP] Failed to start webserver listener on port %@:\r\nError:%@", port, error);
     }
     _isListening = true;
 
@@ -99,7 +99,7 @@ static bool _isListening;
         }
     });
 
-    NSLog(@"[HTTP] Listening at localhost on port %@", port);
+    NSLog(@"[Jarvis] [HTTP] Listening at localhost on port %@", port);
     return 0;
 }
 
@@ -116,7 +116,7 @@ static bool _isListening;
     
     dispatch_async(dispatch_get_main_queue(), ^{
         @autoreleasepool {
-            NSLog(@"[UIC] Accepted client %@:%hu", host, port);
+            NSLog(@"[Jarvis] [HTTP] Accepted client %@:%hu", host, port);
         }
     });
 
@@ -137,7 +137,7 @@ static bool _isListening;
     NSData *strData = [data subdataWithRange:NSMakeRange(0, [data length] - 2)];
     NSString *msg = [[NSString alloc] initWithData:strData encoding:NSUTF8StringEncoding];
     if (msg) {
-        NSLog(@"[UIC] Received data: %@", msg);
+        NSLog(@"[Jarvis] [HTTP] Received data: %@", msg);
         NSArray *split = [msg componentsSeparatedByString:@" "];
         [msg release];
         if (split.count == 3) {
@@ -161,7 +161,7 @@ static bool _isListening;
                         response = [self.delegate handleLocationRequest:params];
                     }
                 } else if ([query hasPrefix:@"/restart"]) {
-                    NSLog(@"[UIC] Restart endpoint called, restarting...");
+                    NSLog(@"[Jarvis] [HTTP] Restart endpoint called, restarting...");
                     [DeviceState restart];
                 } else if ([query hasPrefix:@"/config"]) {
                     NSMutableString *text = [[NSMutableString alloc] init];
@@ -180,15 +180,15 @@ static bool _isListening;
                     //UIImage *screenshot = [self takeScreenshot];
                     response = [Utils buildResponse:@":)" withResponseCode:Success];
                 } else {
-                    NSLog(@"[UIC] Invalid request endpoint.");
+                    NSLog(@"[Jarvis] [HTTP] Invalid request endpoint.");
                     response = [Utils buildResponse:@"" withResponseCode:NotFound];
                 }
-                //NSLog(@"[HTTP] Response: %@", response);
+                //NSLog(@"[Jarvis] [HTTP] Response: %@", response);
                 [sender writeData:[response dataUsingEncoding:NSUTF8StringEncoding] withTimeout:-1 tag:0];
             }
         }
     } else {
-        NSLog(@"[UIC] Error converting received data into UTF-8 String");
+        NSLog(@"[Jarvis] [HTTP] Error converting received data into UTF-8 String");
     }
     //    }
     //});
@@ -202,7 +202,7 @@ static bool _isListening;
 {
     NSString *dataCTRL = [NSString stringWithFormat:@"%@\r\n", data];
     NSData *msg = [dataCTRL dataUsingEncoding:NSUTF8StringEncoding];
-    NSLog(@"[UIC] Sending data: %@", dataCTRL);
+    NSLog(@"[Jarvis] [HTTP] Sending data: %@", dataCTRL);
     [socket writeData:msg withTimeout:-1 tag:0];
 }
 */

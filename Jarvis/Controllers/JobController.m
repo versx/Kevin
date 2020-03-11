@@ -11,7 +11,7 @@
 
 -(id)init
 {
-    NSLog(@"[JobController] init");
+    NSLog(@"[Jarvis] [JobController] init");
     if ((self = [super init]))
     {
     }
@@ -22,7 +22,7 @@
 -(void)handlePokemonJob:(NSString *)action withData:(NSDictionary *)data hasWarning:(BOOL)hasWarning
 {
     if (hasWarning && [[Settings sharedInstance] enableAccountManager]) {
-        NSLog(@"[UIC] Account has a warning and tried to scan for Pokemon. Logging out!");
+        NSLog(@"[Jarvis] [JobController] Account has a warning and tried to scan for Pokemon. Logging out!");
         //self.lock.lock();
         CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
         [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
@@ -32,7 +32,7 @@
     
     NSNumber *lat = data[@"lat"];
     NSNumber *lon = data[@"lon"];
-    NSLog(@"[UIC] Scanning for Pokemon at %@ %@", lat, lon);
+    NSLog(@"[Jarvis] [JobController] Scanning for Pokemon at %@ %@", lat, lon);
     
     NSDate *start = [NSDate date];
     //self.lock.lock();
@@ -42,7 +42,7 @@
     [[DeviceState sharedInstance] setCurrentLocation:[Utils createCoordinate:[lat doubleValue] lon:[lon doubleValue]]];
     [[DeviceState sharedInstance] setWaitForData:true];
     //self.lock.unlock();
-    NSLog(@"[UIC] Scanning prepared");
+    NSLog(@"[Jarvis] [JobController] Scanning prepared");
     
     BOOL locked = true;
     while (locked) {
@@ -54,7 +54,7 @@
             [[DeviceState sharedInstance] setWaitForData:false];
             NSNumber *failedCount = [[DeviceState sharedInstance] failedCount];
             [[DeviceState sharedInstance] setFailedCount:[Utils incrementInt:failedCount]];
-            NSLog(@"[UIC] Pokemon loading timed out.");
+            NSLog(@"[Jarvis] [JobController] Pokemon loading timed out.");
             NSMutableDictionary *failedData = [[NSMutableDictionary alloc] init];
             failedData[@"uuid"] = [[Device sharedInstance] uuid];
             failedData[@"username"] = [[Device sharedInstance] username];
@@ -62,7 +62,11 @@
             failedData[@"lat"] = lat;
             failedData[@"lon"] = lon;
             failedData[@"type"] = @"job_failed";
-            [Utils postRequest:[[Settings sharedInstance] backendControllerUrl] dict:failedData blocking:true completion:^(NSDictionary *result) {}];
+            [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                          dict:failedData
+                      blocking:true
+                    completion:^(NSDictionary *result) {}
+            ];
         }
     }
 }
@@ -76,7 +80,7 @@
         firstWarningDate != nil &&
         timeSince >= [maxWarningTimeRaid intValue] &&
         [[Settings sharedInstance] enableAccountManager]) {
-        NSLog(@"[UIC] Account has warning and is over maxWarningTimeRaid (%@). Logging out!", maxWarningTimeRaid);
+        NSLog(@"[Jarvis] [JobController] Account has warning and is over maxWarningTimeRaid (%@). Logging out!", maxWarningTimeRaid);
         //self.lock.lock();
         CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
         [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
@@ -86,7 +90,7 @@
     
     NSNumber *lat = data[@"lat"] ?: 0;
     NSNumber *lon = data[@"lon"] ?: 0;
-    NSLog(@"[UIC] Scanning for Raid at %@ %@", lat, lon);
+    NSLog(@"[Jarvis] [JobController] Scanning for Raid at %@ %@", lat, lon);
     
     NSDate *start = [NSDate date];
     //self.lock.lock();
@@ -96,7 +100,7 @@
     //_targetMaxDistance = [[Settings sharedInstance] targetMaxDistance];
     [[DeviceState sharedInstance] setWaitForData:true];
     //self.lock.unlock();
-    NSLog(@"[UIC] Scanning prepared.");
+    NSLog(@"[Jarvis] [JobController] Scanning prepared.");
     
     BOOL locked = true;
     NSNumber *raidMaxTime = [[Settings sharedInstance] raidMaxTime];
@@ -108,19 +112,23 @@
             [[DeviceState sharedInstance] setWaitForData:false];
             NSNumber *failedCount = [[DeviceState sharedInstance] failedCount];
             [[DeviceState sharedInstance] setFailedCount:[Utils incrementInt:failedCount]];
-            NSLog(@"[UIC] Raids loading timed out.");
+            NSLog(@"[Jarvis] [JobController] Raids loading timed out.");
             NSMutableDictionary *raidData = [[NSMutableDictionary alloc] init];
             raidData[@"uuid"] = [[Device sharedInstance] uuid];
             raidData[@"action"] = action;
             raidData[@"lat"] = lat;
             raidData[@"lon"] = lon;
             raidData[@"type"] = @"job_failed";
-            [Utils postRequest:[[Settings sharedInstance] backendControllerUrl] dict:raidData blocking:true completion:^(NSDictionary *result) {}];
+            [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                          dict:raidData
+                      blocking:true
+                    completion:^(NSDictionary *result) {}
+            ];
         } else {
             locked = [[DeviceState sharedInstance] waitForData];
             if (!locked) {
                 [[DeviceState sharedInstance] setFailedCount:0];
-                NSLog(@"[UIC] Raids loaded after %f", timeIntervalSince);
+                NSLog(@"[Jarvis] [JobController] Raids loaded after %f", timeIntervalSince);
             }
         }
         //self.lock.unlock();
@@ -133,11 +141,11 @@
     NSNumber *lat = data[@"lat"];
     NSNumber *lon = data[@"lon"];
     NSNumber *delay = data[@"delay"];
-    NSLog(@"[UIC] Scanning for Quest at %@ %@ in %@ seconds", lat, lon, delay);
+    NSLog(@"[Jarvis] [JobController] Scanning for Quest at %@ %@ in %@ seconds", lat, lon, delay);
     NSDate *firstWarningDate = [[DeviceState sharedInstance] firstWarningDate];
     
     if (hasWarning && firstWarningDate != nil && [NSDate date]) {
-        NSLog(@"[UIC] Account has a warning and is over maxWarningTimeRaid. Logging out!");
+        NSLog(@"[Jarvis] [JobController] Account has a warning and is over maxWarningTimeRaid. Logging out!");
         //self.lock.lock();
         CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
         [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
@@ -152,7 +160,7 @@
         NSNumber *i = @(arc4random_uniform(60));
         [NSThread sleepForTimeInterval:2];
         if ([Jarvis__ getToMainScreen]) {
-            NSLog(@"[UIC] Deploying an egg");
+            NSLog(@"[Jarvis] [JobController] Deploying an egg");
             if ([Jarvis__ eggDeploy]) {
                 // If an egg was found, set the timer to 31 minutes.
                 //NSDate *eggStart = [[NSDate date] initWithTimeInterval:(1860 + [i intValue]) sinceDate:[NSDate date]];
@@ -164,25 +172,29 @@
                 NSDate *eggStart = [NSDate dateWithTimeInterval:(960 + [i intValue]) sinceDate:[NSDate date]];
                 [[DeviceState sharedInstance] setEggStart:eggStart];
             }
-            NSLog(@"[UIC] Egg timer set to %@ UTC for a recheck.", [[DeviceState sharedInstance] eggStart]);
+            NSLog(@"[Jarvis] [JobController] Egg timer set to %@ UTC for a recheck.", [[DeviceState sharedInstance] eggStart]);
         } else {
             
             NSDate *eggStart = [NSDate dateWithTimeInterval:(960 + [i intValue]) sinceDate:[NSDate date]];
             [[DeviceState sharedInstance] setEggStart:eggStart];
         }
-        NSLog(@"[UIC] Egg timer set to %@ UTC for a recheck.", [[DeviceState sharedInstance] eggStart]);
+        NSLog(@"[Jarvis] [JobController] Egg timer set to %@ UTC for a recheck.", [[DeviceState sharedInstance] eggStart]);
     }
     
     if (delay >= [[Settings sharedInstance] minDelayLogout] &&
                  [[Settings sharedInstance] enableAccountManager]) {
-        NSLog(@"[UIC] Switching account. Delay too large.");
+        NSLog(@"[Jarvis] [JobController] Switching account. Delay too large.");
         NSMutableDictionary *questData = [[NSMutableDictionary alloc] init];
         questData[@"uuid"] = [[Device sharedInstance] uuid];
         questData[@"action"] = action;
         questData[@"lat"] = lat;
         questData[@"lon"] = lon;
         questData[@"type"] = @"job_failed";
-        [Utils postRequest:[[Settings sharedInstance] backendControllerUrl] dict:questData blocking:true completion:^(NSDictionary *result) {}];
+        [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                      dict:questData
+                  blocking:true
+                completion:^(NSDictionary *result) {}
+        ];
         //self.lock.lock();
         CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
         [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
@@ -200,7 +212,7 @@
     //_targetMaxDistance = [[Settings sharedInstance] targetMaxDistance];
     [[DeviceState sharedInstance] setWaitForData:true];
     //self.lock.unlock();
-    NSLog(@"[UIC] Scanning prepared");
+    NSLog(@"[Jarvis] [JobController] Scanning prepared");
     
     NSDate *start = [NSDate date];
     BOOL success = false;
@@ -216,7 +228,7 @@
             NSNumber *left = @([delay doubleValue] - timeIntervalSince);
             //NSNumber *delayDouble = [NSNumber numberWithDouble:[delay doubleValue]];
             //NSDate *end = [[NSDate date] initWithTimeIntervalSince1970:[delayDouble doubleValue]];
-            NSLog(@"[UIC] Delaying by %@ seconds.", left);
+            NSLog(@"[Jarvis] [JobController] Delaying by %@ seconds.", left);
 
             while (!found && (timeIntervalSince <= [delay doubleValue])) {
                 //self.lock.lock();
@@ -238,7 +250,7 @@
             [[DeviceState sharedInstance] setWaitForData:false];
             NSNumber *failedCount = [[DeviceState sharedInstance] failedCount];
             [[DeviceState sharedInstance] setFailedCount:[Utils incrementInt:failedCount]];
-            NSLog(@"[UIC] Pokestop loading timed out.");
+            NSLog(@"[Jarvis] [JobController] Pokestop loading timed out.");
             NSMutableDictionary *failedData = [[NSMutableDictionary alloc] init];
             failedData[@"uuid"] = [[Device sharedInstance] uuid];
             failedData[@"action"] = action;
@@ -248,14 +260,15 @@
             [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
                           dict:failedData
                       blocking:true
-                    completion:^(NSDictionary *result) {}];
+                    completion:^(NSDictionary *result) {}
+            ];
         } else {
             locked = [[DeviceState sharedInstance] waitForData];
             if (!locked) {
                 [[DeviceState sharedInstance] setDelayQuest:true];
                 success = true;
                 [[DeviceState sharedInstance] setFailedCount:0];
-                NSLog(@"[UIC] Pokestop loaded after %f", timeIntervalSince);
+                NSLog(@"[Jarvis] [JobController] Pokestop loaded after %f", timeIntervalSince);
             }
         }
         //self.lock.unlock();
@@ -272,7 +285,7 @@
         [[DeviceState sharedInstance] setGotQuest:false];
         if ([[DeviceState sharedInstance] noQuestCount] >= [[Settings sharedInstance] maxNoQuestCount]) {
             //self.lock.unlock();
-            NSLog(@"[UIC] Stuck somewhere. Restarting...");
+            NSLog(@"[Jarvis] [JobController] Stuck somewhere. Restarting...");
             [DeviceState logout];
         }
         
@@ -283,9 +296,9 @@
                 attempts = [Utils incrementInt:attempts];
                 //self.lock.lock();
                 BOOL gotQuest = [[DeviceState sharedInstance] gotQuest];
-                NSLog(@"[UIC] Got quest data: %@", gotQuest ? @"Yes" : @"No");
+                NSLog(@"[Jarvis] [JobController] Got quest data: %@", gotQuest ? @"Yes" : @"No");
                 if (!gotQuest) {
-                    NSLog(@"[UIC] UltraQuests pokestop re-attempt: %@", attempts);
+                    NSLog(@"[Jarvis] [JobController] UltraQuests pokestop re-attempt: %@", attempts);
                     //self.lock.unlock();
                     [NSThread sleepForTimeInterval:2];
                 } else {
@@ -303,12 +316,12 @@
     //degreePerMeter = 83267.0991559005
     NSNumber *lat = data[@"lat"] ?: 0;
     NSNumber *lon = data[@"lon"] ?: 0;
-    NSLog(@"[UIC] Scanning for IV at %@ %@", lat, lon);
+    NSLog(@"[Jarvis] [JobController] Scanning for IV at %@ %@", lat, lon);
     NSNumber *delay = data[@"delay"] ?: @0.0;
     NSString *fortType = data[@"fort_type"] ?: @"P";
     NSString *targetFortId = data[@"fort_id"] ?: @"";
     [[DeviceState sharedInstance] setTargetFortId:targetFortId];
-    NSLog(@"[UIC] [RES1] Location: %@ %@ Delay: %@ FortType: %@ FortId: %@", lat, lon, delay, fortType, targetFortId);
+    NSLog(@"[Jarvis] [JobController] [RES1] Location: %@ %@ Delay: %@ FortType: %@ FortId: %@", lat, lon, delay, fortType, targetFortId);
     
     if (![[DeviceState sharedInstance] isQuestInit]) {
         [[DeviceState sharedInstance] setIsQuestInit:true];
@@ -333,18 +346,18 @@
         if ([noItemsCount intValue] >= 200) {
             [[DeviceState sharedInstance] setIsQuestInit:false];
             [[DeviceState sharedInstance] setNoItemsCount:0];
-            NSLog(@"[UIC] Stuck somewhere. Restarting accounts...");
+            NSLog(@"[Jarvis] [JobController] Stuck somewhere. Restarting accounts...");
             [DeviceState restart];
             [[Device sharedInstance] setShouldExit:true];
             return;
         }
         
         [[DeviceState sharedInstance] setSkipSpin:false];
-        NSLog(@"[UIC] Quest Distance: %@", questDistance);
+        NSLog(@"[Jarvis] [JobController] Quest Distance: %@", questDistance);
         if ([questDistance intValue] <= 5.0) {
             delay = @0.0;
             [[DeviceState sharedInstance] setSkipSpin:true];
-            NSLog(@"[UIC] Quest Distance: %@m < 30.0m Already spun this pokestop. Go to next pokestop.", questDistance);
+            NSLog(@"[Jarvis] [JobController] Quest Distance: %@m < 30.0m Already spun this pokestop. Go to next pokestop.", questDistance);
             [[DeviceState sharedInstance] setGotItems:true];
         } else if ([questDistance intValue] <= 100.0) {
             delay = @3.0;
@@ -364,7 +377,7 @@
     }
     
     if (![[DeviceState sharedInstance] skipSpin]) {
-        NSLog(@"[UIC] Spinning fort at %@ %@ in %@ seconds", lat, lon, delay);
+        NSLog(@"[Jarvis] [JobController] Spinning fort at %@ %@ in %@ seconds", lat, lon, delay);
         CLLocation *lastQuestLocation = [Utils createCoordinate:[lat doubleValue] lon:[lon doubleValue]];
         [[DeviceState sharedInstance] setLastQuestLocation:lastQuestLocation];
         NSDate *firstWarningDate = [[DeviceState sharedInstance] firstWarningDate];
@@ -374,7 +387,7 @@
             firstWarningDate != nil &&
             timeSince >= [maxWarningTimeRaid intValue] &&
             [[Settings sharedInstance] enableAccountManager]) {
-            NSLog(@"[UIC] Account has warning and is over maxWarningTimeRaid (%@). Logging out!", maxWarningTimeRaid);
+            NSLog(@"[Jarvis] [JobController] Account has warning and is over maxWarningTimeRaid (%@). Logging out!", maxWarningTimeRaid);
             //self.lock.lock();
             CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
             [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
@@ -394,7 +407,7 @@
         //_targetMaxDistance = [[Settings sharedInstance] targetMaxDistance] ?: @250.0;
         [[DeviceState sharedInstance] setWaitForData:false];
         //self.lock.unlock();
-        NSLog(@"[UIC] Scanning prepared");
+        NSLog(@"[Jarvis] [JobController] Scanning prepared");
         
         NSDate *start = [NSDate date];
         NSNumber *delayTemp = delay;
@@ -405,7 +418,7 @@
             NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:start];
             if (timeIntervalSince >= [delayTemp intValue]) {
                 NSNumber *left = @([delayTemp intValue] - timeIntervalSince);
-                NSLog(@"[UIC] Delaying by %@", left);
+                NSLog(@"[Jarvis] [JobController] Delaying by %@", left);
                 // TODO: usleep(UInt32(min(10.0, left) * 100000.0));
                 continue;
             }
@@ -416,7 +429,7 @@
                 [[DeviceState sharedInstance] setWaitForData:false];
                 NSNumber *failedCount = [[DeviceState sharedInstance] failedCount];
                 [[DeviceState sharedInstance] setFailedCount:[Utils incrementInt:failedCount]];
-                NSLog(@"[UIC] Pokestop loading timed out...");
+                NSLog(@"[Jarvis] [JobController] Pokestop loading timed out...");
                 NSMutableDictionary *failedData = [[NSMutableDictionary alloc] init];
                 failedData[@"uuid"] = [[Device sharedInstance] uuid];
                 failedData[@"type"] = @"job_failed";
@@ -434,7 +447,7 @@
                     success = true;
                     [[DeviceState sharedInstance] setDelayQuest:true];
                     [[DeviceState sharedInstance] setFailedCount:0];
-                    NSLog(@"[UIC] Pokestop loaded after %f", [[NSDate date] timeIntervalSinceDate:start]);
+                    NSLog(@"[Jarvis] [JobController] Pokestop loaded after %f", [[NSDate date] timeIntervalSinceDate:start]);
                     [NSThread sleepForTimeInterval:1];
                 }
             }
@@ -442,7 +455,7 @@
         }
         
         if (success) {
-            NSLog(@"[UIC] Spinning Pokestop");
+            NSLog(@"[Jarvis] [JobController] Spinning Pokestop");
             NSDate *lastDeployTime = [[DeviceState sharedInstance] lastDeployTime];
             NSNumber *luckyEggsCount = [[DeviceState sharedInstance] luckyEggsCount];
             NSNumber *spinCount = [[DeviceState sharedInstance] spinCount];
@@ -450,7 +463,7 @@
             if (([luckyEggsCount intValue] >= 1 && timeIntervalSince >= 2000) ||
                 ([spinCount intValue] >= 400 && [[[Device sharedInstance] level] intValue] >= 20)) {
                 [Jarvis__ getToMainScreen];
-                NSLog(@"[UIC] Clearing Items for UQ");
+                NSLog(@"[Jarvis] [JobController] Clearing Items for UQ");
                 if ([Jarvis__ eggDeploy]) {
                     [[DeviceState sharedInstance] setLastDeployTime:[NSDate date]];
                     [[DeviceState sharedInstance] setLuckyEggsCount:[Utils decrementInt:luckyEggsCount]];
@@ -467,12 +480,12 @@
                     if (![[DeviceState sharedInstance] gotItems]) {
                         //self.lock.unlock();
                         if ([attempts intValue] % 5 == 0) {
-                            NSLog(@"[UIC] Waiting to spin...");
+                            NSLog(@"[Jarvis] [JobController] Waiting to spin...");
                         }
                         usleep([sleepUsleep intValue]);
                     } else {
                         //self.lock.unlock();
-                        NSLog(@"[UIC] Successfully spun Pokestop");
+                        NSLog(@"[Jarvis] [JobController] Successfully spun Pokestop");
                         [[DeviceState sharedInstance] setUltraQuestSpin:false];
                         //_spins = _spins + 1;
                         //sleep(3 * [[Device sharedInstance] delayMultiplier;
@@ -482,13 +495,13 @@
                 }
                 [[DeviceState sharedInstance] setUltraQuestSpin:false];
                 if (![[DeviceState sharedInstance] gotItems]) {
-                    NSLog(@"[UIC] Failed to spin Pokestop");
+                    NSLog(@"[Jarvis] [JobController] Failed to spin Pokestop");
                 }
             }
         }
         
     } else {
-        NSLog(@"[UIC] Sleep 3 seconds before skipping...");
+        NSLog(@"[Jarvis] [JobController] Sleep 3 seconds before skipping...");
         [NSThread sleepForTimeInterval:3];
     }
 }
@@ -502,7 +515,7 @@
         firstWarningDate != nil &&
         timeSince >= [maxWarningTimeRaid intValue] &&
         [[Settings sharedInstance] enableAccountManager]) {
-        NSLog(@"[UIC] Account has warning and is over maxWarningTimeRaid (%@). Logging out!", maxWarningTimeRaid);
+        NSLog(@"[Jarvis] [JobController] Account has warning and is over maxWarningTimeRaid (%@). Logging out!", maxWarningTimeRaid);
         //self.lock.lock();
         CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
         [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
@@ -512,7 +525,7 @@
     
     NSNumber *lat = data[@"lat"] ?: 0;
     NSNumber *lon = data[@"lon"] ?: 0;
-    NSLog(@"[UIC] Scanning for IV at %@ %@", lat, lon);
+    NSLog(@"[Jarvis] [JobController] Scanning for IV at %@ %@", lat, lon);
     
     NSDate *start = [NSDate date];
     //self.lock.lock();
@@ -523,7 +536,7 @@
     [[DeviceState sharedInstance] setWaitForData:true];
     // REVIEW: Not used - _encounterDelay = [[Settings sharedInstance] encounterDelay];
     //self.lock.unlock();
-    NSLog(@"[UIC] Scanning prepared");
+    NSLog(@"[Jarvis] [JobController] Scanning prepared");
     
     bool locked = true;
     while (locked) {
@@ -535,19 +548,23 @@
             [[DeviceState sharedInstance] setWaitForData:false];
             NSNumber *failedCount = [[DeviceState sharedInstance] failedCount];
             [[DeviceState sharedInstance] setFailedCount:[Utils incrementInt:failedCount]];
-            NSLog(@"[UIC] Raids loading timed out.");
+            NSLog(@"[Jarvis] [JobController] Raids loading timed out.");
             NSMutableDictionary *raidData = [[NSMutableDictionary alloc] init];
             raidData[@"uuid"] = [[Device sharedInstance] uuid];
             raidData[@"action"] = @"scan_raid";
             raidData[@"lat"] = lat;
             raidData[@"lon"] = lon;
             raidData[@"type"] = @"job_failed";
-            [Utils postRequest:[[Settings sharedInstance] backendControllerUrl] dict:raidData blocking:true completion:^(NSDictionary *result) {}];
+            [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                          dict:raidData
+                      blocking:true
+                    completion:^(NSDictionary *result) {}
+            ];
         } else {
             locked = [[DeviceState sharedInstance] waitForData];;
             if (!locked) {
                 [[DeviceState sharedInstance] setFailedCount:0];
-                NSLog(@"[UIC] Pokemon loaded after %f", timeIntervalSince);
+                NSLog(@"[Jarvis] [JobController] Pokemon loaded after %f", timeIntervalSince);
             }
         }
     }
@@ -571,8 +588,12 @@
         tokenData[@"username"] = [[Device sharedInstance] username];
         tokenData[@"ptcToken"] = [[Device sharedInstance] ptcToken];
         tokenData[@"type"] = @"ptcToken";
-        [Utils postRequest:[[Settings sharedInstance] backendControllerUrl] dict:tokenData blocking:true completion:^(NSDictionary *result) {}];
-        NSLog(@"[UIC] [Jarvis] Received ptcToken, swapping account...");
+        [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                      dict:tokenData
+                  blocking:true
+                completion:^(NSDictionary *result) {}
+        ];
+        NSLog(@"[Jarvis] [JobController] [Jarvis] Received ptcToken, swapping account...");
         [DeviceState logout];
     //}
 }

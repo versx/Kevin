@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2C13B0C9FE415007BCA1950A /* Pods_Jarvis__.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1BB35D16B13E3593B7D5F26 /* Pods_Jarvis__.framework */; };
+		9211CA00C706A83E974CA33E /* libPods-Jarvis++.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 296C1E02BE9643A58C925D14 /* libPods-Jarvis++.a */; };
 		C0025AA52414170C007813F7 /* HttpServer.m in Sources */ = {isa = PBXBuildFile; fileRef = C0025AA42414170C007813F7 /* HttpServer.m */; };
 		C0025AA72414171C007813F7 /* HttpServer.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AA62414171C007813F7 /* HttpServer.h */; };
 		C0025AAB2414175C007813F7 /* HttpServerProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AAA2414175C007813F7 /* HttpServerProtocol.h */; };
@@ -53,11 +53,12 @@
 		C0AC1D4C240DA4C1008F4DFB /* PTFakeTouch.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1D3A240DA4C1008F4DFB /* PTFakeTouch.m */; };
 		C0B68E022414C33E009B5970 /* Consts.h in Headers */ = {isa = PBXBuildFile; fileRef = C0B68E012414C33E009B5970 /* Consts.h */; };
 		C0B68E042414C632009B5970 /* Consts.m in Sources */ = {isa = PBXBuildFile; fileRef = C0B68E032414C632009B5970 /* Consts.m */; };
+		C0BAF0952418B62C003E2419 /* Jarvis++.pch in Headers */ = {isa = PBXBuildFile; fileRef = C0BAF0942418B62C003E2419 /* Jarvis++.pch */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		49861DD8B60D17E8116B0EE7 /* Pods-Jarvis++.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jarvis++.debug.xcconfig"; path = "Target Support Files/Pods-Jarvis++/Pods-Jarvis++.debug.xcconfig"; sourceTree = "<group>"; };
-		8070BC4A2C47606354FA2CF4 /* Pods-Jarvis++.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jarvis++.release.xcconfig"; path = "Target Support Files/Pods-Jarvis++/Pods-Jarvis++.release.xcconfig"; sourceTree = "<group>"; };
+		296C1E02BE9643A58C925D14 /* libPods-Jarvis++.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Jarvis++.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		576D6DB1B1EC8CA3F9CC34B3 /* Pods-Jarvis++.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jarvis++.debug.xcconfig"; path = "Target Support Files/Pods-Jarvis++/Pods-Jarvis++.debug.xcconfig"; sourceTree = "<group>"; };
 		C0025AA42414170C007813F7 /* HttpServer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HttpServer.m; sourceTree = "<group>"; };
 		C0025AA62414171C007813F7 /* HttpServer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HttpServer.h; sourceTree = "<group>"; };
 		C0025AAA2414175C007813F7 /* HttpServerProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HttpServerProtocol.h; sourceTree = "<group>"; };
@@ -111,7 +112,8 @@
 		C0AC1D3B240DA4C1008F4DFB /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C0B68E012414C33E009B5970 /* Consts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Consts.h; sourceTree = "<group>"; };
 		C0B68E032414C632009B5970 /* Consts.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Consts.m; sourceTree = "<group>"; };
-		E1BB35D16B13E3593B7D5F26 /* Pods_Jarvis__.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Jarvis__.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C0BAF0942418B62C003E2419 /* Jarvis++.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Jarvis++.pch"; sourceTree = "<group>"; };
+		DE32C59AA5BBE15492B98B42 /* Pods-Jarvis++.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jarvis++.release.xcconfig"; path = "Target Support Files/Pods-Jarvis++/Pods-Jarvis++.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -126,7 +128,7 @@
 				C01B4965240ACF5D00633B45 /* Foundation.framework in Frameworks */,
 				C0AC1D3D240DA4C1008F4DFB /* IOKit.framework in Frameworks */,
 				C01B4967240ACF5D00633B45 /* UIKit.framework in Frameworks */,
-				2C13B0C9FE415007BCA1950A /* Pods_Jarvis__.framework in Frameworks */,
+				9211CA00C706A83E974CA33E /* libPods-Jarvis++.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -136,8 +138,8 @@
 		91E40CCDBD064A40A2555622 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				49861DD8B60D17E8116B0EE7 /* Pods-Jarvis++.debug.xcconfig */,
-				8070BC4A2C47606354FA2CF4 /* Pods-Jarvis++.release.xcconfig */,
+				576D6DB1B1EC8CA3F9CC34B3 /* Pods-Jarvis++.debug.xcconfig */,
+				DE32C59AA5BBE15492B98B42 /* Pods-Jarvis++.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -192,6 +194,7 @@
 		C01B4957240ACF5D00633B45 = {
 			isa = PBXGroup;
 			children = (
+				C0BAF0942418B62C003E2419 /* Jarvis++.pch */,
 				C019482824161E730094A2C8 /* config.plist */,
 				C0025AC124148455007813F7 /* Controllers */,
 				C0025ABC241483A2007813F7 /* Extensions */,
@@ -224,7 +227,7 @@
 				C01B4982240AD01E00633B45 /* CoreLocation.framework */,
 				C01B4964240ACF5D00633B45 /* Foundation.framework */,
 				C01B4966240ACF5D00633B45 /* UIKit.framework */,
-				E1BB35D16B13E3593B7D5F26 /* Pods_Jarvis__.framework */,
+				296C1E02BE9643A58C925D14 /* libPods-Jarvis++.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -356,6 +359,7 @@
 				C0AC1D44240DA4C1008F4DFB /* UIWindow-KIFAdditions.h in Headers */,
 				C0025AA72414171C007813F7 /* HttpServer.h in Headers */,
 				C0AC1D43240DA4C1008F4DFB /* UIEvent+KIFAdditions.h in Headers */,
+				C0BAF0952418B62C003E2419 /* Jarvis++.pch in Headers */,
 				C0025AC32414846B007813F7 /* JobController.h in Headers */,
 				C0025AB424143923007813F7 /* DeviceState.h in Headers */,
 				C0AC1CF4240BB37C008F4DFB /* Device.h in Headers */,
@@ -369,11 +373,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C01B4979240ACF5D00633B45 /* Build configuration list for PBXNativeTarget "Jarvis++" */;
 			buildPhases = (
-				8DC0ACD71BEA65A66DB47500 /* [CP] Check Pods Manifest.lock */,
+				438C207F6F0E1B93D0AC0A81 /* [CP] Check Pods Manifest.lock */,
 				C01B495C240ACF5D00633B45 /* Sources */,
 				C01B495D240ACF5D00633B45 /* Frameworks */,
 				C01B495E240ACF5D00633B45 /* Headers */,
-				C0BAF09324174FAE003E2419 /* ShellScript */,
+				C0BAF09324174FAE003E2419 /* Run Script */,
 			);
 			buildRules = (
 			);
@@ -416,7 +420,7 @@
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		8DC0ACD71BEA65A66DB47500 /* [CP] Check Pods Manifest.lock */ = {
+		438C207F6F0E1B93D0AC0A81 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -438,7 +442,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C0BAF09324174FAE003E2419 /* ShellScript */ = {
+		C0BAF09324174FAE003E2419 /* Run Script */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -447,13 +451,14 @@
 			);
 			inputPaths = (
 			);
+			name = "Run Script";
 			outputFileListPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\noptool install -c load -p \"@executable_path/libJarvis++.dylib\" -t \"Payload/pokemongo.app/pokemongo\"\n";
+			shellScript = "# Remove previous payload folder\nrm -rf Payload\n# Unzip ipa\nunzip app.zip\n# Remove stupid directory settings file\nrm -rf __MACOSX\n# Copy dylib to app\ncp \"${CONFIGURATION_BUILD_DIR}/libJarvis++.dylib\" \"Payload/pokemongo.app/libJarvis++.dylib\"\n# Copy config\ncp config.plist \"Payload/pokemongo.app/config.plist\"\n# Inject load command for dylib\noptool install -c load -p \"@executable_path/libJarvis++.dylib\" -t \"Payload/pokemongo.app/pokemongo\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -536,7 +541,7 @@
 		};
 		C01B497A240ACF5D00633B45 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 49861DD8B60D17E8116B0EE7 /* Pods-Jarvis++.debug.xcconfig */;
+			baseConfigurationReference = 576D6DB1B1EC8CA3F9CC34B3 /* Pods-Jarvis++.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ARCHS = arm64;
@@ -567,6 +572,7 @@
 					"@loader_path/Frameworks",
 					"$(inherited)",
 				);
+				MACH_O_TYPE = mh_dylib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
 				USER_HEADER_SEARCH_PATHS = "";
@@ -583,7 +589,7 @@
 		};
 		C01B497B240ACF5D00633B45 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8070BC4A2C47606354FA2CF4 /* Pods-Jarvis++.release.xcconfig */;
+			baseConfigurationReference = DE32C59AA5BBE15492B98B42 /* Pods-Jarvis++.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ARCHS = arm64;
@@ -614,6 +620,7 @@
 					"@loader_path/Frameworks",
 					"$(inherited)",
 				);
+				MACH_O_TYPE = mh_dylib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
 				SYSTEM_FRAMEWORK_SEARCH_PATHS = "";
