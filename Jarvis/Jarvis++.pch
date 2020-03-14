@@ -5,10 +5,13 @@
 //  Created by versx on 3/10/20.
 //
 
-#ifndef Jarvis___pch
-#define Jarvis___pch
+//#define JARVIS_VERSION 0.4.1
+//NSString *JARVIS_VERSION = @"0.4.3";
 
 #define DEBUG
+
+#ifndef Jarvis___pch
+#define Jarvis___pch
 
 // Include any system framework and library headers here that should be included in all compilation units.
 // You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.

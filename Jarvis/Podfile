@@ -7,7 +7,7 @@ target 'Jarvis++' do
   inherit! :search_paths
 
   # Pods for Jarvis++
-  pod 'CocoaAsyncSocket'
+  pod 'CocoaHTTPServer', :git => 'https://github.com/robbiehanson/CocoaHTTPServer.git'
   pod 'PaperTrailLumberjack', :git => 'https://github.com/greenbits/papertrail-lumberjack-ios.git'
   #pod 'KIF'
 end

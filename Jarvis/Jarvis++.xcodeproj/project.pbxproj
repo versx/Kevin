@@ -8,18 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		9211CA00C706A83E974CA33E /* libPods-Jarvis++.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 296C1E02BE9643A58C925D14 /* libPods-Jarvis++.a */; };
-		C0025AA52414170C007813F7 /* HttpServer.m in Sources */ = {isa = PBXBuildFile; fileRef = C0025AA42414170C007813F7 /* HttpServer.m */; };
-		C0025AA72414171C007813F7 /* HttpServer.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AA62414171C007813F7 /* HttpServer.h */; };
-		C0025AAB2414175C007813F7 /* HttpServerProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AAA2414175C007813F7 /* HttpServerProtocol.h */; };
 		C0025AAE241421E9007813F7 /* Utils.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AAD241421E9007813F7 /* Utils.h */; };
 		C0025AB0241421F4007813F7 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = C0025AAF241421F4007813F7 /* Utils.m */; };
 		C0025AB224143917007813F7 /* DeviceState.m in Sources */ = {isa = PBXBuildFile; fileRef = C0025AB124143917007813F7 /* DeviceState.m */; };
 		C0025AB424143923007813F7 /* DeviceState.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AB324143923007813F7 /* DeviceState.h */; };
-		C0025AB7241447F3007813F7 /* HttpResponseCode.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AB6241447F3007813F7 /* HttpResponseCode.h */; };
 		C0025ABE241483B7007813F7 /* UIImage+Pixels.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025ABD241483B7007813F7 /* UIImage+Pixels.h */; };
 		C0025AC0241483C6007813F7 /* UIImage+Pixels.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0025ABF241483C6007813F7 /* UIImage+Pixels.mm */; };
 		C0025AC32414846B007813F7 /* JobController.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AC22414846B007813F7 /* JobController.h */; };
 		C0025AC524148477007813F7 /* JobController.m in Sources */ = {isa = PBXBuildFile; fileRef = C0025AC424148477007813F7 /* JobController.m */; };
+		C00EE489241C70B2001771AB /* HttpClientConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = C00EE488241C70B2001771AB /* HttpClientConnection.h */; };
+		C00EE48B241C70C5001771AB /* HttpClientConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = C00EE48A241C70C5001771AB /* HttpClientConnection.m */; };
 		C0132B62240B630000719452 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0132B61240B630000719452 /* CFNetwork.framework */; };
 		C0132B64240B631700719452 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0132B63240B631700719452 /* Security.framework */; };
 		C01B4965240ACF5D00633B45 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01B4964240ACF5D00633B45 /* Foundation.framework */; };
@@ -59,18 +57,16 @@
 /* Begin PBXFileReference section */
 		296C1E02BE9643A58C925D14 /* libPods-Jarvis++.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Jarvis++.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		576D6DB1B1EC8CA3F9CC34B3 /* Pods-Jarvis++.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jarvis++.debug.xcconfig"; path = "Target Support Files/Pods-Jarvis++/Pods-Jarvis++.debug.xcconfig"; sourceTree = "<group>"; };
-		C0025AA42414170C007813F7 /* HttpServer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HttpServer.m; sourceTree = "<group>"; };
-		C0025AA62414171C007813F7 /* HttpServer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HttpServer.h; sourceTree = "<group>"; };
-		C0025AAA2414175C007813F7 /* HttpServerProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HttpServerProtocol.h; sourceTree = "<group>"; };
 		C0025AAD241421E9007813F7 /* Utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
 		C0025AAF241421F4007813F7 /* Utils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Utils.m; sourceTree = "<group>"; };
 		C0025AB124143917007813F7 /* DeviceState.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceState.m; sourceTree = "<group>"; };
 		C0025AB324143923007813F7 /* DeviceState.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceState.h; sourceTree = "<group>"; };
-		C0025AB6241447F3007813F7 /* HttpResponseCode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HttpResponseCode.h; sourceTree = "<group>"; };
 		C0025ABD241483B7007813F7 /* UIImage+Pixels.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+Pixels.h"; sourceTree = "<group>"; };
 		C0025ABF241483C6007813F7 /* UIImage+Pixels.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "UIImage+Pixels.mm"; sourceTree = "<group>"; };
 		C0025AC22414846B007813F7 /* JobController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JobController.h; sourceTree = "<group>"; };
 		C0025AC424148477007813F7 /* JobController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JobController.m; sourceTree = "<group>"; };
+		C00EE488241C70B2001771AB /* HttpClientConnection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HttpClientConnection.h; sourceTree = "<group>"; };
+		C00EE48A241C70C5001771AB /* HttpClientConnection.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HttpClientConnection.m; sourceTree = "<group>"; };
 		C0132B61240B630000719452 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		C0132B63240B631700719452 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		C019482824161E730094A2C8 /* config.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = config.plist; sourceTree = "<group>"; };
@@ -147,10 +143,8 @@
 		C0025AA3241416DE007813F7 /* Net */ = {
 			isa = PBXGroup;
 			children = (
-				C0025AB6241447F3007813F7 /* HttpResponseCode.h */,
-				C0025AA62414171C007813F7 /* HttpServer.h */,
-				C0025AA42414170C007813F7 /* HttpServer.m */,
-				C0025AAA2414175C007813F7 /* HttpServerProtocol.h */,
+				C00EE488241C70B2001771AB /* HttpClientConnection.h */,
+				C00EE48A241C70C5001771AB /* HttpClientConnection.m */,
 			);
 			path = Net;
 			sourceTree = "<group>";
@@ -346,21 +340,19 @@
 				C0AC1D3E240DA4C1008F4DFB /* IOHIDEvent+KIF.h in Headers */,
 				C0AC1D46240DA4C1008F4DFB /* FixCategoryBug.h in Headers */,
 				C0AC1D49240DA4C1008F4DFB /* UITouch-KIFAdditions.h in Headers */,
-				C0025AAB2414175C007813F7 /* HttpServerProtocol.h in Headers */,
 				C0AC1CF8240BB97A008F4DFB /* Settings.h in Headers */,
 				C0AC1D42240DA4C1008F4DFB /* UIView-KIFAdditions.h in Headers */,
 				C0AC1D3F240DA4C1008F4DFB /* UIApplication-KIFAdditions.h in Headers */,
-				C0025AB7241447F3007813F7 /* HttpResponseCode.h in Headers */,
 				C0B68E022414C33E009B5970 /* Consts.h in Headers */,
 				C0025ABE241483B7007813F7 /* UIImage+Pixels.h in Headers */,
 				C01B4971240ACF5D00633B45 /* Jarvis__.h in Headers */,
 				C0AC1D4B240DA4C1008F4DFB /* LoadableCategory.h in Headers */,
 				C0025AAE241421E9007813F7 /* Utils.h in Headers */,
 				C0AC1D44240DA4C1008F4DFB /* UIWindow-KIFAdditions.h in Headers */,
-				C0025AA72414171C007813F7 /* HttpServer.h in Headers */,
 				C0AC1D43240DA4C1008F4DFB /* UIEvent+KIFAdditions.h in Headers */,
 				C0BAF0952418B62C003E2419 /* Jarvis++.pch in Headers */,
 				C0025AC32414846B007813F7 /* JobController.h in Headers */,
+				C00EE489241C70B2001771AB /* HttpClientConnection.h in Headers */,
 				C0025AB424143923007813F7 /* DeviceState.h in Headers */,
 				C0AC1CF4240BB37C008F4DFB /* Device.h in Headers */,
 			);
@@ -458,7 +450,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Remove previous payload folder\nrm -rf Payload\n# Unzip ipa\nunzip app.zip\n# Remove stupid directory settings file\nrm -rf __MACOSX\n# Copy dylib to app\ncp \"${CONFIGURATION_BUILD_DIR}/libJarvis++.dylib\" \"Payload/pokemongo.app/libJarvis++.dylib\"\n# Copy config\ncp config.plist \"Payload/pokemongo.app/config.plist\"\n# Inject load command for dylib\noptool install -c load -p \"@executable_path/libJarvis++.dylib\" -t \"Payload/pokemongo.app/pokemongo\"\n";
+			shellScript = "# Remove previous payload folder\nrm -rf Payload\n\n# Unzip ipa\nunzip app.zip\n\n# Remove stupid directory settings file\nrm -rf __MACOSX\n\n# Copy dylib to app\ncp \"${CONFIGURATION_BUILD_DIR}/libJarvis++.dylib\" \"Payload/pokemongo.app/libJarvis++.dylib\"\n\n# Copy config\n#cp config.plist \"Payload/pokemongo.app/config.plist\"\n\n# Inject load command for dylib\noptool install -c load -p \"@executable_path/libJarvis++.dylib\" -t \"Payload/pokemongo.app/pokemongo\"\n\n# Remove previously signed ipa\nrm -rf \"/Users/helpdesk/Desktop/deployer-redux/Releases/jarvis/resignedSigned.ipa\"\n\n# Remove previously unsigned ipa\nrm -rf \"/Users/helpdesk/Desktop/deployer-redux/Releases/jarvis/resigned.ipa\" \n\n# Zip up final product\nzip -r -X \"/Users/helpdesk/Desktop/deployer-redux/Releases/jarvis/resigned.zip\" \"Payload/\"\n\n# Rename .zip to .ipa\nmv \"/Users/helpdesk/Desktop/deployer-redux/Releases/jarvis/resigned.zip\" \"/Users/helpdesk/Desktop/deployer-redux/Releases/jarvis/resigned.ipa\"\n\ncd \"/Users/helpdesk/Desktop/deployer-redux\"\n\n# Run deployer\nnode \"/Users/helpdesk/Desktop/deployer-redux/deploy.js\" -f true -l true\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -469,6 +461,7 @@
 			files = (
 				C01B4973240ACF5D00633B45 /* Jarvis__.m in Sources */,
 				C0AC1CF6240BB96C008F4DFB /* Settings.m in Sources */,
+				C00EE48B241C70C5001771AB /* HttpClientConnection.m in Sources */,
 				C0025AC524148477007813F7 /* JobController.m in Sources */,
 				C0025AB0241421F4007813F7 /* Utils.m in Sources */,
 				C0AC1D48240DA4C1008F4DFB /* UIView-KIFAdditions.m in Sources */,
@@ -482,7 +475,6 @@
 				C0AC1D41240DA4C1008F4DFB /* UITouch-KIFAdditions.m in Sources */,
 				C0AC1D4C240DA4C1008F4DFB /* PTFakeTouch.m in Sources */,
 				C0B68E042414C632009B5970 /* Consts.m in Sources */,
-				C0025AA52414170C007813F7 /* HttpServer.m in Sources */,
 				C0AC1D45240DA4C1008F4DFB /* UIApplication-KIFAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -9,10 +9,10 @@
 #import "Device.h"
 #import "Settings.h"
 #import "../Controllers/JobController.h"
-#import "../Net/HttpServer.h"
+#import "../Net/HttpClientConnection.h"
 #import "../Utilities/Utils.h"
 
-#import <CocoaAsyncSocket/GCDAsyncSocket.h>
+#import <CocoaHTTPServer/HTTPServer.h>
 #import <PaperTrailLumberjack/RMPaperTrailLogger.h>
 
 #import <Foundation/Foundation.h>
@@ -29,7 +29,9 @@
 -(void)start;
 -(void)startUicLoop;
 
--(NSString *)handleDataRequest:(NSDictionary *)params;
--(NSString *)handleLocationRequest:(NSDictionary *)params;
++(NSString *)handleDataRequest:(NSDictionary *)params;
++(NSString *)handleLocationRequest:(NSDictionary *)params;
++(NSString *)handleTouchRequest:(NSDictionary *)params;
++(NSString *)handleConfigRequest;//:(NSDictionary *)params;
 
 @end

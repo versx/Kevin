@@ -87,15 +87,15 @@
 +(void)restart
 {
     NSLog(@"[Jarvis] [DeviceState] Restarting...");
-    //UIControl *ui = [[UIControl alloc] init];
-    //UIApplication *app = [UIApplication sharedApplication];
-    //SEL selector = @selector([NSXPCConnection superclass]:invalidate:);
-    //[ui sendAction:selector to:[UIApplication sharedApplication] forEvent:nil];
     // TODO: Restart
     return;
     while (true) { // TODO: Uhh this doesn't look safe. ;-|
-        //[[[UIControl alloc] init] sendAction:@selector(NSXPCConnection:invalidate:) to:[UIApplication sharedApplication] forEvent:nil];
         // TODO: UIControl().sendAction(#selector(NSXPCConnection.invalidate) to:UIApplication.shared for:nil);
+        SEL selector = [NSXPCConnection respondsToSelector:@selector(invalidate)];
+        [[[UIControl alloc] init] sendAction:selector
+                                          to:[UIApplication sharedApplication]
+                                    forEvent:nil
+        ];
         [NSThread sleepForTimeInterval:2];
     }
 }

@@ -21,7 +21,7 @@ static BOOL _startup = true;
 //static NSLock *_lock = [[NSLock alloc] init];
 static NSNumber *_jitterCorner = @0;
 //static NSString *_action;
-static NSNumber *_encounterDistance = @0.0;
+//static NSNumber *_encounterDistance = @0.0;
 //static NSNumber *_encounterDelay = @0.0;
 
 // Button Detection
@@ -36,7 +36,8 @@ static BOOL _invalidScreen = false;
 
 @implementation UIC2
 
-static HttpServer *_httpServer;
+//static HttpServer *_httpServer;
+static HTTPServer *_httpServer;
 static JobController *_jobController;
 static RMPaperTrailLogger *_logger;
 
@@ -76,21 +77,39 @@ static RMPaperTrailLogger *_logger;
     NSLog(@"[Jarvis] [UIC] Device Model: %@", [[Device sharedInstance] model]);
     NSLog(@"[Jarvis] [UIC] Device OS: %@", [[Device sharedInstance] osName]);
     NSLog(@"[Jarvis] [UIC] Device OS Version: %@", [[Device sharedInstance] osVersion]);
+    //NSLog(@"[Jarvis] [UIC] Device Delay Multiplier: %@", [[Device sharedInstance] multiplier]);
     NSLog(@"-----------------------------");
+    
+    // Print settings
     [[Settings sharedInstance] config];
-    
-    //UIColor *color = [Utils getPixelColor:0 withY:0];
-    //NSLog(@"[Jarvis] [UIC] PixelColor: %@", color);
-    
+
     //NSLog(@"Testing RESTART in 3 seconds...");
     //[NSThread sleepForTimeInterval:3];
     //[self restart];
     
+    // Initialize job controller
     _jobController = [[JobController alloc] init];
+
+    // Initalize our http server
+    _httpServer = [[HTTPServer alloc] init];
     
-    _httpServer = [[HttpServer alloc] init];
-    _httpServer.delegate = self;
-    [_httpServer listen];
+    // Tell the server to broadcast its presence via Bonjour.
+    // This allows browsers such as Safari to automatically discover our service.
+    [_httpServer setType:@"_http._tcp."];
+    
+    // Normally there's no need to run our server on any specific port.
+    // Technologies like Bonjour allow clients to dynamically discover the server's port at runtime.
+    // However, for easy testing you may want force a certain port so you can just hit the refresh button.
+    [_httpServer setPort:[[[Settings sharedInstance] port] intValue]];
+    
+    // We're going to extend the base HTTPConnection class with our MyHTTPConnection class.
+    // This allows us to do all kinds of customizations.
+    [_httpServer setConnectionClass:[HttpClientConnection class]];
+
+    NSError *error = nil;
+    if (![_httpServer start:&error]) {
+        NSLog(@"[Jarvis] [UIC] Error starting HTTP Server: %@", error);
+    }
 
     [self startHeatbeatLoop];
     
@@ -140,25 +159,23 @@ static RMPaperTrailLogger *_logger;
     [[DeviceState sharedInstance] setEggStart:eggStart];
     // Init AI
     //initJarvis();
-    
-    //NSLog(@"[Jarvis] [UIC] Running on %@ delay set to %@",
-    //      [[Device sharedInstance] model],
-    //      [[Device sharedInstance] multiplier]
-    //);
+
     [self loginStateHandler];
 }
 
 
 #pragma mark State Managers
 
--(void *)loginStateHandler
+-(void)loginStateHandler
 {
+    NSLog(@"[Jarvis] [UIC] loginStateHandler");
     dispatch_queue_t loginStateQueue = dispatch_queue_create("login_state_queue", NULL);
     dispatch_async(loginStateQueue, ^{
         NSNumber *startupCount = @0;
         while (_startup) {
             if (!_firststart) {
                 NSLog(@"[Jarvis] [UIC] App still in startup...");
+                //[NSThread sleepForTimeInterval:60];
                 while (!_menuButton) {
                     _newPlayerButton = [Jarvis__ clickButton:@"NewPlayerButton"];
                     NSLog(@"[Jarvis] Found NewPlayerButton: %s", _newPlayerButton ? "Yes" : "No");
@@ -283,6 +300,7 @@ static RMPaperTrailLogger *_logger;
                 [Jarvis__ clickButton:@"TrackerButton"];
                 _startup = false;
             } else {
+                NSLog(@"[Jarvis] [UIC] First startup, waiting...");
                 [NSThread sleepForTimeInterval:10];
                 _firststart = false;
             }
@@ -290,10 +308,9 @@ static RMPaperTrailLogger *_logger;
         }
     });
     //dispatch_release(loginStateQueue);
-    return 0;
 }
 
--(void *)gameStateHandler
+-(void)gameStateHandler
 {
     // TODO: qos: background dispatch
     dispatch_queue_t gameStateQueue = dispatch_queue_create("game_state_queue", NULL);
@@ -500,13 +517,12 @@ static RMPaperTrailLogger *_logger;
         }
     });
     //dispatch_release(gameStateQueue);
-    return 0;
 }
 
 
 #pragma mark Request Handlers
 
--(NSString *)handleLocationRequest:(NSDictionary *)params
++(NSString *)handleLocationRequest:(NSDictionary *)params
 {
     NSMutableDictionary *responseData = [[NSMutableDictionary alloc] init];
     //self.lock.lock();
@@ -584,20 +600,16 @@ static RMPaperTrailLogger *_logger;
         }
     }
 
-    // response: "Content-Type" = "application/json";
-    
-    //NSString *response = [NSString stringWithFormat:@"%@\r\n%@", _response_200, responseData];
-    NSString *body = [Utils toJsonString:responseData withPrettyPrint:false];
+    NSString *response = [Utils toJsonString:responseData withPrettyPrint:false];
     [responseData release];
-    NSString *response = [Utils buildResponse:body withResponseCode:Success];
     return response;
 }
 
--(NSString *)handleDataRequest:(NSDictionary *)params
++(NSString *)handleDataRequest:(NSDictionary *)params
 {
     CLLocation *currentLocation = [[DeviceState sharedInstance] currentLocation];
     if (currentLocation == nil) {
-        return [Utils buildResponse:@"" withResponseCode:BadRequest];
+        return @"Error"; // TODO: Return json response { status: error }
     }
     [[DeviceState sharedInstance] setLastUpdate:[NSDate date]];
     CLLocation *currentLoc = [Utils createCoordinate:currentLocation.coordinate.latitude lon: currentLocation.coordinate.longitude];
@@ -676,10 +688,10 @@ static RMPaperTrailLogger *_logger;
                     if ([pokemonFoundCount intValue] > 0) {
                         if (pokemonLat != 0 && pokemonLon != 0 && pokemonEncounterId == pokemonEncounterIdResult) {
                             [[DeviceState sharedInstance] setWaitRequiresPokemon:false];
-                            CLLocation *oldLocation = [[DeviceState sharedInstance] currentLocation];
+                            //CLLocation *oldLocation = [[DeviceState sharedInstance] currentLocation];
                             [[DeviceState sharedInstance] setCurrentLocation:[Utils createCoordinate:[pokemonLat doubleValue] lon:[pokemonLon doubleValue]]];
-                            CLLocation *newLocation = [[DeviceState sharedInstance] currentLocation];
-                            _encounterDistance = [NSNumber numberWithDouble:[newLocation distanceFromLocation:oldLocation]];
+                            //CLLocation *newLocation = [[DeviceState sharedInstance] currentLocation];
+                            //_encounterDistance = [NSNumber numberWithDouble:[newLocation distanceFromLocation:oldLocation]];
                             [[DeviceState sharedInstance] setPokemonEncounterId:nil];
                             [[DeviceState sharedInstance] setWaitForData:false];
                             toPrint = @"[Jarvis] [UIC] Got Data and found Pokemon";
@@ -723,9 +735,27 @@ static RMPaperTrailLogger *_logger;
         
         NSLog(@"[Jarvis] [UIC] Handle data response: %@", toPrint);
     }];
-    NSString *body = [Utils toJsonString:data withPrettyPrint:false];
-    NSString *response = [Utils buildResponse:body withResponseCode:Success];
+    NSString *response = [Utils toJsonString:data withPrettyPrint:false];
     return response;
+}
+
++(NSString *)handleTouchRequest:(NSDictionary *)params
+{
+    [Utils touch:[params[@"x"] intValue]
+           withY:[params[@"y"] intValue]];
+    return @"OK";
+}
+
++(NSString *)handleConfigRequest
+{
+    NSMutableString *text = [[NSMutableString alloc] init];
+    NSDictionary *config = [[Settings sharedInstance] config];
+    if (config != nil) {
+        for (id key in config) {
+            [text appendFormat:@"%@=%@\n", key, config[key]];
+        }
+    }
+    return text;
 }
 
 @end
