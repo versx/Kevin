@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		9211CA00C706A83E974CA33E /* libPods-Jarvis++.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 296C1E02BE9643A58C925D14 /* libPods-Jarvis++.a */; };
+		46A19D696FB20DF10E086937 /* libPods-Jarvis++.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B758B3E2D00044589FFB5B7 /* libPods-Jarvis++.a */; };
 		C0025AAE241421E9007813F7 /* Utils.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AAD241421E9007813F7 /* Utils.h */; };
 		C0025AB0241421F4007813F7 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = C0025AAF241421F4007813F7 /* Utils.m */; };
 		C0025AB224143917007813F7 /* DeviceState.m in Sources */ = {isa = PBXBuildFile; fileRef = C0025AB124143917007813F7 /* DeviceState.m */; };
@@ -18,6 +18,8 @@
 		C0025AC524148477007813F7 /* JobController.m in Sources */ = {isa = PBXBuildFile; fileRef = C0025AC424148477007813F7 /* JobController.m */; };
 		C00EE489241C70B2001771AB /* HttpClientConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = C00EE488241C70B2001771AB /* HttpClientConnection.h */; };
 		C00EE48B241C70C5001771AB /* HttpClientConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = C00EE48A241C70C5001771AB /* HttpClientConnection.m */; };
+		C00EE48D241D4830001771AB /* JarvisTestCase.h in Headers */ = {isa = PBXBuildFile; fileRef = C00EE48C241D4830001771AB /* JarvisTestCase.h */; };
+		C00EE48F241D4855001771AB /* JarvisTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = C00EE48E241D4855001771AB /* JarvisTestCase.m */; };
 		C0132B62240B630000719452 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0132B61240B630000719452 /* CFNetwork.framework */; };
 		C0132B64240B631700719452 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0132B63240B631700719452 /* Security.framework */; };
 		C01B4965240ACF5D00633B45 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01B4964240ACF5D00633B45 /* Foundation.framework */; };
@@ -27,36 +29,39 @@
 		C01B4980240ACF9400633B45 /* UIC.h in Headers */ = {isa = PBXBuildFile; fileRef = C01B497E240ACF9400633B45 /* UIC.h */; };
 		C01B4981240ACF9400633B45 /* UIC.mm in Sources */ = {isa = PBXBuildFile; fileRef = C01B497F240ACF9400633B45 /* UIC.mm */; };
 		C01B4983240AD01E00633B45 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01B4982240AD01E00633B45 /* CoreLocation.framework */; };
+		C067ACEA241EAFF6007E3055 /* PTFakeTouch.h in Headers */ = {isa = PBXBuildFile; fileRef = C067ACD7241EAFF6007E3055 /* PTFakeTouch.h */; };
+		C067ACEB241EAFF6007E3055 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C067ACD8241EAFF6007E3055 /* IOKit.framework */; };
+		C067ACEC241EAFF7007E3055 /* IOHIDEvent+KIF.h in Headers */ = {isa = PBXBuildFile; fileRef = C067ACDA241EAFF6007E3055 /* IOHIDEvent+KIF.h */; };
+		C067ACED241EAFF7007E3055 /* UIApplication-KIFAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = C067ACDB241EAFF6007E3055 /* UIApplication-KIFAdditions.h */; };
+		C067ACEE241EAFF7007E3055 /* UIWindow-KIFAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C067ACDC241EAFF6007E3055 /* UIWindow-KIFAdditions.m */; };
+		C067ACEF241EAFF7007E3055 /* UITouch-KIFAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C067ACDD241EAFF6007E3055 /* UITouch-KIFAdditions.m */; };
+		C067ACF0241EAFF7007E3055 /* UIView-KIFAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = C067ACDE241EAFF6007E3055 /* UIView-KIFAdditions.h */; };
+		C067ACF1241EAFF7007E3055 /* UIEvent+KIFAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = C067ACDF241EAFF6007E3055 /* UIEvent+KIFAdditions.h */; };
+		C067ACF2241EAFF7007E3055 /* UIWindow-KIFAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = C067ACE0241EAFF6007E3055 /* UIWindow-KIFAdditions.h */; };
+		C067ACF3241EAFF7007E3055 /* UIApplication-KIFAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C067ACE1241EAFF6007E3055 /* UIApplication-KIFAdditions.m */; };
+		C067ACF4241EAFF7007E3055 /* FixCategoryBug.h in Headers */ = {isa = PBXBuildFile; fileRef = C067ACE2241EAFF6007E3055 /* FixCategoryBug.h */; };
+		C067ACF5241EAFF7007E3055 /* IOHIDEvent+KIF.m in Sources */ = {isa = PBXBuildFile; fileRef = C067ACE3241EAFF6007E3055 /* IOHIDEvent+KIF.m */; };
+		C067ACF6241EAFF7007E3055 /* UIView-KIFAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C067ACE4241EAFF6007E3055 /* UIView-KIFAdditions.m */; };
+		C067ACF7241EAFF7007E3055 /* UITouch-KIFAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = C067ACE5241EAFF6007E3055 /* UITouch-KIFAdditions.h */; };
+		C067ACF8241EAFF7007E3055 /* UIEvent+KIFAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C067ACE6241EAFF6007E3055 /* UIEvent+KIFAdditions.m */; };
+		C067ACF9241EAFF7007E3055 /* LoadableCategory.h in Headers */ = {isa = PBXBuildFile; fileRef = C067ACE7241EAFF6007E3055 /* LoadableCategory.h */; };
+		C067ACFA241EAFF7007E3055 /* PTFakeTouch.m in Sources */ = {isa = PBXBuildFile; fileRef = C067ACE8241EAFF6007E3055 /* PTFakeTouch.m */; };
+		C067AD2B241EB515007E3055 /* KIF.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C067AD27241EB209007E3055 /* KIF.framework */; };
+		C067AD2F241EB776007E3055 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C067AD2E241EB776007E3055 /* XCTest.framework */; };
 		C0AC1CDD240BAD44008F4DFB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0AC1CDC240BAD44008F4DFB /* CoreGraphics.framework */; };
 		C0AC1CF2240BB365008F4DFB /* Device.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1CF1240BB365008F4DFB /* Device.m */; };
 		C0AC1CF4240BB37C008F4DFB /* Device.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1CF3240BB37C008F4DFB /* Device.h */; };
 		C0AC1CF6240BB96C008F4DFB /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1CF5240BB96C008F4DFB /* Settings.m */; };
 		C0AC1CF8240BB97A008F4DFB /* Settings.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1CF7240BB97A008F4DFB /* Settings.h */; };
-		C0AC1D3C240DA4C1008F4DFB /* PTFakeTouch.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1D29240DA4C1008F4DFB /* PTFakeTouch.h */; };
-		C0AC1D3D240DA4C1008F4DFB /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0AC1D2A240DA4C1008F4DFB /* IOKit.framework */; };
-		C0AC1D3E240DA4C1008F4DFB /* IOHIDEvent+KIF.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1D2C240DA4C1008F4DFB /* IOHIDEvent+KIF.h */; };
-		C0AC1D3F240DA4C1008F4DFB /* UIApplication-KIFAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1D2D240DA4C1008F4DFB /* UIApplication-KIFAdditions.h */; };
-		C0AC1D40240DA4C1008F4DFB /* UIWindow-KIFAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1D2E240DA4C1008F4DFB /* UIWindow-KIFAdditions.m */; };
-		C0AC1D41240DA4C1008F4DFB /* UITouch-KIFAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1D2F240DA4C1008F4DFB /* UITouch-KIFAdditions.m */; };
-		C0AC1D42240DA4C1008F4DFB /* UIView-KIFAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1D30240DA4C1008F4DFB /* UIView-KIFAdditions.h */; };
-		C0AC1D43240DA4C1008F4DFB /* UIEvent+KIFAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1D31240DA4C1008F4DFB /* UIEvent+KIFAdditions.h */; };
-		C0AC1D44240DA4C1008F4DFB /* UIWindow-KIFAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1D32240DA4C1008F4DFB /* UIWindow-KIFAdditions.h */; };
-		C0AC1D45240DA4C1008F4DFB /* UIApplication-KIFAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1D33240DA4C1008F4DFB /* UIApplication-KIFAdditions.m */; };
-		C0AC1D46240DA4C1008F4DFB /* FixCategoryBug.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1D34240DA4C1008F4DFB /* FixCategoryBug.h */; };
-		C0AC1D47240DA4C1008F4DFB /* IOHIDEvent+KIF.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1D35240DA4C1008F4DFB /* IOHIDEvent+KIF.m */; };
-		C0AC1D48240DA4C1008F4DFB /* UIView-KIFAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1D36240DA4C1008F4DFB /* UIView-KIFAdditions.m */; };
-		C0AC1D49240DA4C1008F4DFB /* UITouch-KIFAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1D37240DA4C1008F4DFB /* UITouch-KIFAdditions.h */; };
-		C0AC1D4A240DA4C1008F4DFB /* UIEvent+KIFAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1D38240DA4C1008F4DFB /* UIEvent+KIFAdditions.m */; };
-		C0AC1D4B240DA4C1008F4DFB /* LoadableCategory.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1D39240DA4C1008F4DFB /* LoadableCategory.h */; };
-		C0AC1D4C240DA4C1008F4DFB /* PTFakeTouch.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1D3A240DA4C1008F4DFB /* PTFakeTouch.m */; };
 		C0B68E022414C33E009B5970 /* Consts.h in Headers */ = {isa = PBXBuildFile; fileRef = C0B68E012414C33E009B5970 /* Consts.h */; };
 		C0B68E042414C632009B5970 /* Consts.m in Sources */ = {isa = PBXBuildFile; fileRef = C0B68E032414C632009B5970 /* Consts.m */; };
 		C0BAF0952418B62C003E2419 /* Jarvis++.pch in Headers */ = {isa = PBXBuildFile; fileRef = C0BAF0942418B62C003E2419 /* Jarvis++.pch */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		296C1E02BE9643A58C925D14 /* libPods-Jarvis++.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Jarvis++.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		576D6DB1B1EC8CA3F9CC34B3 /* Pods-Jarvis++.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jarvis++.debug.xcconfig"; path = "Target Support Files/Pods-Jarvis++/Pods-Jarvis++.debug.xcconfig"; sourceTree = "<group>"; };
+		2EF23DFC61FC9528A2C6B4F9 /* Pods-Jarvis++.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jarvis++.debug.xcconfig"; path = "Target Support Files/Pods-Jarvis++/Pods-Jarvis++.debug.xcconfig"; sourceTree = "<group>"; };
+		4B758B3E2D00044589FFB5B7 /* libPods-Jarvis++.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Jarvis++.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		55E833E5AC2B9F7037D6E68C /* Pods-Jarvis++.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jarvis++.release.xcconfig"; path = "Target Support Files/Pods-Jarvis++/Pods-Jarvis++.release.xcconfig"; sourceTree = "<group>"; };
 		C0025AAD241421E9007813F7 /* Utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
 		C0025AAF241421F4007813F7 /* Utils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Utils.m; sourceTree = "<group>"; };
 		C0025AB124143917007813F7 /* DeviceState.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceState.m; sourceTree = "<group>"; };
@@ -67,6 +72,8 @@
 		C0025AC424148477007813F7 /* JobController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JobController.m; sourceTree = "<group>"; };
 		C00EE488241C70B2001771AB /* HttpClientConnection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HttpClientConnection.h; sourceTree = "<group>"; };
 		C00EE48A241C70C5001771AB /* HttpClientConnection.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HttpClientConnection.m; sourceTree = "<group>"; };
+		C00EE48C241D4830001771AB /* JarvisTestCase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JarvisTestCase.h; sourceTree = "<group>"; };
+		C00EE48E241D4855001771AB /* JarvisTestCase.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JarvisTestCase.m; sourceTree = "<group>"; };
 		C0132B61240B630000719452 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		C0132B63240B631700719452 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		C019482824161E730094A2C8 /* config.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = config.plist; sourceTree = "<group>"; };
@@ -83,33 +90,34 @@
 		C01B497E240ACF9400633B45 /* UIC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIC.h; sourceTree = "<group>"; };
 		C01B497F240ACF9400633B45 /* UIC.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = UIC.mm; sourceTree = "<group>"; };
 		C01B4982240AD01E00633B45 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		C067ACD7241EAFF6007E3055 /* PTFakeTouch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTFakeTouch.h; sourceTree = "<group>"; };
+		C067ACD8241EAFF6007E3055 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = IOKit.framework; sourceTree = "<group>"; };
+		C067ACDA241EAFF6007E3055 /* IOHIDEvent+KIF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IOHIDEvent+KIF.h"; sourceTree = "<group>"; };
+		C067ACDB241EAFF6007E3055 /* UIApplication-KIFAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIApplication-KIFAdditions.h"; sourceTree = "<group>"; };
+		C067ACDC241EAFF6007E3055 /* UIWindow-KIFAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIWindow-KIFAdditions.m"; sourceTree = "<group>"; };
+		C067ACDD241EAFF6007E3055 /* UITouch-KIFAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITouch-KIFAdditions.m"; sourceTree = "<group>"; };
+		C067ACDE241EAFF6007E3055 /* UIView-KIFAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView-KIFAdditions.h"; sourceTree = "<group>"; };
+		C067ACDF241EAFF6007E3055 /* UIEvent+KIFAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIEvent+KIFAdditions.h"; sourceTree = "<group>"; };
+		C067ACE0241EAFF6007E3055 /* UIWindow-KIFAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIWindow-KIFAdditions.h"; sourceTree = "<group>"; };
+		C067ACE1241EAFF6007E3055 /* UIApplication-KIFAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIApplication-KIFAdditions.m"; sourceTree = "<group>"; };
+		C067ACE2241EAFF6007E3055 /* FixCategoryBug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FixCategoryBug.h; sourceTree = "<group>"; };
+		C067ACE3241EAFF6007E3055 /* IOHIDEvent+KIF.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "IOHIDEvent+KIF.m"; sourceTree = "<group>"; };
+		C067ACE4241EAFF6007E3055 /* UIView-KIFAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView-KIFAdditions.m"; sourceTree = "<group>"; };
+		C067ACE5241EAFF6007E3055 /* UITouch-KIFAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITouch-KIFAdditions.h"; sourceTree = "<group>"; };
+		C067ACE6241EAFF6007E3055 /* UIEvent+KIFAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIEvent+KIFAdditions.m"; sourceTree = "<group>"; };
+		C067ACE7241EAFF6007E3055 /* LoadableCategory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoadableCategory.h; sourceTree = "<group>"; };
+		C067ACE8241EAFF6007E3055 /* PTFakeTouch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTFakeTouch.m; sourceTree = "<group>"; };
+		C067ACE9241EAFF6007E3055 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C067AD27241EB209007E3055 /* KIF.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KIF.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		C067AD2E241EB776007E3055 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		C0AC1CDC240BAD44008F4DFB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		C0AC1CF1240BB365008F4DFB /* Device.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Device.m; sourceTree = "<group>"; };
 		C0AC1CF3240BB37C008F4DFB /* Device.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Device.h; sourceTree = "<group>"; };
 		C0AC1CF5240BB96C008F4DFB /* Settings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Settings.m; sourceTree = "<group>"; };
 		C0AC1CF7240BB97A008F4DFB /* Settings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Settings.h; sourceTree = "<group>"; };
-		C0AC1D29240DA4C1008F4DFB /* PTFakeTouch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTFakeTouch.h; sourceTree = "<group>"; };
-		C0AC1D2A240DA4C1008F4DFB /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = IOKit.framework; sourceTree = "<group>"; };
-		C0AC1D2C240DA4C1008F4DFB /* IOHIDEvent+KIF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IOHIDEvent+KIF.h"; sourceTree = "<group>"; };
-		C0AC1D2D240DA4C1008F4DFB /* UIApplication-KIFAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIApplication-KIFAdditions.h"; sourceTree = "<group>"; };
-		C0AC1D2E240DA4C1008F4DFB /* UIWindow-KIFAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIWindow-KIFAdditions.m"; sourceTree = "<group>"; };
-		C0AC1D2F240DA4C1008F4DFB /* UITouch-KIFAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITouch-KIFAdditions.m"; sourceTree = "<group>"; };
-		C0AC1D30240DA4C1008F4DFB /* UIView-KIFAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView-KIFAdditions.h"; sourceTree = "<group>"; };
-		C0AC1D31240DA4C1008F4DFB /* UIEvent+KIFAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIEvent+KIFAdditions.h"; sourceTree = "<group>"; };
-		C0AC1D32240DA4C1008F4DFB /* UIWindow-KIFAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIWindow-KIFAdditions.h"; sourceTree = "<group>"; };
-		C0AC1D33240DA4C1008F4DFB /* UIApplication-KIFAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIApplication-KIFAdditions.m"; sourceTree = "<group>"; };
-		C0AC1D34240DA4C1008F4DFB /* FixCategoryBug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FixCategoryBug.h; sourceTree = "<group>"; };
-		C0AC1D35240DA4C1008F4DFB /* IOHIDEvent+KIF.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "IOHIDEvent+KIF.m"; sourceTree = "<group>"; };
-		C0AC1D36240DA4C1008F4DFB /* UIView-KIFAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView-KIFAdditions.m"; sourceTree = "<group>"; };
-		C0AC1D37240DA4C1008F4DFB /* UITouch-KIFAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITouch-KIFAdditions.h"; sourceTree = "<group>"; };
-		C0AC1D38240DA4C1008F4DFB /* UIEvent+KIFAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIEvent+KIFAdditions.m"; sourceTree = "<group>"; };
-		C0AC1D39240DA4C1008F4DFB /* LoadableCategory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoadableCategory.h; sourceTree = "<group>"; };
-		C0AC1D3A240DA4C1008F4DFB /* PTFakeTouch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTFakeTouch.m; sourceTree = "<group>"; };
-		C0AC1D3B240DA4C1008F4DFB /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C0B68E012414C33E009B5970 /* Consts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Consts.h; sourceTree = "<group>"; };
 		C0B68E032414C632009B5970 /* Consts.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Consts.m; sourceTree = "<group>"; };
 		C0BAF0942418B62C003E2419 /* Jarvis++.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Jarvis++.pch"; sourceTree = "<group>"; };
-		DE32C59AA5BBE15492B98B42 /* Pods-Jarvis++.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jarvis++.release.xcconfig"; path = "Target Support Files/Pods-Jarvis++/Pods-Jarvis++.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,11 +128,13 @@
 				C0AC1CDD240BAD44008F4DFB /* CoreGraphics.framework in Frameworks */,
 				C0132B64240B631700719452 /* Security.framework in Frameworks */,
 				C0132B62240B630000719452 /* CFNetwork.framework in Frameworks */,
+				C067ACEB241EAFF6007E3055 /* IOKit.framework in Frameworks */,
 				C01B4983240AD01E00633B45 /* CoreLocation.framework in Frameworks */,
 				C01B4965240ACF5D00633B45 /* Foundation.framework in Frameworks */,
-				C0AC1D3D240DA4C1008F4DFB /* IOKit.framework in Frameworks */,
+				C067AD2B241EB515007E3055 /* KIF.framework in Frameworks */,
+				C067AD2F241EB776007E3055 /* XCTest.framework in Frameworks */,
 				C01B4967240ACF5D00633B45 /* UIKit.framework in Frameworks */,
-				9211CA00C706A83E974CA33E /* libPods-Jarvis++.a in Frameworks */,
+				46A19D696FB20DF10E086937 /* libPods-Jarvis++.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -134,8 +144,8 @@
 		91E40CCDBD064A40A2555622 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				576D6DB1B1EC8CA3F9CC34B3 /* Pods-Jarvis++.debug.xcconfig */,
-				DE32C59AA5BBE15492B98B42 /* Pods-Jarvis++.release.xcconfig */,
+				2EF23DFC61FC9528A2C6B4F9 /* Pods-Jarvis++.debug.xcconfig */,
+				55E833E5AC2B9F7037D6E68C /* Pods-Jarvis++.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -188,19 +198,19 @@
 		C01B4957240ACF5D00633B45 = {
 			isa = PBXGroup;
 			children = (
-				C0BAF0942418B62C003E2419 /* Jarvis++.pch */,
 				C019482824161E730094A2C8 /* config.plist */,
 				C0025AC124148455007813F7 /* Controllers */,
 				C0025ABC241483A2007813F7 /* Extensions */,
 				C01B4963240ACF5D00633B45 /* Frameworks */,
 				C01B4968240ACF5D00633B45 /* Jarvis++ */,
+				C0BAF0942418B62C003E2419 /* Jarvis++.pch */,
 				C0025AA3241416DE007813F7 /* Net */,
+				91E40CCDBD064A40A2555622 /* Pods */,
 				C01B4962240ACF5D00633B45 /* Products */,
-				C0AC1D28240DA4C1008F4DFB /* PTFakeTouch */,
+				C067ACD6241EAFF6007E3055 /* PTFakeTouch */,
 				C0025AB52414393B007813F7 /* States */,
 				C01B497D240ACF9400633B45 /* UIC */,
 				C0025AAC241421D5007813F7 /* Utilities */,
-				91E40CCDBD064A40A2555622 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -215,13 +225,15 @@
 		C01B4963240ACF5D00633B45 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C067AD2E241EB776007E3055 /* XCTest.framework */,
+				C067AD27241EB209007E3055 /* KIF.framework */,
 				C0AC1CDC240BAD44008F4DFB /* CoreGraphics.framework */,
 				C0132B63240B631700719452 /* Security.framework */,
 				C0132B61240B630000719452 /* CFNetwork.framework */,
 				C01B4982240AD01E00633B45 /* CoreLocation.framework */,
 				C01B4964240ACF5D00633B45 /* Foundation.framework */,
 				C01B4966240ACF5D00633B45 /* UIKit.framework */,
-				296C1E02BE9643A58C925D14 /* libPods-Jarvis++.a */,
+				4B758B3E2D00044589FFB5B7 /* libPods-Jarvis++.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -287,6 +299,8 @@
 				C0B68E032414C632009B5970 /* Consts.m */,
 				C0AC1CF3240BB37C008F4DFB /* Device.h */,
 				C0AC1CF1240BB365008F4DFB /* Device.m */,
+				C00EE48C241D4830001771AB /* JarvisTestCase.h */,
+				C00EE48E241D4855001771AB /* JarvisTestCase.m */,
 				C0AC1CF7240BB97A008F4DFB /* Settings.h */,
 				C0AC1CF5240BB96C008F4DFB /* Settings.m */,
 				C01B497E240ACF9400633B45 /* UIC.h */,
@@ -295,35 +309,35 @@
 			path = UIC;
 			sourceTree = "<group>";
 		};
-		C0AC1D28240DA4C1008F4DFB /* PTFakeTouch */ = {
+		C067ACD6241EAFF6007E3055 /* PTFakeTouch */ = {
 			isa = PBXGroup;
 			children = (
-				C0AC1D2A240DA4C1008F4DFB /* IOKit.framework */,
-				C0AC1D29240DA4C1008F4DFB /* PTFakeTouch.h */,
-				C0AC1D3A240DA4C1008F4DFB /* PTFakeTouch.m */,
-				C0AC1D3B240DA4C1008F4DFB /* Info.plist */,
-				C0AC1D2B240DA4C1008F4DFB /* head */,
+				C067ACD7241EAFF6007E3055 /* PTFakeTouch.h */,
+				C067ACD8241EAFF6007E3055 /* IOKit.framework */,
+				C067ACD9241EAFF6007E3055 /* head */,
+				C067ACE8241EAFF6007E3055 /* PTFakeTouch.m */,
+				C067ACE9241EAFF6007E3055 /* Info.plist */,
 			);
 			path = PTFakeTouch;
 			sourceTree = "<group>";
 		};
-		C0AC1D2B240DA4C1008F4DFB /* head */ = {
+		C067ACD9241EAFF6007E3055 /* head */ = {
 			isa = PBXGroup;
 			children = (
-				C0AC1D34240DA4C1008F4DFB /* FixCategoryBug.h */,
-				C0AC1D2C240DA4C1008F4DFB /* IOHIDEvent+KIF.h */,
-				C0AC1D35240DA4C1008F4DFB /* IOHIDEvent+KIF.m */,
-				C0AC1D39240DA4C1008F4DFB /* LoadableCategory.h */,
-				C0AC1D2D240DA4C1008F4DFB /* UIApplication-KIFAdditions.h */,
-				C0AC1D33240DA4C1008F4DFB /* UIApplication-KIFAdditions.m */,
-				C0AC1D31240DA4C1008F4DFB /* UIEvent+KIFAdditions.h */,
-				C0AC1D38240DA4C1008F4DFB /* UIEvent+KIFAdditions.m */,
-				C0AC1D37240DA4C1008F4DFB /* UITouch-KIFAdditions.h */,
-				C0AC1D2F240DA4C1008F4DFB /* UITouch-KIFAdditions.m */,
-				C0AC1D30240DA4C1008F4DFB /* UIView-KIFAdditions.h */,
-				C0AC1D36240DA4C1008F4DFB /* UIView-KIFAdditions.m */,
-				C0AC1D32240DA4C1008F4DFB /* UIWindow-KIFAdditions.h */,
-				C0AC1D2E240DA4C1008F4DFB /* UIWindow-KIFAdditions.m */,
+				C067ACDA241EAFF6007E3055 /* IOHIDEvent+KIF.h */,
+				C067ACDB241EAFF6007E3055 /* UIApplication-KIFAdditions.h */,
+				C067ACDC241EAFF6007E3055 /* UIWindow-KIFAdditions.m */,
+				C067ACDD241EAFF6007E3055 /* UITouch-KIFAdditions.m */,
+				C067ACDE241EAFF6007E3055 /* UIView-KIFAdditions.h */,
+				C067ACDF241EAFF6007E3055 /* UIEvent+KIFAdditions.h */,
+				C067ACE0241EAFF6007E3055 /* UIWindow-KIFAdditions.h */,
+				C067ACE1241EAFF6007E3055 /* UIApplication-KIFAdditions.m */,
+				C067ACE2241EAFF6007E3055 /* FixCategoryBug.h */,
+				C067ACE3241EAFF6007E3055 /* IOHIDEvent+KIF.m */,
+				C067ACE4241EAFF6007E3055 /* UIView-KIFAdditions.m */,
+				C067ACE5241EAFF6007E3055 /* UITouch-KIFAdditions.h */,
+				C067ACE6241EAFF6007E3055 /* UIEvent+KIFAdditions.m */,
+				C067ACE7241EAFF6007E3055 /* LoadableCategory.h */,
 			);
 			path = head;
 			sourceTree = "<group>";
@@ -335,26 +349,27 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C067ACEC241EAFF7007E3055 /* IOHIDEvent+KIF.h in Headers */,
+				C067ACF2241EAFF7007E3055 /* UIWindow-KIFAdditions.h in Headers */,
 				C01B4980240ACF9400633B45 /* UIC.h in Headers */,
-				C0AC1D3C240DA4C1008F4DFB /* PTFakeTouch.h in Headers */,
-				C0AC1D3E240DA4C1008F4DFB /* IOHIDEvent+KIF.h in Headers */,
-				C0AC1D46240DA4C1008F4DFB /* FixCategoryBug.h in Headers */,
-				C0AC1D49240DA4C1008F4DFB /* UITouch-KIFAdditions.h in Headers */,
 				C0AC1CF8240BB97A008F4DFB /* Settings.h in Headers */,
-				C0AC1D42240DA4C1008F4DFB /* UIView-KIFAdditions.h in Headers */,
-				C0AC1D3F240DA4C1008F4DFB /* UIApplication-KIFAdditions.h in Headers */,
 				C0B68E022414C33E009B5970 /* Consts.h in Headers */,
+				C067ACF4241EAFF7007E3055 /* FixCategoryBug.h in Headers */,
+				C067ACED241EAFF7007E3055 /* UIApplication-KIFAdditions.h in Headers */,
+				C067ACEA241EAFF6007E3055 /* PTFakeTouch.h in Headers */,
 				C0025ABE241483B7007813F7 /* UIImage+Pixels.h in Headers */,
 				C01B4971240ACF5D00633B45 /* Jarvis__.h in Headers */,
-				C0AC1D4B240DA4C1008F4DFB /* LoadableCategory.h in Headers */,
+				C00EE48D241D4830001771AB /* JarvisTestCase.h in Headers */,
 				C0025AAE241421E9007813F7 /* Utils.h in Headers */,
-				C0AC1D44240DA4C1008F4DFB /* UIWindow-KIFAdditions.h in Headers */,
-				C0AC1D43240DA4C1008F4DFB /* UIEvent+KIFAdditions.h in Headers */,
+				C067ACF0241EAFF7007E3055 /* UIView-KIFAdditions.h in Headers */,
+				C067ACF9241EAFF7007E3055 /* LoadableCategory.h in Headers */,
 				C0BAF0952418B62C003E2419 /* Jarvis++.pch in Headers */,
 				C0025AC32414846B007813F7 /* JobController.h in Headers */,
 				C00EE489241C70B2001771AB /* HttpClientConnection.h in Headers */,
+				C067ACF1241EAFF7007E3055 /* UIEvent+KIFAdditions.h in Headers */,
 				C0025AB424143923007813F7 /* DeviceState.h in Headers */,
 				C0AC1CF4240BB37C008F4DFB /* Device.h in Headers */,
+				C067ACF7241EAFF7007E3055 /* UITouch-KIFAdditions.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -365,7 +380,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C01B4979240ACF5D00633B45 /* Build configuration list for PBXNativeTarget "Jarvis++" */;
 			buildPhases = (
-				438C207F6F0E1B93D0AC0A81 /* [CP] Check Pods Manifest.lock */,
+				01C21A2C286A521DCCE592F0 /* [CP] Check Pods Manifest.lock */,
 				C01B495C240ACF5D00633B45 /* Sources */,
 				C01B495D240ACF5D00633B45 /* Frameworks */,
 				C01B495E240ACF5D00633B45 /* Headers */,
@@ -412,7 +427,7 @@
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		438C207F6F0E1B93D0AC0A81 /* [CP] Check Pods Manifest.lock */ = {
+		01C21A2C286A521DCCE592F0 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -462,20 +477,21 @@
 				C01B4973240ACF5D00633B45 /* Jarvis__.m in Sources */,
 				C0AC1CF6240BB96C008F4DFB /* Settings.m in Sources */,
 				C00EE48B241C70C5001771AB /* HttpClientConnection.m in Sources */,
+				C067ACF3241EAFF7007E3055 /* UIApplication-KIFAdditions.m in Sources */,
 				C0025AC524148477007813F7 /* JobController.m in Sources */,
 				C0025AB0241421F4007813F7 /* Utils.m in Sources */,
-				C0AC1D48240DA4C1008F4DFB /* UIView-KIFAdditions.m in Sources */,
+				C00EE48F241D4855001771AB /* JarvisTestCase.m in Sources */,
 				C0025AC0241483C6007813F7 /* UIImage+Pixels.mm in Sources */,
+				C067ACFA241EAFF7007E3055 /* PTFakeTouch.m in Sources */,
 				C0AC1CF2240BB365008F4DFB /* Device.m in Sources */,
-				C0AC1D40240DA4C1008F4DFB /* UIWindow-KIFAdditions.m in Sources */,
-				C0AC1D4A240DA4C1008F4DFB /* UIEvent+KIFAdditions.m in Sources */,
+				C067ACF5241EAFF7007E3055 /* IOHIDEvent+KIF.m in Sources */,
 				C0025AB224143917007813F7 /* DeviceState.m in Sources */,
-				C0AC1D47240DA4C1008F4DFB /* IOHIDEvent+KIF.m in Sources */,
 				C01B4981240ACF9400633B45 /* UIC.mm in Sources */,
-				C0AC1D41240DA4C1008F4DFB /* UITouch-KIFAdditions.m in Sources */,
-				C0AC1D4C240DA4C1008F4DFB /* PTFakeTouch.m in Sources */,
+				C067ACEE241EAFF7007E3055 /* UIWindow-KIFAdditions.m in Sources */,
+				C067ACEF241EAFF7007E3055 /* UITouch-KIFAdditions.m in Sources */,
 				C0B68E042414C632009B5970 /* Consts.m in Sources */,
-				C0AC1D45240DA4C1008F4DFB /* UIApplication-KIFAdditions.m in Sources */,
+				C067ACF6241EAFF7007E3055 /* UIView-KIFAdditions.m in Sources */,
+				C067ACF8241EAFF7007E3055 /* UIEvent+KIFAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -533,7 +549,7 @@
 		};
 		C01B497A240ACF5D00633B45 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 576D6DB1B1EC8CA3F9CC34B3 /* Pods-Jarvis++.debug.xcconfig */;
+			baseConfigurationReference = 2EF23DFC61FC9528A2C6B4F9 /* Pods-Jarvis++.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ARCHS = arm64;
@@ -545,26 +561,54 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				ENABLE_BITCODE = NO;
+				ENABLE_TESTABILITY = NO;
 				EXECUTABLE_PREFIX = lib;
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/System/Library/PrivateFrameworks",
-					"$(PROJECT_DIR)/PTFakeTouch",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks/**",
+					"$(SDKROOT)/System/Library/Frameworks",
 					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(PROJECT_DIR)/PTFakeTouch",
 				);
+				GCC_NO_COMMON_BLOCKS = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Jarvis++/Jarvis++-Prefix.pch";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"${PODS_CONFIGURATION_BUILD_DIR}/CocoaAsyncSocket/CocoaAsyncSocket.framework/Headers\"/**",
-				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INSTALL_PATH = "@rpath/";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/CocoaAsyncSocket\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/CocoaHTTPServer\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/CocoaLumberjack\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/PaperTrailLumberjack\"",
 				);
 				MACH_O_TYPE = mh_dylib;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"CocoaAsyncSocket\"",
+					"-l\"CocoaHTTPServer\"",
+					"-l\"CocoaLumberjack\"",
+					"-l\"PaperTrailLumberjack\"",
+					"-l\"xml2\"",
+					"-framework",
+					"\"CFNetwork\"",
+					"-framework",
+					"\"CoreGraphics\"",
+					"-framework",
+					"\"IOKit\"",
+					"-framework",
+					"\"QuartzCore\"",
+					"-framework",
+					"\"Security\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
 				USER_HEADER_SEARCH_PATHS = "";
@@ -581,7 +625,7 @@
 		};
 		C01B497B240ACF5D00633B45 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DE32C59AA5BBE15492B98B42 /* Pods-Jarvis++.release.xcconfig */;
+			baseConfigurationReference = 55E833E5AC2B9F7037D6E68C /* Pods-Jarvis++.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ARCHS = arm64;
@@ -593,26 +637,54 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				ENABLE_BITCODE = NO;
+				ENABLE_TESTABILITY = NO;
 				EXECUTABLE_PREFIX = lib;
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/System/Library/PrivateFrameworks",
-					"$(PROJECT_DIR)/PTFakeTouch",
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks/**",
+					"$(SDKROOT)/System/Library/Frameworks",
 					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(PROJECT_DIR)/PTFakeTouch",
 				);
+				GCC_NO_COMMON_BLOCKS = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Jarvis++/Jarvis++-Prefix.pch";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"${PODS_CONFIGURATION_BUILD_DIR}/CocoaAsyncSocket/CocoaAsyncSocket.framework/Headers\"/**",
-				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INSTALL_PATH = "@rpath/";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/CocoaAsyncSocket\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/CocoaHTTPServer\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/CocoaLumberjack\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/PaperTrailLumberjack\"",
 				);
 				MACH_O_TYPE = mh_dylib;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"CocoaAsyncSocket\"",
+					"-l\"CocoaHTTPServer\"",
+					"-l\"CocoaLumberjack\"",
+					"-l\"PaperTrailLumberjack\"",
+					"-l\"xml2\"",
+					"-framework",
+					"\"CFNetwork\"",
+					"-framework",
+					"\"CoreGraphics\"",
+					"-framework",
+					"\"IOKit\"",
+					"-framework",
+					"\"QuartzCore\"",
+					"-framework",
+					"\"Security\"",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = NO;
 				SYSTEM_FRAMEWORK_SEARCH_PATHS = "";

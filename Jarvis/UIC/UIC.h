@@ -15,10 +15,8 @@
 #import <CocoaHTTPServer/HTTPServer.h>
 #import <PaperTrailLumberjack/RMPaperTrailLogger.h>
 
-#import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
-#import <UIKit/UIDevice.h>
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
 #include <string.h>
 #include <sys/utsname.h>

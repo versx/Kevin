@@ -1,5 +1,5 @@
 # Uncomment the next line to define a global platform for your project
-platform :ios, '10.0'
+platform :ios, '9.0'
 project 'Jarvis++.xcodeproj'
 workspace 'Jarvis'
 target 'Jarvis++' do
@@ -9,7 +9,8 @@ target 'Jarvis++' do
   # Pods for Jarvis++
   pod 'CocoaHTTPServer', :git => 'https://github.com/robbiehanson/CocoaHTTPServer.git'
   pod 'PaperTrailLumberjack', :git => 'https://github.com/greenbits/papertrail-lumberjack-ios.git'
-  #pod 'KIF'
+  #pod 'KIF', :git => 'https://github.com/kif-framework/KIF.git'
+  #pod 'KIF', '~> 3.7.8'
 end
 
 #post_install do |installer|

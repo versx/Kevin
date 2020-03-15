@@ -9,7 +9,7 @@
 
 @implementation Consts
 
-NSString *JARVIS_VERSION = @"0.4.24";
+NSString *JARVIS_VERSION = @"0.4.30";
 
 // UserDefaults keys
 NSString *TOKEN_USER_DEFAULT_KEY = @"5750bac0-483c-4131-80fd-6b047b2ca7b4";

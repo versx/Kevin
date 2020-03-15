@@ -45,6 +45,7 @@ static void __attribute__((constructor)) initialize(void) {
             NSLog(@"[Jarvis] Took screenshot to check for pixel coord for button %@...", buttonName);
             if ([buttonName isEqualToString:@"NewPlayerButton"]) {
                 UIColor *color = [_image getPixelColor:400 withY:820];
+                // TODO: Pixel check
                 [Utils touch:250 withY:400];
                 NSLog(@"[Jarvis] %@ Pixel Color: %@", buttonName, color);
             } else if ([buttonName isEqualToString:@"TrainerClubButton"]) {

@@ -6,7 +6,6 @@
 //
 
 #import "UIC.h"
-//#import <XCTest/XCTest.h>
 
 // TODO: KIF library
 // TODO: StateManager class
@@ -39,6 +38,7 @@ static BOOL _invalidScreen = false;
 //static HttpServer *_httpServer;
 static HTTPServer *_httpServer;
 static JobController *_jobController;
+//static JarvisTestCase *_tester;
 static RMPaperTrailLogger *_logger;
 
 #pragma mark Constructor/Deconstructor
@@ -82,6 +82,8 @@ static RMPaperTrailLogger *_logger;
     
     // Print settings
     [[Settings sharedInstance] config];
+    
+    //_tester = [[JarvisTestCase alloc] init];
 
     //NSLog(@"Testing RESTART in 3 seconds...");
     //[NSThread sleepForTimeInterval:3];
@@ -175,7 +177,7 @@ static RMPaperTrailLogger *_logger;
         while (_startup) {
             if (!_firststart) {
                 NSLog(@"[Jarvis] [UIC] App still in startup...");
-                //[NSThread sleepForTimeInterval:60];
+                [NSThread sleepForTimeInterval:15];
                 while (!_menuButton) {
                     _newPlayerButton = [Jarvis__ clickButton:@"NewPlayerButton"];
                     NSLog(@"[Jarvis] Found NewPlayerButton: %s", _newPlayerButton ? "Yes" : "No");
@@ -202,6 +204,7 @@ static RMPaperTrailLogger *_logger;
                             [NSThread sleepForTimeInterval:1];
                         }
                         // TODO: typeUsername();
+                        //[JarvisTestCase type:@"username"];
                         [NSThread sleepForTimeInterval:1];
                         
                         bool passwordButton = false;
@@ -210,6 +213,7 @@ static RMPaperTrailLogger *_logger;
                             [NSThread sleepForTimeInterval:1];
                         }
                         // TODO: typePassword();
+                        //[JarvisTestCase type:@"password"];
                         [NSThread sleepForTimeInterval:1];
                         
                         // TODO: touchAtPoint(180, 100);

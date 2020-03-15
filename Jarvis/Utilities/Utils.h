@@ -8,6 +8,7 @@
 #import <CoreLocation/CoreLocation.h>
 #import <UIKit/UIKit.h>
 
+//#import <PTFakeTouch/PTFakeMetaTouch.h>
 #import "../PTFakeTouch/PTFakeTouch.h"
 #import "../UIC/Consts.h"
 #import "../UIC/Settings.h"
