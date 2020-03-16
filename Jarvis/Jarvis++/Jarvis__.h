@@ -6,6 +6,8 @@
 //
 
 #import "../UIC/UIC.h"
+#import "../UIC/JarvisTestCase.h"
+#import "../Extensions/UIImage+Pixels.h"
 
 @interface Jarvis__ : NSObject
 
@@ -14,5 +16,8 @@
 +(NSString *)getMenuButton;
 +(BOOL)eggDeploy;
 +(BOOL)getToMainScreen;
+
++(void)typeUsername;
++(void)typePassword;
 
 @end

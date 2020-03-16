@@ -8,7 +8,7 @@
 #import <CoreLocation/CoreLocation.h>
 #import <UIKit/UIKit.h>
 
-#import "../Net/HttpResponseCode.h"
+//#import <PTFakeTouch/PTFakeMetaTouch.h>
 #import "../PTFakeTouch/PTFakeTouch.h"
 #import "../UIC/Consts.h"
 #import "../UIC/Settings.h"
@@ -30,8 +30,6 @@
                 dict:(NSDictionary *)data
             blocking:(BOOL)blocking
           completion:(void (^)(NSDictionary* result))completion;
-
-+(NSString *)buildResponse:(NSString *)data withResponseCode:(enum HttpResponseCode)responseCode;
 
 +(NSString *)toJsonString:(NSDictionary *)dict withPrettyPrint:(BOOL)prettyPrint;
 

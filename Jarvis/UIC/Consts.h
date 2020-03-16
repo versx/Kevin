@@ -7,6 +7,8 @@
 
 @interface Consts : NSObject
 
+extern NSString *JARVIS_VERSION;
+
 extern NSString *TOKEN_USER_DEFAULT_KEY;
 extern NSString *LOGIN_USER_DEFAULT_KEY;
 

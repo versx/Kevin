@@ -6,12 +6,10 @@
 //
 
 #import "UIC.h"
-//#import <XCTest/XCTest.h>
 
 // TODO: KIF library
 // TODO: StateManager class
 // TODO: Pixel checks
-// TODO: CocoaPods
 // TODO: Pixel offsets in remote config
 
 #pragma mark Global Variables
@@ -22,7 +20,7 @@ static BOOL _startup = true;
 //static NSLock *_lock = [[NSLock alloc] init];
 static NSNumber *_jitterCorner = @0;
 //static NSString *_action;
-static NSNumber *_encounterDistance = @0.0;
+//static NSNumber *_encounterDistance = @0.0;
 //static NSNumber *_encounterDelay = @0.0;
 
 // Button Detection
@@ -37,18 +35,26 @@ static BOOL _invalidScreen = false;
 
 @implementation UIC2
 
-static HttpServer *_httpServer;
+//static HttpServer *_httpServer;
+static HTTPServer *_httpServer;
 static JobController *_jobController;
+//static JarvisTestCase *_tester;
+static RMPaperTrailLogger *_logger;
 
 #pragma mark Constructor/Deconstructor
 
 -(id)init
 {
-    NSLog(@"[UIC] init");
+    NSLog(@"[Jarvis] [UIC] init");
     if ((self = [super init]))
     {
-        //NSDictionary *config = [[Settings sharedInstance] fetchRemoteConfig:@"https://ver.sx/x/uic.plist"];
-        //NSLog(@"[UIC] Remote Config: %@", config);
+        _logger = [RMPaperTrailLogger sharedInstance];
+        _logger.host = [[Settings sharedInstance] loggingUrl];
+        _logger.port = [[[Settings sharedInstance] loggingPort] intValue];
+        _logger.debug = false; // Silences some NSLogging
+        _logger.useTcp = [[Settings sharedInstance] loggingTcp]; // TLS is on by default on OS X and ignored on iOS
+        _logger.useTLS = [[Settings sharedInstance] loggingTls]; // Use TLS
+        [DDLog addLogger:_logger];
     }
     
     return self;
@@ -65,37 +71,57 @@ static JobController *_jobController;
 
 -(void)start
 {
-    NSLog(@"[UIC] start");
+    NSLog(@"[Jarvis] [UIC] start");
     NSLog(@"-----------------------------");
-    NSLog(@"[UIC] Device Uuid: %@", [[Device sharedInstance] uuid]);
-    NSLog(@"[UIC] Device Model: %@", [[Device sharedInstance] model]);
-    NSLog(@"[UIC] Device OS: %@", [[Device sharedInstance] osName]);
-    NSLog(@"[UIC] Device OS Version: %@", [[Device sharedInstance] osVersion]);
+    NSLog(@"[Jarvis] [UIC] Device Uuid: %@", [[Device sharedInstance] uuid]);
+    NSLog(@"[Jarvis] [UIC] Device Model: %@", [[Device sharedInstance] model]);
+    NSLog(@"[Jarvis] [UIC] Device OS: %@", [[Device sharedInstance] osName]);
+    NSLog(@"[Jarvis] [UIC] Device OS Version: %@", [[Device sharedInstance] osVersion]);
+    //NSLog(@"[Jarvis] [UIC] Device Delay Multiplier: %@", [[Device sharedInstance] multiplier]);
     NSLog(@"-----------------------------");
+    
+    // Print settings
     [[Settings sharedInstance] config];
     
-    //UIColor *color = [Utils getPixelColor:0 withY:0];
-    //NSLog(@"[UIC] PixelColor: %@", color);
-    
+    //_tester = [[JarvisTestCase alloc] init];
+
     //NSLog(@"Testing RESTART in 3 seconds...");
     //[NSThread sleepForTimeInterval:3];
     //[self restart];
     
+    // Initialize job controller
     _jobController = [[JobController alloc] init];
+
+    // Initalize our http server
+    _httpServer = [[HTTPServer alloc] init];
     
-    _httpServer = [[HttpServer alloc] init];
-    _httpServer.delegate = self;
-    [_httpServer listen];
+    // Tell the server to broadcast its presence via Bonjour.
+    // This allows browsers such as Safari to automatically discover our service.
+    [_httpServer setType:@"_http._tcp."];
+    
+    // Normally there's no need to run our server on any specific port.
+    // Technologies like Bonjour allow clients to dynamically discover the server's port at runtime.
+    // However, for easy testing you may want force a certain port so you can just hit the refresh button.
+    [_httpServer setPort:[[[Settings sharedInstance] port] intValue]];
+    
+    // We're going to extend the base HTTPConnection class with our MyHTTPConnection class.
+    // This allows us to do all kinds of customizations.
+    [_httpServer setConnectionClass:[HttpClientConnection class]];
+
+    NSError *error = nil;
+    if (![_httpServer start:&error]) {
+        NSLog(@"[Jarvis] [UIC] Error starting HTTP Server: %@", error);
+    }
 
     [self startHeatbeatLoop];
     
-    // TODO: [self startUicLoop];
+    [self startUicLoop];
 }
 
 -(void)startHeatbeatLoop
 {
     bool heatbeatRunning = true;
-    NSLog(@"[UIC] Starting heatbeat dispatch queue...");
+    NSLog(@"[Jarvis] [UIC] Starting heatbeat dispatch queue...");
     NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
     data[@"uuid"] = [[Device sharedInstance] uuid];
     data[@"username"] = [[Device sharedInstance] username];
@@ -113,15 +139,15 @@ static JobController *_jobController;
             NSDate *lastUpdate = [[DeviceState sharedInstance] lastUpdate];
             NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:lastUpdate];
             if (timeIntervalSince >= 120) {
-                NSLog(@"[UIC] [Jarvis] HTTP SERVER DIED. Restarting...");
+                NSLog(@"[Jarvis] [UIC] HTTP SERVER DIED. Restarting...");
                 [DeviceState restart];
             } else {
-                NSLog(@"[UIC] Last data %f We Good", timeIntervalSince);
+                NSLog(@"[Jarvis] [UIC] Last data %f We Good", timeIntervalSince);
             }
         }
         
         // Force stop HTTP listener to prevent binding issues.
-        NSLog(@"[UIC] Force-stopping HTTP server.");
+        NSLog(@"[Jarvis] [UIC] Force-stopping HTTP server.");
         [_httpServer stop];
     });
     //dispatch_release(heatbeatQueue);
@@ -129,37 +155,37 @@ static JobController *_jobController;
 
 -(void)startUicLoop
 {
-    NSLog(@"[UIC] startUicLoop");
+    NSLog(@"[Jarvis] [UIC] startUicLoop");
     NSDate *eggStart = [NSDate dateWithTimeInterval:-1860 sinceDate:[NSDate date]];
+    NSLog(@"[Jarvis] [UIC] Setting eggStart...");
     [[DeviceState sharedInstance] setEggStart:eggStart];
     // Init AI
     //initJarvis();
-    
-    NSLog(@"[UIC] Running on %@ delay set to %@",
-          [[Device sharedInstance] model],
-          [[Device sharedInstance] multiplier]
-    );
+
     [self loginStateHandler];
 }
 
 
 #pragma mark State Managers
 
--(void *)loginStateHandler
+-(void)loginStateHandler
 {
+    NSLog(@"[Jarvis] [UIC] loginStateHandler");
     dispatch_queue_t loginStateQueue = dispatch_queue_create("login_state_queue", NULL);
     dispatch_async(loginStateQueue, ^{
         NSNumber *startupCount = @0;
         while (_startup) {
             if (!_firststart) {
-                NSLog(@"[UIC] [Jarvis] App still in startup...");
+                NSLog(@"[Jarvis] [UIC] App still in startup...");
+                [NSThread sleepForTimeInterval:3];
                 while (!_menuButton) {
                     _newPlayerButton = [Jarvis__ clickButton:@"NewPlayerButton"];
+                    NSLog(@"[Jarvis] Found NewPlayerButton: %s", _newPlayerButton ? "Yes" : "No");
                     if (_newPlayerButton) {
                         [[NSUserDefaults standardUserDefaults] removeObjectForKey:TOKEN_USER_DEFAULT_KEY];
                         _newPlayerButton = false;
-                        NSLog(@"[UIC] [Jarvis] Started at Login Screen");
-                        [NSThread sleepForTimeInterval:1];
+                        NSLog(@"[Jarvis] [UIC] Started at Login Screen");
+                        [NSThread sleepForTimeInterval:2];
                         bool ptcButton = false;
                         NSNumber *ptcTryCount = @0;
                         while (!ptcButton) {
@@ -169,7 +195,7 @@ static JobController *_jobController;
                                 _newPlayerButton = [Jarvis__ clickButton:@"NewPlayerButton"];
                                 ptcTryCount = @0;
                             }
-                            [NSThread sleepForTimeInterval:1];
+                            [NSThread sleepForTimeInterval:3];
                         }
                         
                         bool usernameButton = false;
@@ -177,19 +203,19 @@ static JobController *_jobController;
                             usernameButton = [Jarvis__ clickButton:@"UsernameButton"];
                             [NSThread sleepForTimeInterval:1];
                         }
-                        // TODO: typeUsername();
-                        [NSThread sleepForTimeInterval:1];
+                        [Jarvis__ typeUsername];
+                        [NSThread sleepForTimeInterval:3];
                         
                         bool passwordButton = false;
                         while (!passwordButton) {
                             passwordButton = [Jarvis__ clickButton:@"PasswordButton"];
                             [NSThread sleepForTimeInterval:1];
                         }
-                        // TODO: typePassword();
-                        [NSThread sleepForTimeInterval:1];
+                        [Jarvis__ typePassword];
+                        [NSThread sleepForTimeInterval:3];
                         
                         // TODO: touchAtPoint(180, 100);
-                        [NSThread sleepForTimeInterval:1];
+                        [NSThread sleepForTimeInterval:3];
                         
                         bool signinButton = false;
                         while (!signinButton) {
@@ -197,7 +223,7 @@ static JobController *_jobController;
                             [NSThread sleepForTimeInterval:1];
                         }
                         
-                        NSNumber *delayMultiplier = [[Device sharedInstance] multiplier];
+                        NSNumber *delayMultiplier = @5;// TODO: [[Device sharedInstance] multiplier];
                         NSNumber *sleep = @([delayMultiplier intValue] + 15);
                         [NSThread sleepForTimeInterval:[sleep intValue]];
                     }
@@ -205,25 +231,33 @@ static JobController *_jobController;
                     _bannedScreen = [Jarvis__ findButton:@"BannedScreen"];
                     if (_bannedScreen) {
                         _bannedScreen = false;
-                        NSLog(@"[UIC] [Jarvis] Account banned, switching accounts.");
-                        NSLog(@"[UIC] [Jarvis] Username: %@", [[Device sharedInstance] username]);
+                        NSLog(@"[Jarvis] [UIC] [Jarvis] Account banned, switching accounts.");
+                        NSLog(@"[Jarvis] [UIC] [Jarvis] Username: %@", [[Device sharedInstance] username]);
                         NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
                         data[@"uuid"] = [[Device sharedInstance] uuid];
                         data[@"username"] = [[Device sharedInstance] username];
                         data[@"type"] = @"account_banned";
-                        [Utils postRequest:[[Settings sharedInstance] backendControllerUrl] dict:data blocking:true completion:^(NSDictionary *result) {}];
+                        [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                                      dict:data
+                                  blocking:true
+                                completion:^(NSDictionary *result) {}
+                        ];
                         [DeviceState logout];
                     }
                     
                     _invalidScreen = [Jarvis__ findButton:@"WrongUser"];
                     if (_invalidScreen) {
                         _invalidScreen = false;
-                        NSLog(@"[UIC] [Jarvis] Wrong username, switching accounts.");
+                        NSLog(@"[Jarvis] [UIC] [Jarvis] Wrong username, switching accounts.");
                         NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
                         data[@"uuid"] = [[Device sharedInstance] uuid];
                         data[@"username"] = [[Device sharedInstance] username];
                         data[@"type"] = @"account_banned"; // TODO: Uhhh should be account_invalid_credentials no?
-                        [Utils postRequest:[[Settings sharedInstance] backendControllerUrl] dict:data blocking:true completion:^(NSDictionary *result) {}];
+                        [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                                      dict:data
+                                  blocking:true
+                                completion:^(NSDictionary *result) {}
+                        ];
                         [DeviceState logout];
                     }
                     
@@ -233,7 +267,11 @@ static JobController *_jobController;
                         data[@"uuid"] = [[Device sharedInstance] uuid];
                         data[@"username"] = [[Device sharedInstance] username];
                         data[@"type"] = @"account_invalid_credentials";
-                        [Utils postRequest:[[Settings sharedInstance] backendControllerUrl] dict:data blocking:true completion:^(NSDictionary *result) {}];
+                        [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                                      dict:data
+                                  blocking:true
+                                completion:^(NSDictionary *result) {}
+                        ];
                         [DeviceState logout];
                     }
                     
@@ -243,7 +281,7 @@ static JobController *_jobController;
                     
                     [NSThread sleepForTimeInterval:5];
                     if ([startupCount intValue] > 10) {
-                        NSLog(@"[UIC] [Jarvis] Stuck somewhere logging out and restarting...");
+                        NSLog(@"[Jarvis] [UIC] [Jarvis] Stuck somewhere logging out and restarting...");
                         [DeviceState logout];
                     }
                     startupCount = [Utils incrementInt:startupCount];
@@ -255,21 +293,26 @@ static JobController *_jobController;
                 tokenData[@"username"] = [[Device sharedInstance] username];
                 tokenData[@"ptcToken"] = [[Device sharedInstance] ptcToken];
                 tokenData[@"type"] = @"ptcToken";
-                [Utils postRequest:[[Settings sharedInstance] backendControllerUrl] dict:tokenData blocking:true completion:^(NSDictionary *result) {}];
-                NSLog(@"[UIC] [Jarvis] App in Main Screen stopping detection.");
+                [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                              dict:tokenData
+                          blocking:true
+                        completion:^(NSDictionary *result) {}
+                ];
+                NSLog(@"[Jarvis] [UIC] [Jarvis] App in Main Screen stopping detection.");
                 [Jarvis__ clickButton:@"TrackerButton"];
                 _startup = false;
             } else {
+                NSLog(@"[Jarvis] [UIC] First startup, waiting...");
                 [NSThread sleepForTimeInterval:10];
                 _firststart = false;
             }
+            [NSThread sleepForTimeInterval:3];
         }
     });
     //dispatch_release(loginStateQueue);
-    return 0;
 }
 
--(void *)gameStateHandler
+-(void)gameStateHandler
 {
     // TODO: qos: background dispatch
     dispatch_queue_t gameStateQueue = dispatch_queue_create("game_state_queue", NULL);
@@ -287,23 +330,23 @@ static JobController *_jobController;
         initData[@"type"] = @"init";
         [Utils postRequest:[[Settings sharedInstance] backendControllerUrl] dict:initData blocking:true completion:^(NSDictionary *result) {
             if (result == nil) {
-                NSLog(@"[UIC] Failed to connect to backend!");
+                NSLog(@"[Jarvis] [UIC] Failed to connect to backend!");
                 [NSThread sleepForTimeInterval:5];
                 [DeviceState restart];
             } else if (![(result[@"status"] ?: @"fail") isEqualToString:@"ok"]) {
                 NSString *error = result[@"error"] ?: @"? (No error sent)";
-                NSLog(@"[UIC] Backend returned error: %@", error);
+                NSLog(@"[Jarvis] [UIC] Backend returned error: %@", error);
                 [[Device sharedInstance] setShouldExit:true];
             }
             
             NSDictionary *data = result[@"data"];
             if (data == nil) {
-                NSLog(@"[UIC] Backend did not include data in response.");
+                NSLog(@"[Jarvis] [UIC] Backend did not include data in response.");
                 [[Device sharedInstance] setShouldExit:true];
             }
             
             if (!(data[@"assigned"] ?: false)) {
-                NSLog(@"[UIC] Device is not assigned to an instance!");
+                NSLog(@"[Jarvis] [UIC] Device is not assigned to an instance!");
                 [[Device sharedInstance] setShouldExit:true];
             }
             
@@ -313,7 +356,7 @@ static JobController *_jobController;
                 [[DeviceState sharedInstance] setFirstWarningDate:firstWarningDate];
             }
             
-            NSLog(@"[UIC] Connected to backend successfully!");
+            NSLog(@"[Jarvis] [UIC] Connected to backend successfully!");
             [[Device sharedInstance] setShouldExit:false];
         }];
         
@@ -345,9 +388,9 @@ static JobController *_jobController;
                     NSNumber *lastLon = data[@"last_encounter_lon"];
                     
                     if (username != nil) {
-                        NSLog(@"[UIC] Got account %@ level %@ from backend.", username, level);
+                        NSLog(@"[Jarvis] [UIC] Got account %@ level %@ from backend.", username, level);
                     } else {
-                        NSLog(@"[UIC] Failed to get account and not logged in.");
+                        NSLog(@"[Jarvis] [UIC] Failed to get account and not logged in.");
                         [[Device sharedInstance] setShouldExit:true];
                     }
                     [[Device sharedInstance] setUsername:username];
@@ -364,14 +407,14 @@ static JobController *_jobController;
                     }
                     [[DeviceState sharedInstance] setStartupLocation:startupLocation];
                     [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
-                    NSLog(@"[UIC] StartupLocation: %@", startupLocation);
+                    NSLog(@"[Jarvis] [UIC] StartupLocation: %@", startupLocation);
                     NSNumber *firstWarningTimestamp = data[@"first_warning_timestamp"];
                     if (firstWarningTimestamp != nil) {
                         NSDate *firstWarningDate = [NSDate dateWithTimeIntervalSince1970:[firstWarningTimestamp doubleValue]];
                         [[DeviceState sharedInstance] setFirstWarningDate:firstWarningDate];
                     }
                 } else {
-                    NSLog(@"[UIC] Failed to get account and not logged in.");
+                    NSLog(@"[Jarvis] [UIC] Failed to get account and not logged in.");
                     [[Device sharedInstance] setMinLevel:@1]; // Never set to 0 until we can complete tutorials.
                     [[Device sharedInstance] setMaxLevel:@29];
                     [NSThread sleepForTimeInterval:1];
@@ -400,10 +443,10 @@ static JobController *_jobController;
                     if (result == nil) {
                         NSNumber *failedGetJobCount = [[DeviceState sharedInstance] failedGetJobCount];
                         if ([failedGetJobCount intValue] == 10) {
-                            NSLog(@"[UIC] Failed to get job 10 times in a row. Exiting...");
+                            NSLog(@"[Jarvis] [UIC] Failed to get job 10 times in a row. Exiting...");
                             [[Device sharedInstance] setShouldExit:true];
                         } else {
-                            NSLog(@"[UIC] Failed to get a job.");
+                            NSLog(@"[Jarvis] [UIC] Failed to get a job.");
                         }
                     } else if ([[Settings sharedInstance] enableAccountManager]) {
                         NSDictionary *data = result[@"data"];
@@ -414,7 +457,7 @@ static JobController *_jobController;
                             [[Device sharedInstance] setMaxLevel:maxLevel];
                             NSNumber *currentLevel = [[Device sharedInstance] level];
                             if (currentLevel != 0 && (currentLevel < minLevel || currentLevel > maxLevel)) {
-                                NSLog(@"[UIC] Account is outside min/max level. Current: %@ Min/Max: %@/%@. Logging out!", currentLevel, minLevel, maxLevel);
+                                NSLog(@"[Jarvis] [UIC] Account is outside min/max level. Current: %@ Min/Max: %@/%@. Logging out!", currentLevel, minLevel, maxLevel);
                                 //self.lock.lock();
                                 CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
                                 [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
@@ -430,45 +473,45 @@ static JobController *_jobController;
                         NSString *action = data[@"action"];
                         [[DeviceState sharedInstance] setLastAction:action];
                         if ([action isEqualToString:@"scan_pokemon"]) {
-                            NSLog(@"[UIC] [STATUS] Pokemon");
+                            NSLog(@"[Jarvis] [UIC] [STATUS] Pokemon");
                             [_jobController handlePokemonJob:action withData:data hasWarning:hasWarning];
                         } else if ([action isEqualToString:@"scan_raid"]) {
-                            NSLog(@"[UIC] [STATUS] Raid");
+                            NSLog(@"[Jarvis] [UIC] [STATUS] Raid");
                             [_jobController handleRaidJob:action withData:data hasWarning:hasWarning];
                         } else if ([action isEqualToString:@"scan_quest"]) {
-                            NSLog(@"[UIC] [STATUS] Quest/Leveling");
+                            NSLog(@"[Jarvis] [UIC] [STATUS] Quest/Leveling");
                             [_jobController handleQuestJob:action withData:data hasWarning:hasWarning];
                         } else if ([action isEqualToString:@"switch_account"]) {
-                            NSLog(@"[UIC] [STATUS] Switching Accounts");
+                            NSLog(@"[Jarvis] [UIC] [STATUS] Switching Accounts");
                             [_jobController handleSwitchAccount:action withData:data hasWarning:hasWarning];
                         } else if ([action isEqualToString:@"leveling"]) {
-                            NSLog(@"[UIC] [STATUS] Leveling");
+                            NSLog(@"[Jarvis] [UIC] [STATUS] Leveling");
                             [_jobController handleLeveling:action withData:data hasWarning:hasWarning];
                         } else if ([action isEqualToString:@"scan_iv"]) {
-                            NSLog(@"[UIC] [STATUS] IV");
+                            NSLog(@"[Jarvis] [UIC] [STATUS] IV");
                             [_jobController handleIVJob:action withData:data hasWarning:hasWarning];
                         } else if ([action isEqualToString:@"gather_token"]) {
-                            NSLog(@"[UIC] [STATUS] Token");
+                            NSLog(@"[Jarvis] [UIC] [STATUS] Token");
                             [_jobController handleGatherToken:action withData:data hasWarning:hasWarning];
                         } else {
-                            NSLog(@"[UIC] Unknown Action: %@", action);
+                            NSLog(@"[Jarvis] [UIC] Unknown Action: %@", action);
                         }
                         
                         NSNumber *emptyGmoCount = [[DeviceState sharedInstance] emptyGmoCount];
                         NSNumber *maxEmptyGMO = [[Settings sharedInstance] maxEmptyGMO];
                         if (emptyGmoCount >= maxEmptyGMO) {
-                            NSLog(@"[UIC] Got Empty GMO %@ times in a row. Restarting...", emptyGmoCount);
+                            NSLog(@"[Jarvis] [UIC] Got Empty GMO %@ times in a row. Restarting...", emptyGmoCount);
                             [DeviceState restart];
                         }
                         
                         NSNumber *failedCount = [[DeviceState sharedInstance] failedCount];
                         if (failedCount >= [[Settings sharedInstance] maxFailedCount]) {
-                            NSLog(@"[UIC] Failed %@ times in a row. Restarting...", failedCount);
+                            NSLog(@"[Jarvis] [UIC] Failed %@ times in a row. Restarting...", failedCount);
                             [DeviceState restart];
                         }
                     } else {
                         [[DeviceState sharedInstance] setFailedGetJobCount:0];
-                        NSLog(@"[UIC] No job left (Result: %@)", result);
+                        NSLog(@"[Jarvis] [UIC] No job left (Result: %@)", result);
                         [NSThread sleepForTimeInterval:5];
                     }
                 }];
@@ -476,13 +519,12 @@ static JobController *_jobController;
         }
     });
     //dispatch_release(gameStateQueue);
-    return 0;
 }
 
 
 #pragma mark Request Handlers
 
--(NSString *)handleLocationRequest:(NSDictionary *)params
++(NSString *)handleLocationRequest:(NSDictionary *)params
 {
     NSMutableDictionary *responseData = [[NSMutableDictionary alloc] init];
     //self.lock.lock();
@@ -560,20 +602,16 @@ static JobController *_jobController;
         }
     }
 
-    // response: "Content-Type" = "application/json";
-    
-    //NSString *response = [NSString stringWithFormat:@"%@\r\n%@", _response_200, responseData];
-    NSString *body = [Utils toJsonString:responseData withPrettyPrint:false];
+    NSString *response = [Utils toJsonString:responseData withPrettyPrint:false];
     [responseData release];
-    NSString *response = [Utils buildResponse:body withResponseCode:Success];
     return response;
 }
 
--(NSString *)handleDataRequest:(NSDictionary *)params
++(NSString *)handleDataRequest:(NSDictionary *)params
 {
     CLLocation *currentLocation = [[DeviceState sharedInstance] currentLocation];
     if (currentLocation == nil) {
-        return [Utils buildResponse:@"" withResponseCode:BadRequest];
+        return @"Error"; // TODO: Return json response { status: error }
     }
     [[DeviceState sharedInstance] setLastUpdate:[NSDate date]];
     CLLocation *currentLoc = [Utils createCoordinate:currentLocation.coordinate.latitude lon: currentLocation.coordinate.longitude];
@@ -628,22 +666,22 @@ static JobController *_jobController;
                 }
             }
             [[Device sharedInstance] setLevel:level];
-            NSLog(@"[UIC] Level from RDM: %@ quests: %@", [[Device sharedInstance] level], quests);
+            NSLog(@"[Jarvis] [UIC] Level from RDM: %@ quests: %@", [[Device sharedInstance] level], quests);
         }
         
-        NSLog(@"[UIC] [RES1] inArea: %s level: %@ nearby: %@ wild: %@ quests: %@ encounters: %@ plat: %@ plon: %@ encounterResponseId: %@ tarlat: %@ tarlon: %@ emptyGMO: %s invalidGMO: %s containsGMO: %s", (inArea ? "Yes" : "No"), level, nearby, wild, quests, encounters, pokemonLat, pokemonLon, pokemonEncounterIdResult, targetLat, targetLon, (onlyEmptyGmos ? "Yes" : "No"), (onlyInvalidGmos ? "Yes" : "No"), (containsGmo ? "Yes" : "No"));
-        NSLog(@"[UIC] [DEBUG] SpinFortLat: %@ SpinFortLon: %@", spinFortLat, spinFortLon);
+        NSLog(@"[Jarvis] [UIC] [RES1] inArea: %s level: %@ nearby: %@ wild: %@ quests: %@ encounters: %@ plat: %@ plon: %@ encounterResponseId: %@ tarlat: %@ tarlon: %@ emptyGMO: %s invalidGMO: %s containsGMO: %s", (inArea ? "Yes" : "No"), level, nearby, wild, quests, encounters, pokemonLat, pokemonLon, pokemonEncounterIdResult, targetLat, targetLon, (onlyEmptyGmos ? "Yes" : "No"), (onlyInvalidGmos ? "Yes" : "No"), (containsGmo ? "Yes" : "No"));
+        NSLog(@"[Jarvis] [UIC] [DEBUG] SpinFortLat: %@ SpinFortLon: %@", spinFortLat, spinFortLon);
 
         //NSNumber *itemDistance = @10000.0;
         if (([spinFortId isEqualToString:@""] || spinFortId == nil) && [spinFortLat doubleValue] != 0.0) {
             CLLocation *fortLocation = [Utils createCoordinate:[spinFortLat doubleValue] lon:[spinFortLon doubleValue]];
             NSNumber *itemDistance = [NSNumber numberWithDouble:[fortLocation distanceFromLocation:currentLoc]];
-            NSLog(@"[UIC] [DEBUG] ItemDistance: %@", itemDistance);
+            NSLog(@"[Jarvis] [UIC] [DEBUG] ItemDistance: %@", itemDistance);
         }
         
         if (onlyInvalidGmos) {
             [[DeviceState sharedInstance] setWaitForData:false];
-            toPrint = @"[UIC] Got GMO but it was malformed. Skipping.";
+            toPrint = @"[Jarvis] [UIC] Got GMO but it was malformed. Skipping.";
         } else if (containsGmo) {
             if (inArea && [diffLat doubleValue] < 0.0001 && [diffLon doubleValue] < 0.0001) {
                 [[DeviceState sharedInstance] setEmptyGmoCount:0];
@@ -652,40 +690,40 @@ static JobController *_jobController;
                     if ([pokemonFoundCount intValue] > 0) {
                         if (pokemonLat != 0 && pokemonLon != 0 && pokemonEncounterId == pokemonEncounterIdResult) {
                             [[DeviceState sharedInstance] setWaitRequiresPokemon:false];
-                            CLLocation *oldLocation = [[DeviceState sharedInstance] currentLocation];
+                            //CLLocation *oldLocation = [[DeviceState sharedInstance] currentLocation];
                             [[DeviceState sharedInstance] setCurrentLocation:[Utils createCoordinate:[pokemonLat doubleValue] lon:[pokemonLon doubleValue]]];
-                            CLLocation *newLocation = [[DeviceState sharedInstance] currentLocation];
-                            _encounterDistance = [NSNumber numberWithDouble:[newLocation distanceFromLocation:oldLocation]];
+                            //CLLocation *newLocation = [[DeviceState sharedInstance] currentLocation];
+                            //_encounterDistance = [NSNumber numberWithDouble:[newLocation distanceFromLocation:oldLocation]];
                             [[DeviceState sharedInstance] setPokemonEncounterId:nil];
                             [[DeviceState sharedInstance] setWaitForData:false];
-                            toPrint = @"[UIC] Got Data and found Pokemon";
+                            toPrint = @"[Jarvis] [UIC] Got Data and found Pokemon";
                         } else {
-                            toPrint = @"[UIC] Got Data but did not find Pokemon";
+                            toPrint = @"[Jarvis] [UIC] Got Data but did not find Pokemon";
                         }
                     } else {
-                        toPrint = @"[UIC] Got Data without Pokemon";
+                        toPrint = @"[Jarvis] [UIC] Got Data without Pokemon";
                     }
                 } else if ([[DeviceState sharedInstance] waitRequiresPokemon]) {
                     if ([pokemonFoundCount intValue] > 0) {
-                        toPrint = @"[UIC] Got Data with Pokemon";
+                        toPrint = @"[Jarvis] [UIC] Got Data with Pokemon";
                         [[DeviceState sharedInstance] setWaitForData:false];
                     } else {
-                        toPrint = @"[UIC] Got Data without Pokemon";
+                        toPrint = @"[Jarvis] [UIC] Got Data without Pokemon";
                     }
                 } else {
-                    toPrint = @"[UIC] Got Data";
+                    toPrint = @"[Jarvis] [UIC] Got Data";
                     [[DeviceState sharedInstance] setWaitForData:false];
                 }
             } else if (onlyEmptyGmos && !_startup) {
                 NSNumber *emptyGmoCount = [[DeviceState sharedInstance] emptyGmoCount];
                 [[DeviceState sharedInstance] setEmptyGmoCount:emptyGmoCount];
-                toPrint = @"[UIC] Got Empty Data";
+                toPrint = @"[Jarvis] [UIC] Got Empty Data";
             } else {
                 [[DeviceState sharedInstance] setEmptyGmoCount:0];
-                toPrint = @"[UIC] Got Data outside Target-Area";
+                toPrint = @"[Jarvis] [UIC] Got Data outside Target-Area";
             }
         } else {
-            toPrint = @"[UIC] Got Data without GMO";
+            toPrint = @"[Jarvis] [UIC] Got Data without GMO";
         }
 
         if (![[DeviceState sharedInstance] gotQuest] && quests != 0) {
@@ -697,11 +735,37 @@ static JobController *_jobController;
             [[DeviceState sharedInstance] setGotIV:true];
         }
         
-        NSLog(@"[UIC] Handle data response: %@", toPrint);
+        NSLog(@"[Jarvis] [UIC] Handle data response: %@", toPrint);
     }];
-    NSString *body = [Utils toJsonString:data withPrettyPrint:false];
-    NSString *response = [Utils buildResponse:body withResponseCode:Success];
+    NSString *response = [Utils toJsonString:data withPrettyPrint:false];
     return response;
+}
+
++(NSString *)handleTouchRequest:(NSDictionary *)params
+{
+    //[Utils touch:[params[@"x"] intValue]
+    //       withY:[params[@"y"] intValue]];
+    [JarvisTestCase touch:[params[@"x"] intValue]
+                    withY:[params[@"y"] intValue]];
+    return @"OK";
+}
+
++(NSString *)handleTypeRequest:(NSDictionary *)params
+{
+    [JarvisTestCase type:params[@"text"]];
+    return @"OK";
+}
+
++(NSString *)handleConfigRequest
+{
+    NSMutableString *text = [[NSMutableString alloc] init];
+    NSDictionary *config = [[Settings sharedInstance] config];
+    if (config != nil) {
+        for (id key in config) {
+            [text appendFormat:@"%@=%@\n", key, config[key]];
+        }
+    }
+    return text;
 }
 
 @end

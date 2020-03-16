@@ -11,7 +11,7 @@
 
 -(id)init
 {
-    NSLog(@"[DeviceState] init");
+    NSLog(@"[Jarvis] [DeviceState] init");
     if ((self = [super init]))
     {
     }
@@ -86,16 +86,16 @@
 
 +(void)restart
 {
-    NSLog(@"[UIC] [Jarvis] Restarting...");
-    //UIControl *ui = [[UIControl alloc] init];
-    //UIApplication *app = [UIApplication sharedApplication];
-    //SEL selector = @selector([NSXPCConnection superclass]:invalidate:);
-    //[ui sendAction:selector to:[UIApplication sharedApplication] forEvent:nil];
+    NSLog(@"[Jarvis] [DeviceState] Restarting...");
     // TODO: Restart
     return;
     while (true) { // TODO: Uhh this doesn't look safe. ;-|
-        //[[[UIControl alloc] init] sendAction:@selector(NSXPCConnection:invalidate:) to:[UIApplication sharedApplication] forEvent:nil];
         // TODO: UIControl().sendAction(#selector(NSXPCConnection.invalidate) to:UIApplication.shared for:nil);
+        SEL selector = [NSXPCConnection respondsToSelector:@selector(invalidate)];
+        [[[UIControl alloc] init] sendAction:selector
+                                          to:[UIApplication sharedApplication]
+                                    forEvent:nil
+        ];
         [NSThread sleepForTimeInterval:2];
     }
 }
@@ -151,7 +151,7 @@
                 }
             
                 [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
-                NSLog(@"[UIC] StartupLocation: %@", startupLocation);
+                NSLog(@"[Jarvis] [DeviceState] StartupLocation: %@", startupLocation);
                 
                 NSNumber *firstWarningTimestamp = data[@"first_warning_timestamp"];
                 if (firstWarningTimestamp != nil) {
@@ -159,8 +159,8 @@
                     [[DeviceState sharedInstance] setFirstWarningDate:firstWarningDate];
                 }
                 if (username != nil && ptcToken != nil && ![ptcToken isEqualToString:@""]) {
-                    NSLog(@"[UIC] Got token %@ level %@ from backend.", ptcToken, level);
-                    NSLog(@"[UIC] Got account %@ level %@ from backend.", username, level);
+                    NSLog(@"[Jarvis] [DeviceState] Got token %@ level %@ from backend.", ptcToken, level);
+                    NSLog(@"[Jarvis] [DeviceState] Got account %@ level %@ from backend.", username, level);
                     [[Device sharedInstance] setUsername:username];
                     [[Device sharedInstance] setPassword:password];
                     [[Device sharedInstance] setPtcToken:ptcToken];
@@ -169,7 +169,7 @@
                     [[NSUserDefaults standardUserDefaults] setValue:ptcToken forKey:TOKEN_USER_DEFAULT_KEY];
                     [[NSUserDefaults standardUserDefaults] synchronize];
                 } else {
-                    NSLog(@"[UIC] [Jarvis] Failed to get account with token. Restarting for normal login.");
+                    NSLog(@"[Jarvis] [DeviceState] Failed to get account with token. Restarting for normal login.");
                     [[NSUserDefaults standardUserDefaults] synchronize];
                     [[NSUserDefaults standardUserDefaults] removeObjectForKey:LOGIN_USER_DEFAULT_KEY];
                     [[Device sharedInstance] setUsername:username];
@@ -180,7 +180,7 @@
                     [[Device sharedInstance] setShouldExit:true];
                 }
             } else {
-                NSLog(@"[UIC] [Jarvis] Failed to get account, restarting.");
+                NSLog(@"[Jarvis] [DeviceState] Failed to get account, restarting.");
                 [NSThread sleepForTimeInterval:1];
                 [[Device sharedInstance] setMinLevel:@1]; // Never set to 0 until we can do tutorials.
                 [[Device sharedInstance] setMaxLevel:@29];

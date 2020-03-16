@@ -28,9 +28,11 @@
 
 -(id)init
 {
-    NSLog(@"[Device] init");
+    NSLog(@"[Jarvis] [Device] init");
     if ((self = [super init]))
     {
+        // TODO: NSUserDefaults
+        multiplier = 5;
         username = @"";
         password = @"";
         ptcToken = [[NSUserDefaults standardUserDefaults] valueForKey:TOKEN_USER_DEFAULT_KEY] ?: @"";
@@ -38,7 +40,6 @@
         minLevel = 1;
         maxLevel = 29;
     }
-    
     return self;
 }
 
@@ -55,13 +56,16 @@
         [sharedInstance setModel:modelName];
         [sharedInstance setOsName:[[UIDevice currentDevice] systemName]];
         [sharedInstance setOsVersion:[[UIDevice currentDevice] systemVersion]];
-        if ([[sharedInstance model] isEqualToString:@"iPhone 5s"] ||
-            [[sharedInstance model] isEqualToString:@"iPhone 6"] ||
-            [[sharedInstance model] isEqualToString:@"iPhone 6 Plus"]) {
+        // TODO: Fix multiplier
+        /*
+        if ([modelName isEqualToString:@"iPhone 5s"] ||
+            [modelName isEqualToString:@"iPhone 6"] ||
+            [modelName isEqualToString:@"iPhone 6 Plus"]) {
             [sharedInstance setMultiplier:45];
         } else {
             [sharedInstance setMultiplier:5];
         }
+        */
         [sharedInstance setMinLevel:1];
         [sharedInstance setMaxLevel:29];
     });
