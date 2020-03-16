@@ -177,7 +177,7 @@ static RMPaperTrailLogger *_logger;
         while (_startup) {
             if (!_firststart) {
                 NSLog(@"[Jarvis] [UIC] App still in startup...");
-                [NSThread sleepForTimeInterval:15];
+                [NSThread sleepForTimeInterval:3];
                 while (!_menuButton) {
                     _newPlayerButton = [Jarvis__ clickButton:@"NewPlayerButton"];
                     NSLog(@"[Jarvis] Found NewPlayerButton: %s", _newPlayerButton ? "Yes" : "No");
@@ -185,7 +185,7 @@ static RMPaperTrailLogger *_logger;
                         [[NSUserDefaults standardUserDefaults] removeObjectForKey:TOKEN_USER_DEFAULT_KEY];
                         _newPlayerButton = false;
                         NSLog(@"[Jarvis] [UIC] Started at Login Screen");
-                        [NSThread sleepForTimeInterval:1];
+                        [NSThread sleepForTimeInterval:2];
                         bool ptcButton = false;
                         NSNumber *ptcTryCount = @0;
                         while (!ptcButton) {
@@ -195,7 +195,7 @@ static RMPaperTrailLogger *_logger;
                                 _newPlayerButton = [Jarvis__ clickButton:@"NewPlayerButton"];
                                 ptcTryCount = @0;
                             }
-                            [NSThread sleepForTimeInterval:1];
+                            [NSThread sleepForTimeInterval:3];
                         }
                         
                         bool usernameButton = false;
@@ -203,21 +203,19 @@ static RMPaperTrailLogger *_logger;
                             usernameButton = [Jarvis__ clickButton:@"UsernameButton"];
                             [NSThread sleepForTimeInterval:1];
                         }
-                        // TODO: typeUsername();
-                        //[JarvisTestCase type:@"username"];
-                        [NSThread sleepForTimeInterval:1];
+                        [Jarvis__ typeUsername];
+                        [NSThread sleepForTimeInterval:3];
                         
                         bool passwordButton = false;
                         while (!passwordButton) {
                             passwordButton = [Jarvis__ clickButton:@"PasswordButton"];
                             [NSThread sleepForTimeInterval:1];
                         }
-                        // TODO: typePassword();
-                        //[JarvisTestCase type:@"password"];
-                        [NSThread sleepForTimeInterval:1];
+                        [Jarvis__ typePassword];
+                        [NSThread sleepForTimeInterval:3];
                         
                         // TODO: touchAtPoint(180, 100);
-                        [NSThread sleepForTimeInterval:1];
+                        [NSThread sleepForTimeInterval:3];
                         
                         bool signinButton = false;
                         while (!signinButton) {
@@ -225,7 +223,7 @@ static RMPaperTrailLogger *_logger;
                             [NSThread sleepForTimeInterval:1];
                         }
                         
-                        NSNumber *delayMultiplier = [[Device sharedInstance] multiplier];
+                        NSNumber *delayMultiplier = @5;// TODO: [[Device sharedInstance] multiplier];
                         NSNumber *sleep = @([delayMultiplier intValue] + 15);
                         [NSThread sleepForTimeInterval:[sleep intValue]];
                     }
@@ -745,8 +743,16 @@ static RMPaperTrailLogger *_logger;
 
 +(NSString *)handleTouchRequest:(NSDictionary *)params
 {
-    [Utils touch:[params[@"x"] intValue]
-           withY:[params[@"y"] intValue]];
+    //[Utils touch:[params[@"x"] intValue]
+    //       withY:[params[@"y"] intValue]];
+    [JarvisTestCase touch:[params[@"x"] intValue]
+                    withY:[params[@"y"] intValue]];
+    return @"OK";
+}
+
++(NSString *)handleTypeRequest:(NSDictionary *)params
+{
+    [JarvisTestCase type:params[@"text"]];
     return @"OK";
 }
 

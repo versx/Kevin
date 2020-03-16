@@ -42,7 +42,7 @@ static void __attribute__((constructor)) initialize(void) {
     dispatch_async(dispatch_get_main_queue(), ^{
         @autoreleasepool {
             _image = [Utils takeScreenshot];
-            NSLog(@"[Jarvis] Took screenshot to check for pixel coord for button %@...", buttonName);
+            //NSLog(@"[Jarvis] Took screenshot to check for pixel coord for button %@...", buttonName);
             if ([buttonName isEqualToString:@"NewPlayerButton"]) {
                 UIColor *color = [_image getPixelColor:400 withY:820];
                 // TODO: Pixel check
@@ -129,6 +129,20 @@ static void __attribute__((constructor)) initialize(void) {
     NSLog(@"[Jarvis] getToMainScreen");
     // TODO: getToMainScreen
     return false;
+}
+
++(void)typeUsername
+{
+    NSString *username = @"lumeone1";//[[Device sharedInstance] username];
+    NSLog(@"[Jarvis] typeUsername: %@", username);
+    [JarvisTestCase type:username];
+}
+
++(void)typePassword
+{
+    NSString *password = @"jerm5301";//[[Device sharedInstance] password];
+    NSLog(@"[Jarvis] typePassword: %@", password);
+    [JarvisTestCase type:password];
 }
 
 @end

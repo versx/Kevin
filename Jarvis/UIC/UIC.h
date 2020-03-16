@@ -30,6 +30,7 @@
 +(NSString *)handleDataRequest:(NSDictionary *)params;
 +(NSString *)handleLocationRequest:(NSDictionary *)params;
 +(NSString *)handleTouchRequest:(NSDictionary *)params;
++(NSString *)handleTypeRequest:(NSDictionary *)params;
 +(NSString *)handleConfigRequest;//:(NSDictionary *)params;
 
 @end

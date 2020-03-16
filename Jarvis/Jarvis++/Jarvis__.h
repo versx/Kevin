@@ -17,4 +17,7 @@
 +(BOOL)eggDeploy;
 +(BOOL)getToMainScreen;
 
++(void)typeUsername;
++(void)typePassword;
+
 @end

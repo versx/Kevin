@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		46A19D696FB20DF10E086937 /* libPods-Jarvis++.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4B758B3E2D00044589FFB5B7 /* libPods-Jarvis++.a */; };
+		1AD80293D695349110C3793B /* libPods-Jarvis++.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DDDB883D38BFB1DFFF011E2A /* libPods-Jarvis++.a */; };
 		C0025AAE241421E9007813F7 /* Utils.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AAD241421E9007813F7 /* Utils.h */; };
 		C0025AB0241421F4007813F7 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = C0025AAF241421F4007813F7 /* Utils.m */; };
 		C0025AB224143917007813F7 /* DeviceState.m in Sources */ = {isa = PBXBuildFile; fileRef = C0025AB124143917007813F7 /* DeviceState.m */; };
@@ -59,9 +59,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		2EF23DFC61FC9528A2C6B4F9 /* Pods-Jarvis++.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jarvis++.debug.xcconfig"; path = "Target Support Files/Pods-Jarvis++/Pods-Jarvis++.debug.xcconfig"; sourceTree = "<group>"; };
-		4B758B3E2D00044589FFB5B7 /* libPods-Jarvis++.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Jarvis++.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		55E833E5AC2B9F7037D6E68C /* Pods-Jarvis++.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jarvis++.release.xcconfig"; path = "Target Support Files/Pods-Jarvis++/Pods-Jarvis++.release.xcconfig"; sourceTree = "<group>"; };
+		4B79D2905CA6EE7C52F90E32 /* Pods-Jarvis++.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jarvis++.debug.xcconfig"; path = "Target Support Files/Pods-Jarvis++/Pods-Jarvis++.debug.xcconfig"; sourceTree = "<group>"; };
 		C0025AAD241421E9007813F7 /* Utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
 		C0025AAF241421F4007813F7 /* Utils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Utils.m; sourceTree = "<group>"; };
 		C0025AB124143917007813F7 /* DeviceState.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceState.m; sourceTree = "<group>"; };
@@ -118,6 +116,8 @@
 		C0B68E012414C33E009B5970 /* Consts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Consts.h; sourceTree = "<group>"; };
 		C0B68E032414C632009B5970 /* Consts.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Consts.m; sourceTree = "<group>"; };
 		C0BAF0942418B62C003E2419 /* Jarvis++.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Jarvis++.pch"; sourceTree = "<group>"; };
+		CAA9A8ACBA3A702C6AC49374 /* Pods-Jarvis++.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jarvis++.release.xcconfig"; path = "Target Support Files/Pods-Jarvis++/Pods-Jarvis++.release.xcconfig"; sourceTree = "<group>"; };
+		DDDB883D38BFB1DFFF011E2A /* libPods-Jarvis++.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Jarvis++.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -134,7 +134,7 @@
 				C067AD2B241EB515007E3055 /* KIF.framework in Frameworks */,
 				C067AD2F241EB776007E3055 /* XCTest.framework in Frameworks */,
 				C01B4967240ACF5D00633B45 /* UIKit.framework in Frameworks */,
-				46A19D696FB20DF10E086937 /* libPods-Jarvis++.a in Frameworks */,
+				1AD80293D695349110C3793B /* libPods-Jarvis++.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -144,8 +144,8 @@
 		91E40CCDBD064A40A2555622 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				2EF23DFC61FC9528A2C6B4F9 /* Pods-Jarvis++.debug.xcconfig */,
-				55E833E5AC2B9F7037D6E68C /* Pods-Jarvis++.release.xcconfig */,
+				4B79D2905CA6EE7C52F90E32 /* Pods-Jarvis++.debug.xcconfig */,
+				CAA9A8ACBA3A702C6AC49374 /* Pods-Jarvis++.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -199,11 +199,11 @@
 			isa = PBXGroup;
 			children = (
 				C019482824161E730094A2C8 /* config.plist */,
+				C0BAF0942418B62C003E2419 /* Jarvis++.pch */,
 				C0025AC124148455007813F7 /* Controllers */,
 				C0025ABC241483A2007813F7 /* Extensions */,
 				C01B4963240ACF5D00633B45 /* Frameworks */,
 				C01B4968240ACF5D00633B45 /* Jarvis++ */,
-				C0BAF0942418B62C003E2419 /* Jarvis++.pch */,
 				C0025AA3241416DE007813F7 /* Net */,
 				91E40CCDBD064A40A2555622 /* Pods */,
 				C01B4962240ACF5D00633B45 /* Products */,
@@ -233,7 +233,7 @@
 				C01B4982240AD01E00633B45 /* CoreLocation.framework */,
 				C01B4964240ACF5D00633B45 /* Foundation.framework */,
 				C01B4966240ACF5D00633B45 /* UIKit.framework */,
-				4B758B3E2D00044589FFB5B7 /* libPods-Jarvis++.a */,
+				DDDB883D38BFB1DFFF011E2A /* libPods-Jarvis++.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -380,7 +380,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C01B4979240ACF5D00633B45 /* Build configuration list for PBXNativeTarget "Jarvis++" */;
 			buildPhases = (
-				01C21A2C286A521DCCE592F0 /* [CP] Check Pods Manifest.lock */,
+				DD19E334717C3F402AC7920B /* [CP] Check Pods Manifest.lock */,
 				C01B495C240ACF5D00633B45 /* Sources */,
 				C01B495D240ACF5D00633B45 /* Frameworks */,
 				C01B495E240ACF5D00633B45 /* Headers */,
@@ -427,7 +427,25 @@
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		01C21A2C286A521DCCE592F0 /* [CP] Check Pods Manifest.lock */ = {
+		C0BAF09324174FAE003E2419 /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\n/Users/helpdesk/Desktop/Projects/Jarvis/Jarvis/inject.sh\n";
+		};
+		DD19E334717C3F402AC7920B /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -448,24 +466,6 @@
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
-		};
-		C0BAF09324174FAE003E2419 /* Run Script */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Run Script";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Remove previous payload folder\nrm -rf Payload\n\n# Unzip ipa\nunzip app.zip\n\n# Remove stupid directory settings file\nrm -rf __MACOSX\n\n# Copy dylib to app\ncp \"${CONFIGURATION_BUILD_DIR}/libJarvis++.dylib\" \"Payload/pokemongo.app/libJarvis++.dylib\"\n\n# Copy config\n#cp config.plist \"Payload/pokemongo.app/config.plist\"\n\n# Inject load command for dylib\noptool install -c load -p \"@executable_path/libJarvis++.dylib\" -t \"Payload/pokemongo.app/pokemongo\"\n\n# Remove previously signed ipa\nrm -rf \"/Users/helpdesk/Desktop/deployer-redux/Releases/jarvis/resignedSigned.ipa\"\n\n# Remove previously unsigned ipa\nrm -rf \"/Users/helpdesk/Desktop/deployer-redux/Releases/jarvis/resigned.ipa\" \n\n# Zip up final product\nzip -r -X \"/Users/helpdesk/Desktop/deployer-redux/Releases/jarvis/resigned.zip\" \"Payload/\"\n\n# Rename .zip to .ipa\nmv \"/Users/helpdesk/Desktop/deployer-redux/Releases/jarvis/resigned.zip\" \"/Users/helpdesk/Desktop/deployer-redux/Releases/jarvis/resigned.ipa\"\n\ncd \"/Users/helpdesk/Desktop/deployer-redux\"\n\n# Run deployer\nnode \"/Users/helpdesk/Desktop/deployer-redux/deploy.js\" -f true -l true\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -549,7 +549,7 @@
 		};
 		C01B497A240ACF5D00633B45 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2EF23DFC61FC9528A2C6B4F9 /* Pods-Jarvis++.debug.xcconfig */;
+			baseConfigurationReference = 4B79D2905CA6EE7C52F90E32 /* Pods-Jarvis++.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ARCHS = arm64;
@@ -625,7 +625,7 @@
 		};
 		C01B497B240ACF5D00633B45 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 55E833E5AC2B9F7037D6E68C /* Pods-Jarvis++.release.xcconfig */;
+			baseConfigurationReference = CAA9A8ACBA3A702C6AC49374 /* Pods-Jarvis++.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ARCHS = arm64;

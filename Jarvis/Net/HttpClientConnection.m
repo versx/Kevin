@@ -20,7 +20,8 @@
         if ([path isEqualToString:@"/loc"] ||
             [path isEqualToString:@"/data"] ||
             [path isEqualToString:@"/touch"] ||
-            [path isEqualToString:@"/config"]) {
+            [path isEqualToString:@"/config"] ||
+            [path isEqualToString:@"/type"]) {
             return YES;
         }
     }
@@ -75,6 +76,8 @@
             response = [UIC2 handleConfigRequest];
         } else if ([path isEqualToString:@"/touch"]) {
             response = [UIC2 handleTouchRequest:json];
+        } else if ([path isEqualToString:@"/type"]) {
+            response = [UIC2 handleTypeRequest:json];
         }
         NSData *responseData = [response dataUsingEncoding:NSUTF8StringEncoding];
         return [[HTTPDataResponse alloc] initWithData:responseData];

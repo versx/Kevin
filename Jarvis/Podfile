@@ -5,6 +5,7 @@ workspace 'Jarvis'
 target 'Jarvis++' do
   # Comment the next line if you don't want to use dynamic frameworks
   inherit! :search_paths
+  #use_frameworks!
 
   # Pods for Jarvis++
   pod 'CocoaHTTPServer', :git => 'https://github.com/robbiehanson/CocoaHTTPServer.git'
