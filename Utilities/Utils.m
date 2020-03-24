@@ -1,0 +1,236 @@
+//
+//  Utils.m
+//  Jarvis++
+//
+//  Created by versx on 3/7/20.
+//
+
+#import "Utils.h"
+
+@implementation Utils
+
+static double _baseHorizontalAccuracy = 200.0; // in meters
+static double _baseVerticalAccuracy = 200.0; // in meters
+
++(NSNumber *)incrementInt:(NSNumber *)value
+{
+    return [NSNumber numberWithInt:[value intValue] + 1];
+}
+
++(NSNumber *)decrementInt:(NSNumber *)value
+{
+    return [NSNumber numberWithInt:[value intValue] - 1];
+}
+
++(CLLocation *)createCoordinate:(double)lat lon:(double)lon
+{
+    return [Utils createCoordinate:lat
+                        lon:lon
+     withHorizontalAccuracy:_baseHorizontalAccuracy
+           verticalAccuracy:_baseVerticalAccuracy];
+}
++(CLLocation *)createCoordinate:(double)lat
+                            lon:(double)lon
+         withHorizontalAccuracy:(double)baseHorizontalAccuracy
+               verticalAccuracy:(double)baseVerticalAccuracy
+{
+    CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(lat, lon);
+    CLLocation *location = [[CLLocation alloc] initWithCoordinate:coordinate
+                                  altitude:-1
+                        horizontalAccuracy:baseHorizontalAccuracy
+                          verticalAccuracy:baseVerticalAccuracy
+                                 timestamp:[NSDate date]];
+    return location;
+}
+
++(void)postRequest:(NSString *)urlString
+              dict:(NSDictionary *)data
+          blocking:(BOOL)blocking
+        completion:(void (^)(NSDictionary* result))completion
+{
+    //dispatch_async(dispatch_get_main_queue(), ^{
+    //    @autoreleasepool {
+    //__block BOOL done = false;
+    //__block NSDictionary *resultDict;
+    
+    // Create the URLSession on the default configuration
+    NSURLSessionConfiguration *defaultSessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSession *defaultSession = [NSURLSession sessionWithConfiguration:defaultSessionConfiguration];
+
+    // Setup the request with URL
+    //syslog(@"[DEBUG] Sending request to %@ with params %@", urlString, data);
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url
+                                                              cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                                          timeoutInterval:-1]; // 0.5
+
+    NSError *error;
+    NSData *postData = [NSJSONSerialization dataWithJSONObject:data options:0 error:&error];
+    [urlRequest setHTTPBody:postData];
+    [urlRequest setValue:[NSString stringWithFormat:@"%lu", (unsigned long)[postData length]] forHTTPHeaderField:@"Content-Length"];
+
+    if ([[Settings sharedInstance] token] != nil &&
+        ![[[Settings sharedInstance] token] isEqualToString:@""]) {
+        NSString *token = [NSString stringWithFormat:@"Bearer %@", [[Settings sharedInstance] token]];
+        [urlRequest addValue:token forHTTPHeaderField:@"Authorization"];
+    }
+    
+    // Convert POST string parameters to data using UTF8 Encoding
+    [urlRequest setHTTPMethod:@"POST"];
+    [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+    [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Accept"];
+
+    // Create dataTask
+    NSURLSessionDataTask *dataTask = [defaultSession dataTaskWithRequest:urlRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (error) {
+            syslog(@"[ERROR] %@", error);
+            return;
+        }
+        NSString *responseData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        //syslog(@"[DEBUG] postRequest response: %@", responseData);
+        [responseData release];
+        if (data != nil) { // TODO: Check if json parsed
+            NSError *jsonError;
+            NSDictionary *resultJson = [NSJSONSerialization JSONObjectWithData:data
+                                                                       options:NSJSONReadingMutableContainers
+                                                                         error:&jsonError];
+            //syslog(@"[DEBUG] postRequest resultJson: %@", resultJson);
+            //resultDict = resultJson;
+            //if (!blocking) {
+                completion(resultJson);
+            //}
+        } else {
+            //if (!blocking) {
+                completion(nil);
+            //}
+        }
+        //done = true;
+    }];
+
+    // Fire the request
+    [dataTask resume];
+    /*
+    if (blocking) {
+        while (!done) {
+            NSLog(@"[Jarvis] [DEBUG] postRequest %@ waiting...", urlString);
+            sleep(1);
+        }
+        syslog(@"[DEBUG] Blocking completed. ResultDict: %@", resultDict);
+        completion(resultDict);
+    }
+    */
+    //    }
+    //});
+}
+
++(NSString *)toJsonString:(NSDictionary *)dict
+          withPrettyPrint:(BOOL)prettyPrint
+{
+    NSError *error;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:dict
+                                                       options:(NSJSONWritingOptions)
+                    (prettyPrint ? NSJSONWritingPrettyPrinted : 0)
+                                                         error:&error];
+
+    if (!jsonData) {
+        syslog(@"[ERROR] %@", error);
+        return @"{}";
+    }
+
+    NSString *json = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    return json;
+}
+
++(void)touch:(int)x withY:(int)y
+{
+    @try {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSInteger point = [PTFakeTouch fakeTouchId:[PTFakeTouch getAvailablePointId]
+                                               AtPoint:CGPointMake(x, y)
+                                        withTouchPhase:UITouchPhaseBegan
+            ];
+            syslog(@"[DEBUG] touch:x=%d,y=%d point=%ld", x, y, (long)point);
+            [PTFakeTouch fakeTouchId:point
+                             AtPoint:CGPointMake(x, y)
+                      withTouchPhase:UITouchPhaseEnded
+            ];
+        });
+    }
+    @catch (NSException *error) {
+        syslog(@"[ERROR] Error: %@", error);
+    }
+}
+
++(UIImage *)takeScreenshot
+{
+    syslog(@"[DEBUG] takeScreenshot");
+    UIImage *image;
+    UIScreen *screen = [UIScreen mainScreen];
+    UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
+    UIGraphicsBeginImageContextWithOptions(screen.bounds.size, false, 0);
+    [keyWindow drawViewHierarchyInRect:keyWindow.bounds afterScreenUpdates:true];
+    image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
+}
+
++(void)takeScreenshot:(void (^)(UIImage* image))completion
+{
+    syslog(@"[DEBUG] takeScreenshot with completion handler");
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIImage *image = [self takeScreenshot];
+        completion(image);
+    });
+}
+
++(void)syslog:(NSString *)msg
+{
+    NSLog(@"%@", msg);
+    //NSLog(@"[Jarvis] [syslog] <%@:%@:%d>: %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__, msg);
+    @try {
+        NSString *host = [[Settings sharedInstance] loggingUrl];
+        if ([host isEqualToString:@""]) {
+            return;
+        }
+        GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self
+                                                               delegateQueue:dispatch_get_main_queue()
+        ];
+        NSError *error = nil;
+        NSNumber *port = [[Settings sharedInstance] loggingPort];
+        if (![tcpSocket connectToHost:host
+                               onPort:[port intValue]
+                                error:&error
+              ]) {
+            NSLog(@"[Jarvis] [Utils] Failed to connect to syslog host %@:%@.", host, port);
+            return;
+        };
+        NSString *date = [Utils iso8601DateTime];
+        NSString *uuid = [[Device sharedInstance] uuid];
+        NSString *model = [[[Device sharedInstance] model] stringByReplacingOccurrencesOfString:@" " withString:@""];
+        NSData *data = [
+                        [NSString stringWithFormat:@"<22>1 %@ %@ %@ - - - %@",
+                         date,
+                         uuid,
+                         model,
+                         msg]
+                     dataUsingEncoding:NSUTF8StringEncoding
+        ];
+        [tcpSocket writeData:data withTimeout:-1 tag:0];
+        [tcpSocket release];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"[Jarvis] [Utils] [ERROR] %@", exception);
+    }
+}
+
++(NSString *)iso8601DateTime
+{
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    NSLocale *enUSPOSIXLocale = [NSLocale localeWithLocaleIdentifier:@"en_US_POSIX"];
+    [formatter setLocale:enUSPOSIXLocale];
+    [formatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ssZZZZZ"];
+    NSString *date = [formatter stringFromDate:[NSDate date]];
+    return date;
+}
+
+@end
