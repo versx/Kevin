@@ -91,14 +91,12 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-//@synthesize username;
-//@synthesize password;
+
 @synthesize ptcToken;
 @synthesize level;
-//@synthesize minLevel;
-//@synthesize maxLevel;
 @synthesize isLoggedIn;
 @synthesize shouldExit;
+
 
 -(id)init
 {
@@ -123,25 +121,19 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [[Device alloc] init];
-        
         [sharedInstance setUuid:[[UIDevice currentDevice] name]];
         NSString *identifier = getModelIdentifier();
         NSString *modelName = getNameFromModelIdentifier(identifier);
         [sharedInstance setModel:modelName];
         [sharedInstance setOsName:[[UIDevice currentDevice] systemName]];
         [sharedInstance setOsVersion:[[UIDevice currentDevice] systemVersion]];
-        // TODO: Fix multiplier
-        /*
         if ([modelName isEqualToString:@"iPhone 5s"] ||
             [modelName isEqualToString:@"iPhone 6"] ||
             [modelName isEqualToString:@"iPhone 6 Plus"]) {
-            [sharedInstance setMultiplier:45];
+            [sharedInstance setMultiplier:@45];
         } else {
-            [sharedInstance setMultiplier:5];
+            [sharedInstance setMultiplier:@5];
         }
-        */
-        //[sharedInstance setMinLevel:1];
-        //[sharedInstance setMaxLevel:29];
     });
     return sharedInstance;
 }

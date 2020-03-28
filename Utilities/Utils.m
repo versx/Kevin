@@ -69,8 +69,7 @@ static double _baseVerticalAccuracy = 200.0; // in meters
     [urlRequest setHTTPBody:postData];
     [urlRequest setValue:[NSString stringWithFormat:@"%lu", (unsigned long)[postData length]] forHTTPHeaderField:@"Content-Length"];
 
-    if ([[Settings sharedInstance] token] != nil &&
-        ![[[Settings sharedInstance] token] isEqualToString:@""]) {
+    if (![[[Settings sharedInstance] token] isNullOrEmpty]) {
         NSString *token = [NSString stringWithFormat:@"Bearer %@", [[Settings sharedInstance] token]];
         [urlRequest addValue:token forHTTPHeaderField:@"Authorization"];
     }
@@ -163,23 +162,45 @@ static double _baseVerticalAccuracy = 200.0; // in meters
 
 +(UIImage *)takeScreenshot
 {
-    syslog(@"[DEBUG] takeScreenshot");
-    UIImage *image;
+    //syslog(@"[VERBOSE] takeScreenshot");
     UIScreen *screen = [UIScreen mainScreen];
     UIWindow *keyWindow = [[UIApplication sharedApplication] keyWindow];
     UIGraphicsBeginImageContextWithOptions(screen.bounds.size, false, 0);
     [keyWindow drawViewHierarchyInRect:keyWindow.bounds afterScreenUpdates:true];
-    image = UIGraphicsGetImageFromCurrentImageContext();
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return image;
 }
 
 +(void)takeScreenshot:(void (^)(UIImage* image))completion
 {
-    syslog(@"[DEBUG] takeScreenshot with completion handler");
+    //syslog(@"[VERBOSE] takeScreenshot with completion handler");
     dispatch_async(dispatch_get_main_queue(), ^{
         UIImage *image = [self takeScreenshot];
         completion(image);
+    });
+}
+
++(void)showAlert:(id)obj withMessage:(NSString *)message
+{
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil
+                                                                   message:@""
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    UIView *firstSubview = alert.view.subviews.firstObject;
+    UIView *alertContentView = firstSubview.subviews.firstObject;
+    for (UIView *subSubView in alertContentView.subviews) {
+        subSubView.backgroundColor = [UIColor colorWithRed:141 / 255.0f
+                                                     green:0   / 255.0f
+                                                      blue:254 / 255.0f
+                                                     alpha:1.0f];
+    }
+    NSMutableAttributedString *mas = [[NSMutableAttributedString alloc] initWithString:message];
+    [mas addAttribute: NSForegroundColorAttributeName value:[UIColor whiteColor] range:NSMakeRange(0,mas.length)];
+    [alert setValue:mas forKey:@"attributedTitle"];
+    [obj presentViewController:alert animated:YES completion:nil];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [alert dismissViewControllerAnimated:YES completion:^{
+        }];
     });
 }
 
@@ -189,7 +210,7 @@ static double _baseVerticalAccuracy = 200.0; // in meters
     //NSLog(@"[Jarvis] [syslog] <%@:%@:%d>: %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__, msg);
     @try {
         NSString *host = [[Settings sharedInstance] loggingUrl];
-        if ([host isEqualToString:@""]) {
+        if ([host isNullOrEmpty]) {
             return;
         }
         GCDAsyncSocket *tcpSocket = [[GCDAsyncSocket alloc] initWithDelegate:self

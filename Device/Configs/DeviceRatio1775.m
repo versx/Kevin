@@ -1,71 +1,27 @@
 //
-//  DeviceConfig.m
+//  DeviceRatio1775.m
 //  Jarvis++
 //
-//  Created by versx on 3/22/20.
+//  Created by versx on 3/27/20.
 //
 
-#import "DeviceConfig.h"
+#import "DeviceRatio1775.h"
 
-// TODO: Support multiple device configs
-
-@implementation DeviceConfig
+/*
+@implementation DeviceRatio1775
 
 static DeviceCoordinateScalar *scalar;
-//static double tapScalar; // Not even used.
 
-+(DeviceConfig *)sharedInstance
+-(id)init:(int)width height:(int)height multiplier:(double)multiplier tapMultiplier:(double)tapMultiplier
 {
-    static DeviceConfig *sharedInstance = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        sharedInstance = [[DeviceConfig alloc] init];
-    });
-    return sharedInstance;
-}
-
--(id)init
-{
-    self = [super init];
-    if (self) {
-        scalar = [[DeviceCoordinateScalar alloc] init];
-        scalar.widthNow = [UIScreen mainScreen].bounds.size.width;
-        scalar.heightNow = [UIScreen mainScreen].bounds.size.height;
-        scalar.widthTarget = 320;
-        scalar.heightTarget = 568;
-        scalar.multiplier = 1.0; // 5S/SE
-        if (@available(iOS 13.0, *)) {
-            scalar.tapMultiplier = 0.5; // iOS 13
-        } else {
-            scalar.tapMultiplier = 1.0; //iOS 12 and below
-        }
-        /*
-        int ratio = scalar.heightNow / scalar.widthNow * 1000;
-        if (ratio >= 1770 && ratio <= 1780) { // iPhones
-            switch (scalar.widthNow) {
-                case 375: // iPhone Normal (6, 6S, 7)
-                    syslog(@"[INFO] Normal Phone size detected.");
-                    break;
-                case 414: // iPhone Large (6+, 6S+, 7+, 8+)
-                    syslog(@"[INFO] Normal Phone size detected.");
-                    break;
-                default: // other iPhones (5S, SE)
-                    syslog(@"[INFO] Normal Phone size detected.");
-                    DeviceConfig *config = [[DeviceRatio1775 alloc] init:scalar.widthNow
-                                                               heightNow:scalar.heightNow
-                                                             widthTarget:scalar.widthTarget
-                                                            heightTarget:scalar.heightTarget
-                                                              multiplier:1.0
-                                                           tapMultiplier:scalar.tapMultiplier
-                    ];
-                    break;
-            }
-        } else if (ratio >= 1330 && ratio <= 1340) { //iPads
-            
-        } else {
-            syslog(@"[FATAL] Unsupported Device");
-        }
-        */
+    if ((self = [super init])) {
+        scalar = [[DeviceCoordinateScalar alloc] init:width
+                                            heightNow:height
+                                          widthTarget:320
+                                         heightTarget:568
+                                           multiplier:multiplier
+                                        tapMultiplier:tapMultiplier
+        ];
     }
     return self;
 }
@@ -260,3 +216,4 @@ static DeviceCoordinateScalar *scalar;
 }
 
 @end
+*/

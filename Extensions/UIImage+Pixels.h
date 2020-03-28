@@ -17,8 +17,6 @@
 
 -(UIImage *)resize:(int)x withY:(int)y;
 
--(NSDictionary *)rgbAtLocation:(int)x withY:(int)y;
-
 -(bool)rgbAtLocation:(DeviceCoordinate *)deviceCoordinate
           betweenMin:(ColorOffset *)min
               andMax:(ColorOffset *)max;

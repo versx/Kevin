@@ -7,6 +7,7 @@
 
 #import <CoreLocation/CoreLocation.h>
 
+#import "../Extensions/NSString+Extensions.h"
 #import "../States/DeviceState.h"
 #import "../UIC/Device.h"
 #import "../UIC/Settings.h"

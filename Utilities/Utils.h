@@ -10,7 +10,7 @@
 #import <CoreLocation/CoreLocation.h>
 #import <UIKit/UIKit.h>
 
-//#import <PTFakeTouch/PTFakeMetaTouch.h>
+#import "../Extensions/NSString+Extensions.h"
 #import "../PTFakeTouch/PTFakeTouch.h"
 #import "../UIC/Consts.h"
 #import "../UIC/Device.h"
@@ -40,6 +40,8 @@
 
 +(UIImage *)takeScreenshot;
 +(void)takeScreenshot:(void (^)(UIImage* image))completion;
+
++(void)showAlert:(id)obj withMessage:(NSString *)message;
 
 +(void)syslog:(NSString *)fmt;
 

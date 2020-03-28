@@ -37,6 +37,10 @@
 		C0339C912427EE5B0046D0AD /* DeviceConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C0339C902427EE5B0046D0AD /* DeviceConfig.m */; };
 		C0339C93242803D80046D0AD /* ColorOffset.h in Headers */ = {isa = PBXBuildFile; fileRef = C0339C92242803D80046D0AD /* ColorOffset.h */; };
 		C0339C95242803E40046D0AD /* ColorOffset.m in Sources */ = {isa = PBXBuildFile; fileRef = C0339C94242803E40046D0AD /* ColorOffset.m */; };
+		C065AE40242ECD2A007114C8 /* DeviceRatio1775.h in Headers */ = {isa = PBXBuildFile; fileRef = C065AE3F242ECD2A007114C8 /* DeviceRatio1775.h */; };
+		C065AE42242ECD3B007114C8 /* DeviceRatio1775.m in Sources */ = {isa = PBXBuildFile; fileRef = C065AE41242ECD3B007114C8 /* DeviceRatio1775.m */; };
+		C065AE44242EFCCA007114C8 /* NSString+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = C065AE43242EFCCA007114C8 /* NSString+Extensions.h */; };
+		C065AE46242EFCD8007114C8 /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C065AE45242EFCD8007114C8 /* NSString+Extensions.m */; };
 		C067ACEA241EAFF6007E3055 /* PTFakeTouch.h in Headers */ = {isa = PBXBuildFile; fileRef = C067ACD7241EAFF6007E3055 /* PTFakeTouch.h */; };
 		C067ACEB241EAFF6007E3055 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C067ACD8241EAFF6007E3055 /* IOKit.framework */; };
 		C067ACEC241EAFF7007E3055 /* IOHIDEvent+KIF.h in Headers */ = {isa = PBXBuildFile; fileRef = C067ACDA241EAFF6007E3055 /* IOHIDEvent+KIF.h */; };
@@ -103,6 +107,10 @@
 		C0339C902427EE5B0046D0AD /* DeviceConfig.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceConfig.m; sourceTree = "<group>"; };
 		C0339C92242803D80046D0AD /* ColorOffset.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ColorOffset.h; sourceTree = "<group>"; };
 		C0339C94242803E40046D0AD /* ColorOffset.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ColorOffset.m; sourceTree = "<group>"; };
+		C065AE3F242ECD2A007114C8 /* DeviceRatio1775.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceRatio1775.h; sourceTree = "<group>"; };
+		C065AE41242ECD3B007114C8 /* DeviceRatio1775.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceRatio1775.m; sourceTree = "<group>"; };
+		C065AE43242EFCCA007114C8 /* NSString+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+Extensions.h"; sourceTree = "<group>"; };
+		C065AE45242EFCD8007114C8 /* NSString+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+Extensions.m"; sourceTree = "<group>"; };
 		C067ACD7241EAFF6007E3055 /* PTFakeTouch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTFakeTouch.h; sourceTree = "<group>"; };
 		C067ACD8241EAFF6007E3055 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = IOKit.framework; sourceTree = "<group>"; };
 		C067ACDA241EAFF6007E3055 /* IOHIDEvent+KIF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IOHIDEvent+KIF.h"; sourceTree = "<group>"; };
@@ -195,6 +203,8 @@
 		C0025ABC241483A2007813F7 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				C065AE43242EFCCA007114C8 /* NSString+Extensions.h */,
+				C065AE45242EFCD8007114C8 /* NSString+Extensions.m */,
 				C0025ABD241483B7007813F7 /* UIImage+Pixels.h */,
 				C0025ABF241483C6007813F7 /* UIImage+Pixels.mm */,
 			);
@@ -328,8 +338,8 @@
 		C0339C842427E8F30046D0AD /* DeviceCoordinate */ = {
 			isa = PBXGroup;
 			children = (
-				C0339C852427E9140046D0AD /* DeviceCoordinate.h */,
 				C0339C872427E9220046D0AD /* DeviceCoordinate.m */,
+				C0339C852427E9140046D0AD /* DeviceCoordinate.h */,
 				C0339C892427E9300046D0AD /* DeviceCoordinateScalar.h */,
 				C0339C8B2427E93C0046D0AD /* DeviceCoordinateScalar.m */,
 			);
@@ -339,12 +349,22 @@
 		C0339C8D2427EE410046D0AD /* Device */ = {
 			isa = PBXGroup;
 			children = (
+				C065AE3E242ECD04007114C8 /* Configs */,
 				C0339C92242803D80046D0AD /* ColorOffset.h */,
 				C0339C94242803E40046D0AD /* ColorOffset.m */,
 				C0339C8E2427EE510046D0AD /* DeviceConfig.h */,
 				C0339C902427EE5B0046D0AD /* DeviceConfig.m */,
 			);
 			path = Device;
+			sourceTree = "<group>";
+		};
+		C065AE3E242ECD04007114C8 /* Configs */ = {
+			isa = PBXGroup;
+			children = (
+				C065AE3F242ECD2A007114C8 /* DeviceRatio1775.h */,
+				C065AE41242ECD3B007114C8 /* DeviceRatio1775.m */,
+			);
+			path = Configs;
 			sourceTree = "<group>";
 		};
 		C067ACD6241EAFF6007E3055 /* PTFakeTouch */ = {
@@ -362,20 +382,20 @@
 		C067ACD9241EAFF6007E3055 /* head */ = {
 			isa = PBXGroup;
 			children = (
+				C067ACE2241EAFF6007E3055 /* FixCategoryBug.h */,
 				C067ACDA241EAFF6007E3055 /* IOHIDEvent+KIF.h */,
+				C067ACE3241EAFF6007E3055 /* IOHIDEvent+KIF.m */,
+				C067ACE7241EAFF6007E3055 /* LoadableCategory.h */,
 				C067ACDB241EAFF6007E3055 /* UIApplication-KIFAdditions.h */,
-				C067ACDC241EAFF6007E3055 /* UIWindow-KIFAdditions.m */,
+				C067ACE1241EAFF6007E3055 /* UIApplication-KIFAdditions.m */,
+				C067ACDF241EAFF6007E3055 /* UIEvent+KIFAdditions.h */,
+				C067ACE6241EAFF6007E3055 /* UIEvent+KIFAdditions.m */,
+				C067ACE5241EAFF6007E3055 /* UITouch-KIFAdditions.h */,
 				C067ACDD241EAFF6007E3055 /* UITouch-KIFAdditions.m */,
 				C067ACDE241EAFF6007E3055 /* UIView-KIFAdditions.h */,
-				C067ACDF241EAFF6007E3055 /* UIEvent+KIFAdditions.h */,
-				C067ACE0241EAFF6007E3055 /* UIWindow-KIFAdditions.h */,
-				C067ACE1241EAFF6007E3055 /* UIApplication-KIFAdditions.m */,
-				C067ACE2241EAFF6007E3055 /* FixCategoryBug.h */,
-				C067ACE3241EAFF6007E3055 /* IOHIDEvent+KIF.m */,
 				C067ACE4241EAFF6007E3055 /* UIView-KIFAdditions.m */,
-				C067ACE5241EAFF6007E3055 /* UITouch-KIFAdditions.h */,
-				C067ACE6241EAFF6007E3055 /* UIEvent+KIFAdditions.m */,
-				C067ACE7241EAFF6007E3055 /* LoadableCategory.h */,
+				C067ACE0241EAFF6007E3055 /* UIWindow-KIFAdditions.h */,
+				C067ACDC241EAFF6007E3055 /* UIWindow-KIFAdditions.m */,
 			);
 			path = head;
 			sourceTree = "<group>";
@@ -397,6 +417,7 @@
 				C067ACED241EAFF7007E3055 /* UIApplication-KIFAdditions.h in Headers */,
 				C067ACEA241EAFF6007E3055 /* PTFakeTouch.h in Headers */,
 				C0339C93242803D80046D0AD /* ColorOffset.h in Headers */,
+				C065AE40242ECD2A007114C8 /* DeviceRatio1775.h in Headers */,
 				C0339C862427E9140046D0AD /* DeviceCoordinate.h in Headers */,
 				C0025ABE241483B7007813F7 /* UIImage+Pixels.h in Headers */,
 				C01B4971240ACF5D00633B45 /* Jarvis__.h in Headers */,
@@ -405,6 +426,7 @@
 				C067ACF0241EAFF7007E3055 /* UIView-KIFAdditions.h in Headers */,
 				C067ACF9241EAFF7007E3055 /* LoadableCategory.h in Headers */,
 				C0BAF0952418B62C003E2419 /* Jarvis++.pch in Headers */,
+				C065AE44242EFCCA007114C8 /* NSString+Extensions.h in Headers */,
 				C0025AC32414846B007813F7 /* JobController.h in Headers */,
 				C0339C8F2427EE510046D0AD /* DeviceConfig.h in Headers */,
 				C00EE489241C70B2001771AB /* HttpClientConnection.h in Headers */,
@@ -532,8 +554,10 @@
 				C01B4981240ACF9400633B45 /* UIC.mm in Sources */,
 				C067ACEE241EAFF7007E3055 /* UIWindow-KIFAdditions.m in Sources */,
 				C067ACEF241EAFF7007E3055 /* UITouch-KIFAdditions.m in Sources */,
+				C065AE46242EFCD8007114C8 /* NSString+Extensions.m in Sources */,
 				C0B68E042414C632009B5970 /* Consts.m in Sources */,
 				C0339C882427E9220046D0AD /* DeviceCoordinate.m in Sources */,
+				C065AE42242ECD3B007114C8 /* DeviceRatio1775.m in Sources */,
 				C0339C8C2427E93C0046D0AD /* DeviceCoordinateScalar.m in Sources */,
 				C067ACF6241EAFF7007E3055 /* UIView-KIFAdditions.m in Sources */,
 				C0339C912427EE5B0046D0AD /* DeviceConfig.m in Sources */,

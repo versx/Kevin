@@ -22,6 +22,8 @@ static void __attribute__((constructor)) initialize(void) {
     if ((self = [super init]))
     {
         syslog(@"[INFO] initializing...");
+        NSSetUncaughtExceptionHandler(&onUncaughtException);
+        
         _uic = [[UIC2 alloc] init];
         [_uic start];
         syslog(@"[INFO] started...");
@@ -33,6 +35,12 @@ static void __attribute__((constructor)) initialize(void) {
 {
     [_uic release];
     [super dealloc];
+}
+
+void onUncaughtException(NSException* exception)
+{
+    syslog(@"[FATAL] %@", exception);
+    syslog(@"[FATAL] %@", [NSThread callStackSymbols]);
 }
 
 +(BOOL)clickButton:(NSString *)buttonName
@@ -59,134 +67,6 @@ static void __attribute__((constructor)) initialize(void) {
         [JarvisTestCase touch:320 withY:800]; // TODO: TrackerButton
     }
     return true;
-}
-
-/*
--(void)isButtonExistsWithCompletionHandler:(void(^)(BOOL exists)) completion
-{
-    dispatch_async(dispatch_get_main_queue(), ^
-    {
-        bool result = true;
-        completion(result);
-    });
-}
- */
-
-+(BOOL)isBirthYear:(NSDictionary *)color
-{
-    bool result = false;
-    syslog(@"[DEBUG] Checking birth year selector pixel: color=%@", color);
-    if ([color[@"red"] isEqual:@0.0313725508749485] &&
-        [color[@"green"] isEqual:@0.7960784435272217] &&
-        [color[@"blue"] isEqual:@1] &&
-        [color[@"alpha"] isEqual:@1]) {
-        syslog(@"[DEBUG] Found birth year selector button");
-        result = true;
-    }
-    return result;
-}
-
-+(BOOL)isSubmit:(NSDictionary *)color
-{
-    bool result = false;
-    syslog(@"[DEBUG] Checking submit button pixel: color=%@", color);
-    if ([color[@"red"] isEqual:@0.0313725508749485] &&
-        [color[@"green"] isEqual:@0.7960784435272217] &&
-        [color[@"blue"] isEqual:@1] &&
-        [color[@"alpha"] isEqual:@1]) {
-        syslog(@"[DEBUG] Found submit button");
-        result = true;
-    }
-    return result;
-}
-
-+(BOOL)isMenuButton:(NSDictionary *)color
-{
-    bool result = false;
-    syslog(@"[DEBUG] Checking menu button pixel: color=%@", color);
-    if ([color[@"red"] isEqual:@0.7490196228027344] && //0.6666666865348816
-        [color[@"green"] isEqual:@0.9490196108818054] && //0.4980392158031464
-        [color[@"blue"] isEqual:@0.1568627506494522] && //0.1137254908680916
-        [color[@"alpha"] isEqual:@1]) {
-        syslog(@"[DEBUG] Found pokeball menu button");
-        result = true;
-    }
-    return result;
-}
-
-+(BOOL)isMenuCloseButton:(NSDictionary *)color
-{
-    bool result = false;
-    syslog(@"[DEBUG] Checking menu close button pixel: color=%@", color);
-    if ([color[@"red"] isEqual:@0.9254902005195618] &&
-        [color[@"green"] isEqual:@0.9803921580314636] &&
-        [color[@"blue"] isEqual:@0.9137254953384399] &&
-        [color[@"alpha"] isEqual:@1]) {
-        syslog(@"[DEBUG] Found close pokeball menu button");
-        result = true;
-    }
-    return result;
-}
-
-+(BOOL)isDifferentAccountButton:(NSDictionary *)color
-{
-    bool result = false;
-    syslog(@"[DEBUG] Checking different account button pixel: color=%@", color);
-    if ([color[@"red"] isEqual:@0.5058823823928833] &&
-        [color[@"green"] isEqual:@0.6549019813537598] &&
-        [color[@"blue"] isEqual:@0.2666666805744171] &&
-        [color[@"alpha"] isEqual:@1]) {
-        syslog(@"[DEBUG] Found submit button");
-        result = true;
-    }
-    return result;
-}
-
-+(BOOL)isRetryButton:(NSDictionary *)color
-{
-    bool result = false;
-    syslog(@"[DEBUG] Checking retry button pixel: color=%@", color);
-    /*
-    if ([color[@"red"] isEqual:@0.9254902005195618] &&
-        [color[@"green"] isEqual:@0.9803921580314636] &&
-        [color[@"blue"] isEqual:@0.9137254953384399] &&
-        [color[@"alpha"] isEqual:@1]) {
-        syslog(@"[DEBUG] Found submit button");
-        result = true;
-    }
-    */
-    return result;
-}
-
-// TODO: Unused
-+(BOOL)isFailedToLoginScreen:(NSDictionary *)color
-{
-    syslog(@"[DEBUG] Checking for failed to login pop-up pixel: color=%@", color);
-    double red = [color[@"red"] doubleValue];
-    double green = [color[@"green"] doubleValue];
-    double blue = [color[@"blue"] doubleValue];
-    if (red >= 0.39 && red <= 0.49 &&
-        green >= 0.75 && green <= 0.90 &&
-        blue >= 0.55 && blue <= 0.70) {
-        return true;
-    }
-    return false;
-}
-
-+(BOOL)isPassengerButton:(NSDictionary *)color
-{
-    bool result = false;
-    syslog(@"[DEBUG] Checking passenger button pixel: color=%@", color);
-    /*
-    if ([color[@"red"] isEqual:@0.9254902005195618] &&
-        [color[@"green"] isEqual:@0.9803921580314636] &&
-        [color[@"blue"] isEqual:@0.9137254953384399] &&
-        [color[@"alpha"] isEqual:@1]) {
-        syslog(@"[DEBUG] Found submit button");
-        result = true;
-    }
-    */
-    return result;
 }
 
 +(BOOL)findButton:(NSString *)buttonName

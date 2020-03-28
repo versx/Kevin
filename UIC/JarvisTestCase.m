@@ -9,6 +9,44 @@
 
 @implementation JarvisTestCase
 
+-(id)init
+{
+    syslog(@"[DEBUG] init");
+    if ((self = [super init])) {
+        [self registerUIInterruptionHandler:@"System Dialog"];
+    }
+    return self;
+}
+
++(JarvisTestCase *)sharedInstance
+{
+    static JarvisTestCase *sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[JarvisTestCase alloc] init];
+    });
+    return sharedInstance;
+}
+
+-(void)registerUIInterruptionHandler:(NSString*)description {
+    syslog(@"[DEBUG] Registering UI interruption handler.");
+    [self addUIInterruptionMonitorWithDescription:@"System Dialog"
+                                          handler:^BOOL(XCUIElement * _Nonnull interruptingElement) {
+        syslog(@"[DEBUG] Interrupting UI element found: %@", interruptingElement);
+        NSArray *buttons = [NSArray arrayWithObjects:@"OK", @"Allow", @"Dismiss", @"Trust", @"Not Now", @"Always", @"Later", @"Remind Me Later", @"Close", @"Allow While Using App", nil];
+        XCUIElement *element = interruptingElement;
+        for (NSString *button in buttons) {
+            XCUIElement *btn = element.buttons[button];
+            if ([btn exists]) {
+                [btn tap];
+                [viewTester tap];
+                return YES;
+            }
+        }
+        return NO;
+    }];
+}
+
 +(void)type:(NSString *)text
 {
     syslog(@"[DEBUG] type %@", text);
@@ -33,7 +71,27 @@
     syslog(@"[DEBUG] swipe up");
     @try {
         dispatch_async(dispatch_get_main_queue(), ^{
-            [viewTester swipeInDirection:KIFSwipeDirectionUp];
+            UIWindow *window = [[UIApplication sharedApplication] keyWindow];
+            UIView *view = [[window rootViewController] view];
+            DeviceCoordinate *dragStart = [[DeviceConfig sharedInstance] ageVerificationDragStart];
+            DeviceCoordinate *dragEnd   = [[DeviceConfig sharedInstance] ageVerificationDragEnd];
+            [view dragFromPoint:CGPointMake([dragStart tapX], [dragStart tapY])
+                        toPoint:CGPointMake([dragEnd tapX], [dragEnd tapY]) steps:8];
+        });
+    }
+    @catch (NSException *exception) {
+        syslog(@"[DEBUG] swipe: %@", exception);
+    }
+}
++(void)drag/*FromPoint*/:(DeviceCoordinate *)start toPoint:(DeviceCoordinate *)end
+{
+    syslog(@"[DEBUG] dragging from %@ to %@", start, end);
+    @try {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            UIWindow *window = [[UIApplication sharedApplication] keyWindow];
+            UIView *view = [[window rootViewController] view];
+            [view dragFromPoint:CGPointMake([start tapX], [start tapY])
+                        toPoint:CGPointMake([end tapX], [end tapY]) steps:10]; //8
         });
     }
     @catch (NSException *exception) {

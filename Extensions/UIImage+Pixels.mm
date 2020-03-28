@@ -20,26 +20,33 @@
     long components = CGImageGetBitsPerComponent(cgImage);
     //syslog(@"[DEBUG] Components: %ld", components);
     if (components == 16) {
-        return nil;
         long pixelInfo = (((width * y) + x) * 8);
-        //int rValue = 0;
-        //int gValue = 0;
-        //int bValue = 0;
-        // TODO: Handle 8 bit images
-        //[NSData dataWithBytes:data[pixelInfo] data[pixelInfo + 1] length:2];
-        //[NSData dataWithBytes:data[pixelInfo + 2] data[pixelInfo + 3] length:2];
-        //[NSData dataWithBytes:data[pixelInfo + 4] data[pixelInfo + 5] length:2];
-        //[NSData dataWithBytes:data[pixelInfo + 6] data[pixelInfo + 6] length:2];
-        UInt8 red = data[pixelInfo]; // CGFloat(rValue) / CGFloat(65535.0)
-        UInt8 green = data[pixelInfo + 1]; // gValue / CGFloat(65535.0)
-        UInt8 blue = data[pixelInfo + 2]; // bValue / CGFloat(65535.0)
-        UInt8 alpha = data[pixelInfo + 3]; // aValue / CGFloat(65535.0)
+        int rValue = 0;
+        int gValue = 0;
+        int bValue = 0;
+        int aValue = 0;
+        NSArray *rDataArr = [NSArray arrayWithObjects:@(data[pixelInfo]), @(data[pixelInfo + 1]), nil];
+        NSArray *gDataArr = [NSArray arrayWithObjects:@(data[pixelInfo + 2]), @(data[pixelInfo + 3]), nil];
+        NSArray *bDataArr = [NSArray arrayWithObjects:@(data[pixelInfo + 4]), @(data[pixelInfo + 5]), nil];
+        NSArray *aDataArr = [NSArray arrayWithObjects:@(data[pixelInfo + 6]), @(data[pixelInfo + 7]), nil];
+        NSData *rData = [[NSData alloc] initWithBytes:rDataArr length:2];
+        NSData *gData = [[NSData alloc] initWithBytes:gDataArr length:2];
+        NSData *bData = [[NSData alloc] initWithBytes:bDataArr length:2];
+        NSData *aData = [[NSData alloc] initWithBytes:aDataArr length:2];
+        [rData getBytes:&rValue length:2];
+        [gData getBytes:&gValue length:2];
+        [bData getBytes:&bValue length:2];
+        [aData getBytes:&aValue length:2];
+        UInt8 red   = CGFloat(rValue) / CGFloat(65535.0);
+        UInt8 green = CGFloat(gValue) / CGFloat(65535.0);
+        UInt8 blue  = CGFloat(bValue) / CGFloat(65535.0);
+        UInt8 alpha = CGFloat(aValue) / CGFloat(65535.0);
         CFRelease(pixelData);
 
-        color = [UIColor colorWithRed:red / 255.0f
-                                green:green / 255.0f
-                                 blue:blue / 255.0f
-                                alpha:alpha / 255.0f
+        color = [UIColor colorWithRed:red
+                                green:green
+                                 blue:blue
+                                alpha:alpha
         ];
     } else {
         long pixelInfo = (((width * y) + x) * 4); // The image is png
@@ -49,9 +56,9 @@
         UInt8 alpha = data[pixelInfo + 3];
         CFRelease(pixelData);
 
-        color = [UIColor colorWithRed:red / 255.0f
+        color = [UIColor colorWithRed:red   / 255.0f
                                 green:green / 255.0f
-                                 blue:blue / 255.0f
+                                 blue:blue  / 255.0f
                                 alpha:alpha / 255.0f
         ];
     }
@@ -68,39 +75,6 @@
     return destImage;
 }
 
--(NSDictionary *)rgbAtLocation:(int)x withY:(int)y
-{
-    UIColor *color = [self getPixelColor:x withY:y];
-    CGColorRef colorRef = [color CGColor];
-    long componentsCount = CGColorGetNumberOfComponents(colorRef);
-    if (componentsCount == 4) {
-        const CGFloat *components = CGColorGetComponents(colorRef);
-        CGFloat red   = components[0];
-        CGFloat green = components[1];
-        CGFloat blue  = components[2];
-        CGFloat alpha = components[3];
-        NSDictionary *dict = @{
-           @"red": @(red),
-           @"green": @(green),
-           @"blue": @(blue),
-           @"alpha": @(alpha),
-        };
-        return dict;
-    } else if (componentsCount == 3) {
-        const CGFloat *components = CGColorGetComponents(colorRef);
-        CGFloat red   = components[0];
-        CGFloat green = components[1];
-        CGFloat blue  = components[2];
-        NSDictionary *dict = @{
-           @"red": @(red),
-           @"green": @(green),
-           @"blue": @(blue),
-        };
-        return dict;
-    }
-    return nil;
-}
-
 -(bool)rgbAtLocation:(DeviceCoordinate *)deviceCoordinate betweenMin:(ColorOffset *)min andMax:(ColorOffset *)max
 {
     return [self rgbAtLocation:[deviceCoordinate x]
@@ -114,18 +88,21 @@
 {
     UIColor *color = [self getPixelColor:x withY:y];
     const CGFloat* colorComponents = CGColorGetComponents([color CGColor]);
-    //const CGFloat* minComponents = CGColorGetComponents([min CGColor]);
-    //const CGFloat* maxComponents = CGColorGetComponents([max CGColor]);
-    syslog(@"[DEBUG] Checking x=%d y=%d between min [r=%f g=%f b=%f] and max [r=%f g=%f b=%f] = [r=%f g=%f b=%f]",
+    CGFloat red = colorComponents[2]; // No idea why index of 0 doesn't work.
+    CGFloat green = colorComponents[1];
+    CGFloat blue = colorComponents[0];
+    /*
+    syslog(@"[DEBUG] Checking x=%d y=%d between min [r=%f g=%f b=%f] and max [r=%f g=%f b=%f] pixel=[r=%f g=%f b=%f]",
            x, y,
            [min red], [min green], [min blue],
            [max red], [max green], [max blue],
-           colorComponents[0], colorComponents[1], colorComponents[2]
+           red, green, blue
     );
+    */
     //NSLog(@"[DEBUG] Alpha: %f", CGColorGetAlpha(color));
-    bool passed = colorComponents[0] >= [min red] && colorComponents[0] <= [max red] && // Red
-                  colorComponents[1] >= [min green] && colorComponents[1] <= [max green] && // Green
-                  colorComponents[2] >= [min blue] && colorComponents[2] <= [max blue]; // Blue
+    bool passed = red   >= [min red]   && red   <= [max red]   && // Red
+                  green >= [min green] && green <= [max green] && // Green
+                  blue  >= [min blue]  && blue  <= [max blue]; // Blue
     return passed;
 }
 

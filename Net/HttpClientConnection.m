@@ -46,7 +46,8 @@ NSString * VALID_POST_ENDPOINTS[6] = {
             [path isEqualToString:@"/data"] ||*/
             [path isEqualToString:@"/config"] ||
             [path isEqualToString:@"/restart"] ||
-            [path isEqualToString:@"/reboot"]) {
+            [path isEqualToString:@"/reboot"] ||
+            [path isEqualToString:@"/clear"]) {
             return YES;
         }
     }
@@ -103,10 +104,17 @@ NSString * VALID_POST_ENDPOINTS[6] = {
         NSString *response;
         if ([path isEqualToString:@"/config"]) {
             response = [UIC2 handleConfigRequest];
-        } else if ([path isEqualToString:@"/restart"] || // TODO: Restart app instead?
-                   [path isEqualToString:@"/reboot"]) {
+        } else if ([path isEqualToString:@"/restart"] || // TODO: Restart app?
+                   [path isEqualToString:@"/reboot"]) { // TODO: Reboot phone?
             response = @"OK";
             [DeviceState restart];
+        } else if ([path isEqualToString:@"/clear"]) {
+            syslog(@"[INFO] Clearing user defaults");
+            syslog(@"[DEBUG] NSUserDefaults Before: %@", [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]);
+            NSString *domainName = [[NSBundle mainBundle] bundleIdentifier];
+            [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:domainName];
+            syslog(@"[DEBUG] NSUserDefaults After: %@", [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]);
+            response = @"OK";
         }
         NSData *responseData = [response dataUsingEncoding:NSUTF8StringEncoding];
         return [[HTTPDataResponse alloc] initWithData:responseData];
