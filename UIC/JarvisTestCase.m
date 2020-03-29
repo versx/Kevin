@@ -49,7 +49,7 @@
 
 +(void)type:(NSString *)text
 {
-    syslog(@"[DEBUG] type %@", text);
+    //syslog(@"[DEBUG] type %@", text);
     @try {
         if ([NSThread isMainThread]) {
             [tester enterTextIntoCurrentFirstResponder:text
@@ -101,7 +101,7 @@
 
 +(void)touch:(int)x withY:(int)y
 {
-    syslog(@"[DEBUG] touch %d %d", x, y);
+    //syslog(@"[DEBUG] touch %d %d", x, y);
     @try {
         if ([NSThread isMainThread]) {
             [viewTester tapScreenAtPoint:CGPointMake(x, y)];

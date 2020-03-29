@@ -7,25 +7,26 @@
 
 #import "UIC.h"
 
+// TODO: Level check
+// TODO: Make dispatch queues global references
+// TODO: Egg Deploy
+// TODO: Fix integer increments/decrements emptyGMOCount, etc
 // TODO: Remove PTFakeTouch
 // TODO: StateManager class
 // TODO: Pixel offsets in remote config
 // TODO: Use https://github.com/mattstevens/RoutingHTTPServer for routes
-// REFERENCE: Find pixel location from screenshot - http://nicodjimenez.github.io/boxLabel/annotate.html
 // TODO: https://developer.apple.com/documentation/xctest/xctestcase/1496273-adduiinterruptionmonitorwithdesc
+// REFERENCE: Find pixel location from screenshot - http://nicodjimenez.github.io/boxLabel/annotate.html
 
 @implementation UIC2
 
 static HTTPServer *_httpServer;
 static JobController *_jobController;
 
+static BOOL _dataStarted = false;
 static BOOL _startup = true;
 static NSNumber *_jitterCorner = @0;
-static BOOL _bannedScreen = false;
-static BOOL _invalidScreen = false;
 //static NSLock *_lock = [[NSLock alloc] init];
-//static NSNumber *_encounterDistance = @0.0;
-//static NSNumber *_encounterDelay = @0.0;
 
 
 #pragma mark Constructor/Deconstructor
@@ -51,7 +52,6 @@ static BOOL _invalidScreen = false;
 
 -(void)start
 {
-    syslog(@"[DEBUG] start");
     syslog(@"[DEBUG] Device Uuid: %@", [[Device sharedInstance] uuid]);
     syslog(@"[DEBUG] Device Model: %@", [[Device sharedInstance] model]);
     syslog(@"[DEBUG] Device OS: %@", [[Device sharedInstance] osName]);
@@ -63,8 +63,9 @@ static BOOL _invalidScreen = false;
     // Print settings
     [[Settings sharedInstance] config];
     
-    JarvisTestCase *jarvis = [[JarvisTestCase alloc] init];
-    [jarvis runTest];
+    //JarvisTestCase *jarvis = [[JarvisTestCase alloc] init];
+    //[jarvis runTest];
+    //[jarvis registerUIInterruptionHandler:@"System Dialog"];
     
     // Initialize job controller
     _jobController = [[JobController alloc] init];
@@ -74,7 +75,11 @@ static BOOL _invalidScreen = false;
     
     // Tell the server to broadcast its presence via Bonjour.
     // This allows browsers such as Safari to automatically discover our service.
-    [_httpServer setType:@"_http._tcp."];
+    //[_httpServer setType:@"_http._tcp."];
+    
+    // Set the listening interface to the WiFi interface.
+    //[_httpServer setInterface:@"lo0"];
+    //[_httpServer setInterface:@"localhost"];
     
     // Normally there's no need to run our server on any specific port.
     // Technologies like Bonjour allow clients to dynamically discover the server's port at runtime.
@@ -90,16 +95,12 @@ static BOOL _invalidScreen = false;
         syslog(@"[ERROR] Error starting HTTP Server: %@", error);
     }
 
-    //[[JarvisTestCase sharedInstance] registerUIInterruptionHandler:@"System Dialog"];
+    syslog(@"[DEBUG] NSUserDefaults: %@", [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]);
 
-    syslog(@"[DEBUG] Setting eggStart...");
-    NSDate *eggStart = [NSDate dateWithTimeInterval:-1860 sinceDate:[NSDate date]];
-    [[DeviceState sharedInstance] setEggStart:eggStart];
+    [[DeviceState sharedInstance] setEggStart:[NSDate dateWithTimeInterval:-1860 sinceDate:[NSDate date]]];
     
-    //[self startHeartbeatLoop];
-    //[self startUicLoop];
     [self login];
-    //[self loginStateHandler];
+    [self startHeartbeatLoop];
 }
 
 -(void)startHeartbeatLoop
@@ -137,6 +138,7 @@ static BOOL _invalidScreen = false;
     //dispatch_release(heatbeatQueue);
 }
 
+/*
 -(void)setDefaultBirthDate
 {
     syslog(@"[DEBUG] NSUserDefaults: %@", [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]);
@@ -148,400 +150,281 @@ static BOOL _invalidScreen = false;
     syslog(@"[DEBUG] Default birthday set");
     syslog(@"[DEBUG] NSUserDefaults: %@", [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]);
 }
+*/
+
++(void)initializeWithBackend
+{
+    NSMutableDictionary *initData = [[NSMutableDictionary alloc] init];
+    initData[@"uuid"] = [[Device sharedInstance] uuid];
+    initData[@"username"] = [[Device sharedInstance] username];
+    initData[@"type"] = @"init";
+    [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                  dict:initData
+              blocking:true
+            completion:^(NSDictionary *result) {
+        syslog(@"[DEBUG] Response from init: %@", result);
+        if (result == nil) {
+            syslog(@"[ERROR] Failed to connect to backend!");
+            [[Device sharedInstance] setShouldExit:true];
+            [NSThread sleepForTimeInterval:5];
+            [DeviceState restart];
+            return;
+        } else if (![(result[@"status"] ?: @"fail") isEqualToString:@"ok"]) {
+            NSString *error = result[@"error"] ?: @"? (No error sent)";
+            syslog(@"[ERROR] Backend returned error: %@", error);
+            [[Device sharedInstance] setShouldExit:true];
+            sleep(1);
+            return;
+        }
+        
+        NSDictionary *data = [result objectForKey:@"data"];
+        if (data == nil) {
+            syslog(@"[ERROR] Backend did not include data in response.");
+            [[Device sharedInstance] setShouldExit:true];
+            sleep(1);
+            return;
+        }
+        
+        if (!(data[@"assigned"] ?: false)) {
+            syslog(@"[WARN] Device is not assigned to an instance!");
+            [[Device sharedInstance] setShouldExit:true];
+            sleep(1);
+            return;
+        }
+        
+        // TODO: firstWarningTimestamp
+        /*
+        NSString *firstWarningTimestamp = data[@"first_warning_timestamp"];
+        syslog(@"[DEBUG] Checking firstWarningTimestamp");
+        if (firstWarningTimestamp != nil && ![firstWarningTimestamp isEqualToString:@"<null>"]) {
+            NSDate *firstWarningDate = [NSDate dateWithTimeIntervalSince1970:[firstWarningTimestamp intValue]];
+            [[DeviceState sharedInstance] setFirstWarningDate:firstWarningDate];
+        }
+        */
+        
+        syslog(@"[INFO] Connected to backend successfully!");
+        [[Device sharedInstance] setShouldExit:false];
+    }];
+    
+    if ([[Device sharedInstance] shouldExit]) {
+        [[Device sharedInstance] setShouldExit:false];
+        [NSThread sleepForTimeInterval:5];
+        [DeviceState restart];
+    }
+}
+
++(void)getAccountFromBackend
+{
+    syslog(@"[INFO] Sending 'get_account' post request.");
+    if (([[[Device sharedInstance] username] isNullOrEmpty] ||
+         [[[Device sharedInstance] username] isEqualToString:@"fail"]) &&
+         [[Settings sharedInstance] enableAccountManager]) {
+        NSMutableDictionary *getAccountData = [[NSMutableDictionary alloc] init];
+        getAccountData[@"uuid"] = [[Device sharedInstance] uuid];
+        getAccountData[@"username"] = [[Device sharedInstance] username];
+        getAccountData[@"min_level"] = [[Device sharedInstance] minLevel];
+        getAccountData[@"max_level"] = [[Device sharedInstance] maxLevel];
+        getAccountData[@"type"] = @"get_account";
+        [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                      dict:getAccountData
+                  blocking:true
+                completion:^(NSDictionary *result) {
+            NSDictionary *data = result[@"data"];
+            if (data != nil) {
+                NSString *username = data[@"username"];
+                NSString *password = data[@"password"];
+                NSNumber *level = data[@"level"];
+                NSDictionary *job = data[@"job"];
+                NSNumber *startLat = job[@"lat"];
+                NSNumber *startLon = job[@"lon"];
+                NSNumber *lastLat = data[@"last_encounter_lat"];
+                NSNumber *lastLon = data[@"last_encounter_lon"];
+                
+                if (username != nil) {
+                    syslog(@"[DEBUG] Got account %@ level %@ from backend.", username, level);
+                } else {
+                    syslog(@"[ERROR] Failed to get account and not logged in.");
+                    [[Device sharedInstance] setShouldExit:true];
+                }
+                [[Device sharedInstance] setUsername:username];
+                [[Device sharedInstance] setPassword:password];
+                [[Device sharedInstance] setLevel:level];
+                [[Device sharedInstance] setIsLoggedIn:false];
+                CLLocation *startupLocation;
+                if ([startLat doubleValue] != 0.0 && [startLon doubleValue] != 0.0) {
+                    startupLocation = [Utils createCoordinate:[startLat doubleValue] lon:[startLon doubleValue]];
+                } else if ([lastLat doubleValue] != 0.0 && [lastLon doubleValue] != 0.0) {
+                    startupLocation = [Utils createCoordinate:[lastLat doubleValue] lon:[lastLon doubleValue]];
+                } else {
+                    startupLocation = [Utils createCoordinate:[startLat doubleValue] lon:[startLon doubleValue]];
+                }
+                [[DeviceState sharedInstance] setStartupLocation:startupLocation];
+                [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
+                syslog(@"[DEBUG] StartupLocation: %@", startupLocation);
+                // TODO: firstWarningTimestamp
+                /*
+                NSNumber *firstWarningTimestamp = data[@"first_warning_timestamp"];
+                if (firstWarningTimestamp != nil) {
+                    NSDate *firstWarningDate = [NSDate dateWithTimeIntervalSince1970:[firstWarningTimestamp doubleValue]];
+                    [[DeviceState sharedInstance] setFirstWarningDate:firstWarningDate];
+                }
+                */
+            } else {
+                syslog(@"[WARN] Failed to get account and not logged in.");
+                [[Device sharedInstance] setMinLevel:@1]; // Never set to 0 until we can complete tutorials.
+                [[Device sharedInstance] setMaxLevel:@29];
+                [NSThread sleepForTimeInterval:1];
+                [[NSUserDefaults standardUserDefaults] removeObjectForKey:LOGIN_USER_DEFAULT_KEY];
+                [NSThread sleepForTimeInterval:5];
+                [[Device sharedInstance] setIsLoggedIn:false];
+                [DeviceState restart];
+            }
+        }];
+    }
+}
 
 
 #pragma mark State Managers
 
--(void)loginStateHandler
-{
-    syslog(@"[DEBUG] loginStateHandler");
-    dispatch_queue_t loginStateQueue = dispatch_queue_create("login_state_queue", NULL);
-    dispatch_async(loginStateQueue, ^{
-        __block NSNumber *startupCount = @0;
-        //__block BOOL birthYearSelector = false;
-        __block BOOL newPlayerButton = false;
-        BOOL firststart = true;
-        __block BOOL menuButton = false;
-        __block NSString *neededButton = @"";
-        
-        while (_startup) {
-            if (!firststart) {
-                syslog(@"[DEBUG] App still in startup...");
-                [NSThread sleepForTimeInterval:1];
-                while (!menuButton) {
-                    NSString *username = [[Device sharedInstance] username];
-                    if ([username isNullOrEmpty]) {
-                        syslog(@"[WARN] Account username is empty, requesting account and restarting...");
-                        [DeviceState logout];
-                        //return;
-                        break;
-                    }
-                    //birthYearSelector = [Jarvis__ findButton:@"BirthYearSelector"];
-                    //if (birthYearSelector) {
-                    //    syslog(@"[DEBUG] Found birth year selector, attempting to click birth year and submit");
-                        [Jarvis__ clickButton:@"BirthYearSelector"];
-                        [NSThread sleepForTimeInterval:2];
-                        [Jarvis__ clickButton:@"BirthYear"];
-                        [NSThread sleepForTimeInterval:2];
-                        [Jarvis__ clickButton:@"SubmitButton"];
-                        [NSThread sleepForTimeInterval:2];
-                    //}
-                    newPlayerButton = [Jarvis__ clickButton:@"NewPlayerButton"]; // TODO: Rename to findButton
-                    syslog(@"[DEBUG] Found NewPlayerButton: %s", newPlayerButton ? "Yes" : "No");
-                    if (newPlayerButton) {
-                        [Jarvis__ clickButton:@"NewPlayerButton"];
-                        [[NSUserDefaults standardUserDefaults] removeObjectForKey:TOKEN_USER_DEFAULT_KEY];
-                        newPlayerButton = false;
-                        syslog(@"[DEBUG] Started at Login Screen");
-                        [NSThread sleepForTimeInterval:2];
-                        bool ptcButton = false;
-                        NSNumber *ptcTryCount = @0;
-                        while (!ptcButton) {
-                            ptcButton = [Jarvis__ clickButton:@"TrainerClubButton"]; // TODO: Rename to findButton
-                            ptcTryCount = [Utils incrementInt:ptcTryCount];
-                            if ([ptcTryCount intValue] > 10) {
-                                newPlayerButton = [Jarvis__ clickButton:@"NewPlayerButton"];
-                                ptcTryCount = @0;
-                            }
-                            [NSThread sleepForTimeInterval:3];
-                        }
-                        
-                        bool usernameButton = false;
-                        while (!usernameButton) {
-                            usernameButton = [Jarvis__ clickButton:@"UsernameButton"];
-                            [NSThread sleepForTimeInterval:1];
-                        }
-                        [Jarvis__ typeUsername];
-                        [NSThread sleepForTimeInterval:3];
-                        
-                        bool passwordButton = false;
-                        while (!passwordButton) {
-                            passwordButton = [Jarvis__ clickButton:@"PasswordButton"];
-                            [NSThread sleepForTimeInterval:1];
-                        }
-                        [Jarvis__ typePassword];
-                        [NSThread sleepForTimeInterval:3];
-                        
-                        // TODO: touchAtPoint(180, 100);
-                        [NSThread sleepForTimeInterval:3];
-                        
-                        bool signinButton = false;
-                        while (!signinButton) {
-                            signinButton = [Jarvis__ clickButton:@"SignInButton"];
-                            [NSThread sleepForTimeInterval:1];
-                        }
-                        
-                        NSNumber *delayMultiplier = @5;// TODO: [[Device sharedInstance] multiplier];
-                        NSNumber *sleep = @([delayMultiplier intValue] + 15);
-                        [NSThread sleepForTimeInterval:[sleep intValue]];
-                    }
-                    
-                    /* TODO: Banned screen detection
-                    _bannedScreen = [Jarvis__ findButton:@"BannedScreen"];
-                    if (_bannedScreen) {
-                        _bannedScreen = false;
-                        syslog(@"[WARN] Account banned, switching accounts.");
-                        syslog(@"[DEBUG] Username: %@", [[Device sharedInstance] username]);
-                        NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
-                        data[@"uuid"] = [[Device sharedInstance] uuid];
-                        data[@"username"] = [[Device sharedInstance] username];
-                        data[@"type"] = @"account_banned";
-                        [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
-                                      dict:data
-                                  blocking:true
-                                completion:^(NSDictionary *result) {}
-                        ];
-                        [DeviceState logout];
-                    }
-                    */
-                    /* TODO: Invalid credentials/failed to login screen detection
-                    _invalidScreen = [Jarvis__ findButton:@"WrongUser"];
-                    if (_invalidScreen) {
-                        _invalidScreen = false;
-                        syslog(@"[WARN] Wrong username, switching accounts.");
-                        NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
-                        data[@"uuid"] = [[Device sharedInstance] uuid];
-                        data[@"username"] = [[Device sharedInstance] username];
-                        data[@"type"] = @"account_banned"; // TODO: Uhhh should be account_invalid_credentials no?
-                        [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
-                                      dict:data
-                                  blocking:true
-                                completion:^(NSDictionary *result) {}
-                        ];
-                        [DeviceState logout];
-                    }
-                    */
-                    dispatch_async(dispatch_get_main_queue(), ^{
-                    neededButton = [Jarvis__ getMenuButton];
-                    if ([neededButton isEqualToString:@"DifferentAccountButton"]) {
-                        syslog(@"[DEBUG] Found different account button, logging out...");
-                        NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
-                        data[@"uuid"] = [[Device sharedInstance] uuid];
-                        data[@"username"] = [[Device sharedInstance] username];
-                        data[@"type"] = @"account_invalid_credentials";
-                        [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
-                                      dict:data
-                                  blocking:true
-                                completion:^(NSDictionary *result) {}
-                        ];
-                        [DeviceState logout];
-                    }
-                    
-                    if ([neededButton isEqualToString:@"MenuButton"]) {
-                        syslog(@"[DEBUG] Found menu button, skipping login loop and starting gameStateHandler loop...");
-                        menuButton = true;
-                    }
-                    });
-                    
-                    [NSThread sleepForTimeInterval:3];
-                    if ([startupCount intValue] > 3) { // TODO: Max startup count before logout/pull for new account
-                        syslog(@"[WARN] Stuck somewhere logging out and restarting...");
-                        [DeviceState logout];
-                    }
-                    startupCount = [Utils incrementInt:startupCount];
-                }
-                
-                [NSThread sleepForTimeInterval:1];
-                NSMutableDictionary *tokenData = [[NSMutableDictionary alloc] init];
-                tokenData[@"uuid"] = [[Device sharedInstance] uuid];
-                tokenData[@"username"] = [[Device sharedInstance] username];
-                tokenData[@"ptcToken"] = [[Device sharedInstance] ptcToken];
-                tokenData[@"type"] = @"ptcToken";
-                [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
-                              dict:tokenData
-                          blocking:true
-                        completion:^(NSDictionary *result) {}
-                ];
-                syslog(@"[DEBUG] App in Main Screen stopping detection.");
-                [Jarvis__ clickButton:@"TrackerButton"];
-                _startup = false;
-            } else {
-                syslog(@"[DEBUG] First startup, waiting...");
-                [NSThread sleepForTimeInterval:10];
-                firststart = false;
-            }
-            [NSThread sleepForTimeInterval:3];
-        }
-    });
-    //dispatch_release(loginStateQueue);
-    
-    //[self gameStateHandler];
-}
-
--(void)gameStateHandler
++(void)getJobHandler
 {
     // TODO: qos: background dispatch
     dispatch_queue_t gameStateQueue = dispatch_queue_create("game_state_queue", NULL);
     dispatch_async(gameStateQueue, ^{
         bool hasWarning = false;
-        [[DeviceState sharedInstance] setFailedGetJobCount:0];
-        [[DeviceState sharedInstance] setFailedCount:0];
-        [[DeviceState sharedInstance] setEmptyGmoCount:0];
+        [[DeviceState sharedInstance] setFailedGetJobCount:@0];
+        [[DeviceState sharedInstance] setFailedCount:@0];
+        [[DeviceState sharedInstance] setEmptyGmoCount:@0];
+        [[DeviceState sharedInstance] setNoQuestCount:@0];
         //_noEncounterCount = 0;
-        [[DeviceState sharedInstance] setNoQuestCount:0];
+
+        // Grab an account from the backend controller.
+        [UIC2 getAccountFromBackend];
         
-        NSMutableDictionary *initData = [[NSMutableDictionary alloc] init];
-        initData[@"uuid"] = [[Device sharedInstance] uuid];
-        initData[@"username"] = [[Device sharedInstance] username];
-        initData[@"type"] = @"init";
-        [Utils postRequest:[[Settings sharedInstance] backendControllerUrl] dict:initData blocking:true completion:^(NSDictionary *result) {
-            if (result == nil) {
-                syslog(@"[ERROR] Failed to connect to backend!");
-                [NSThread sleepForTimeInterval:5];
-                [DeviceState restart];
-            } else if (![(result[@"status"] ?: @"fail") isEqualToString:@"ok"]) {
-                NSString *error = result[@"error"] ?: @"? (No error sent)";
-                syslog(@"[ERROR] Backend returned error: %@", error);
-                [[Device sharedInstance] setShouldExit:true];
+        syslog(@"[INFO] Starting job handler.");
+        while (![[Device sharedInstance] shouldExit]) {
+            dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+            __block NSDictionary *data = nil;
+            if ([[DeviceState sharedInstance] needsLogout]) {
+                syslog(@"[INFO] Logging out...");
+                //self.lock.lock();
+                CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
+                [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
+                //self.lock.unlock();
+                [DeviceState logout];
             }
-            
-            NSDictionary *data = [result objectForKey:@"data"];
-            if (data == nil) {
-                syslog(@"[ERROR] Backend did not include data in response.");
-                [[Device sharedInstance] setShouldExit:true];
-            }
-            
-            if (!(data[@"assigned"] ?: false)) {
-                syslog(@"[WARN] Device is not assigned to an instance!");
-                [[Device sharedInstance] setShouldExit:true];
-            }
-            
-            NSString *firstWarningTimestamp = data[@"first_warning_timestamp"];
-            if (firstWarningTimestamp != nil && ![firstWarningTimestamp isEqualToString:@"<null>"]) {
-                NSDate *firstWarningDate = [NSDate dateWithTimeIntervalSince1970:[firstWarningTimestamp intValue]];
-                [[DeviceState sharedInstance] setFirstWarningDate:firstWarningDate];
-            }
-            
-            syslog(@"[INFO] Connected to backend successfully!");
-            [[Device sharedInstance] setShouldExit:false];
-        }];
-        
-        if ([[Device sharedInstance] shouldExit]) {
-            [[Device sharedInstance] setShouldExit:false];
-            [NSThread sleepForTimeInterval:5];
-            [DeviceState restart];
-        }
-        
-        if (([[[Device sharedInstance] username] isNullOrEmpty] ||
-             [[[Device sharedInstance] username] isEqualToString:@"fail"]) &&
-             [[Settings sharedInstance] enableAccountManager]) {
-            NSMutableDictionary *getAccountData = [[NSMutableDictionary alloc] init];
-            getAccountData[@"uuid"] = [[Device sharedInstance] uuid];
-            getAccountData[@"username"] = [[Device sharedInstance] username];
-            getAccountData[@"min_level"] = [[Device sharedInstance] minLevel];
-            getAccountData[@"max_level"] = [[Device sharedInstance] maxLevel];
-            getAccountData[@"type"] = @"get_account";
-            [Utils postRequest:[[Settings sharedInstance] backendControllerUrl] dict:getAccountData blocking:true completion:^(NSDictionary *result) {
-                NSDictionary *data = result[@"data"];
-                if (data != nil) {
-                    NSString *username = data[@"username"];
-                    NSString *password = data[@"password"];
-                    NSNumber *level = data[@"level"];
-                    NSDictionary *job = data[@"job"];
-                    NSNumber *startLat = job[@"lat"];
-                    NSNumber *startLon = job[@"lon"];
-                    NSNumber *lastLat = data[@"last_encounter_lat"];
-                    NSNumber *lastLon = data[@"last_encounter_lon"];
-                    
-                    if (username != nil) {
-                        syslog(@"[DEBUG] Got account %@ level %@ from backend.", username, level);
-                    } else {
-                        syslog(@"[ERROR] Failed to get account and not logged in.");
+            NSMutableDictionary *jobData = [[NSMutableDictionary alloc] init];
+            jobData[@"uuid"] = [[Device sharedInstance] uuid];
+            jobData[@"username"] = [[Device sharedInstance] username];
+            jobData[@"type"] = @"get_job";
+            [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                          dict:jobData
+                      blocking:true
+                    completion:^(NSDictionary *result) {
+                syslog(@"[DEBUG] get_job response: %@", result);
+                if (result == nil) {
+                    NSNumber *failedGetJobCount = [[DeviceState sharedInstance] failedGetJobCount];
+                    if ([failedGetJobCount intValue] == 10) {
+                        syslog(@"[ERROR] Failed to get job 10 times in a row. Exiting...");
                         [[Device sharedInstance] setShouldExit:true];
-                    }
-                    [[Device sharedInstance] setUsername:username];
-                    [[Device sharedInstance] setPassword:password];
-                    [[Device sharedInstance] setLevel:level];
-                    [[Device sharedInstance] setIsLoggedIn:false];
-                    CLLocation *startupLocation;
-                    if ([startLat doubleValue] != 0.0 && [startLon doubleValue] != 0.0) {
-                        startupLocation = [Utils createCoordinate:[startLat doubleValue] lon:[startLon doubleValue]];
-                    } else if ([lastLat doubleValue] != 0.0 && [lastLon doubleValue] != 0.0) {
-                        startupLocation = [Utils createCoordinate:[lastLat doubleValue] lon:[lastLon doubleValue]];
+                        return;
                     } else {
-                        startupLocation = [Utils createCoordinate:[startLat doubleValue] lon:[startLon doubleValue]];
+                        syslog(@"[ERROR] Failed to get a job.");
+                        return;
                     }
-                    [[DeviceState sharedInstance] setStartupLocation:startupLocation];
-                    [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
-                    syslog(@"[DEBUG] StartupLocation: %@", startupLocation);
-                    NSNumber *firstWarningTimestamp = data[@"first_warning_timestamp"];
-                    if (firstWarningTimestamp != nil) {
-                        NSDate *firstWarningDate = [NSDate dateWithTimeIntervalSince1970:[firstWarningTimestamp doubleValue]];
-                        [[DeviceState sharedInstance] setFirstWarningDate:firstWarningDate];
+                } else if ([[Settings sharedInstance] enableAccountManager]) {
+                    data = result[@"data"];
+                    if (data != nil) {
+                        NSNumber *minLevel = data[@"min_level"];
+                        NSNumber *maxLevel = data[@"max_level"];
+                        [[Device sharedInstance] setMinLevel:minLevel];
+                        [[Device sharedInstance] setMaxLevel:maxLevel];
+                        NSNumber *currentLevel = [[Device sharedInstance] level];
+                        syslog(@"[DEBUG] Current level %@ (Min: %@, Max: %@)", currentLevel, minLevel, maxLevel);
+                        /* TODO: Fix level being 0
+                        if (currentLevel != 0 && (currentLevel < minLevel || currentLevel > maxLevel)) {
+                            syslog(@"[WARN] Account is outside min/max level. Current: %@ Min/Max: %@/%@. Logging out!", currentLevel, minLevel, maxLevel);
+                            //self.lock.lock();
+                            CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
+                            [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
+                            [DeviceState logout];
+                            //self.lock.unlock();
+                        }
+                        */
                     }
-                } else {
-                    syslog(@"[WARN] Failed to get account and not logged in.");
-                    [[Device sharedInstance] setMinLevel:@1]; // Never set to 0 until we can complete tutorials.
-                    [[Device sharedInstance] setMaxLevel:@29];
-                    [NSThread sleepForTimeInterval:1];
-                    [[NSUserDefaults standardUserDefaults] removeObjectForKey:LOGIN_USER_DEFAULT_KEY];
+                }
+                
+                [[DeviceState sharedInstance] setFailedGetJobCount:0];
+                syslog(@"[INFO] Starting data parsing");
+                if (data == nil) {
+                    syslog(@"[WARN] No job left (Result: %@)", result);
+                    [[DeviceState sharedInstance] setFailedGetJobCount:0];
                     [NSThread sleepForTimeInterval:5];
-                    [[Device sharedInstance] setIsLoggedIn:false];
+                    return;
+                }
+
+                @try {
+                    NSString *action = data[@"action"];
+                    [[DeviceState sharedInstance] setLastAction:action];
+                    if ([action isEqualToString:@"scan_pokemon"]) {
+                        syslog(@"[DEBUG] [STATUS] Pokemon");
+                        [_jobController handlePokemonJob:action withData:data hasWarning:hasWarning];
+                    } else if ([action isEqualToString:@"scan_raid"]) {
+                        syslog(@"[DEBUG] [STATUS] Raid");
+                        [_jobController handleRaidJob:action withData:data hasWarning:hasWarning];
+                    } else if ([action isEqualToString:@"scan_quest"]) {
+                        syslog(@"[DEBUG] [STATUS] Quest/Leveling");
+                        [_jobController handleQuestJob:action withData:data hasWarning:hasWarning];
+                    } else if ([action isEqualToString:@"switch_account"]) {
+                        syslog(@"[DEBUG] [STATUS] Switching Accounts");
+                        [_jobController handleSwitchAccount:action withData:data hasWarning:hasWarning];
+                    } else if ([action isEqualToString:@"leveling"]) {
+                        syslog(@"[DEBUG] [STATUS] Leveling");
+                        [_jobController handleLeveling:action withData:data hasWarning:hasWarning];
+                    } else if ([action isEqualToString:@"scan_iv"]) {
+                        syslog(@"[DEBUG] [STATUS] IV");
+                        [_jobController handleIVJob:action withData:data hasWarning:hasWarning];
+                    } else if ([action isEqualToString:@"gather_token"]) {
+                        syslog(@"[DEBUG] [STATUS] Token");
+                        [_jobController handleGatherToken:action withData:data hasWarning:hasWarning];
+                    } else {
+                        syslog(@"[WARN] Unknown action received: %@", action);
+                    }
+                }
+                @catch (NSException *exception) {
+                    syslog(@"[ERROR] Exception: %@", exception);
+                }
+                
+                dispatch_semaphore_signal(sem);
+                
+                NSNumber *emptyGmoCount = [[DeviceState sharedInstance] emptyGmoCount];
+                NSNumber *maxEmptyGMO = [[Settings sharedInstance] maxEmptyGMO];
+                if (emptyGmoCount >= maxEmptyGMO) {
+                    syslog(@"[WARN] Got Empty GMO %@ times in a row. Restarting...", emptyGmoCount);
                     [DeviceState restart];
                 }
-            }];
-        }
-        
-        while (![[Device sharedInstance] shouldExit]) {
-            while (!_startup) {
-                if ([[DeviceState sharedInstance] needsLogout]) {
-                    //self.lock.lock();
-                    CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
-                    [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
-                    //self.lock.unlock();
-                    [DeviceState logout];
+                
+                NSNumber *failedCount = [[DeviceState sharedInstance] failedCount];
+                if (failedCount >= [[Settings sharedInstance] maxFailedCount]) {
+                    syslog(@"[ERROR] Failed %@ times in a row. Restarting...", failedCount);
+                    [DeviceState restart];
                 }
-                NSMutableDictionary *getJobData = [[NSMutableDictionary alloc] init];
-                getJobData[@"uuid"] = [[Device sharedInstance] uuid];
-                getJobData[@"username"] = [[Device sharedInstance] username];
-                getJobData[@"type"] = @"get_job";
-                [Utils postRequest:[[Settings sharedInstance] backendControllerUrl] dict:getJobData blocking:true completion:^(NSDictionary *result) {
-                    if (result == nil) {
-                        NSNumber *failedGetJobCount = [[DeviceState sharedInstance] failedGetJobCount];
-                        if ([failedGetJobCount intValue] == 10) {
-                            syslog(@"[ERROR] Failed to get job 10 times in a row. Exiting...");
-                            [[Device sharedInstance] setShouldExit:true];
-                        } else {
-                            syslog(@"[ERROR] Failed to get a job.");
-                        }
-                    } else if ([[Settings sharedInstance] enableAccountManager]) {
-                        NSDictionary *data = result[@"data"];
-                        if (data != nil) {
-                            NSNumber *minLevel = data[@"min_level"];
-                            NSNumber *maxLevel = data[@"max_level"];
-                            [[Device sharedInstance] setMinLevel:minLevel];
-                            [[Device sharedInstance] setMaxLevel:maxLevel];
-                            NSNumber *currentLevel = [[Device sharedInstance] level];
-                            if (currentLevel != 0 && (currentLevel < minLevel || currentLevel > maxLevel)) {
-                                syslog(@"[WARN] Account is outside min/max level. Current: %@ Min/Max: %@/%@. Logging out!", currentLevel, minLevel, maxLevel);
-                                //self.lock.lock();
-                                CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
-                                [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
-                                [DeviceState logout];
-                                //self.lock.unlock();
-                            }
-                        }
-                    }
-                    
-                    [[DeviceState sharedInstance] setFailedGetJobCount:0];
-                    NSDictionary *data = result[@"data"];
-                    if (data != nil) {
-                        NSString *action = data[@"action"];
-                        [[DeviceState sharedInstance] setLastAction:action];
-                        if ([action isEqualToString:@"scan_pokemon"]) {
-                            syslog(@"[DEBUG] [STATUS] Pokemon");
-                            [_jobController handlePokemonJob:action withData:data hasWarning:hasWarning];
-                        } else if ([action isEqualToString:@"scan_raid"]) {
-                            syslog(@"[DEBUG] [STATUS] Raid");
-                            [_jobController handleRaidJob:action withData:data hasWarning:hasWarning];
-                        } else if ([action isEqualToString:@"scan_quest"]) {
-                            syslog(@"[DEBUG] [STATUS] Quest/Leveling");
-                            [_jobController handleQuestJob:action withData:data hasWarning:hasWarning];
-                        } else if ([action isEqualToString:@"switch_account"]) {
-                            syslog(@"[DEBUG] [STATUS] Switching Accounts");
-                            [_jobController handleSwitchAccount:action withData:data hasWarning:hasWarning];
-                        } else if ([action isEqualToString:@"leveling"]) {
-                            syslog(@"[DEBUG] [STATUS] Leveling");
-                            [_jobController handleLeveling:action withData:data hasWarning:hasWarning];
-                        } else if ([action isEqualToString:@"scan_iv"]) {
-                            syslog(@"[DEBUG] [STATUS] IV");
-                            [_jobController handleIVJob:action withData:data hasWarning:hasWarning];
-                        } else if ([action isEqualToString:@"gather_token"]) {
-                            syslog(@"[DEBUG] [STATUS] Token");
-                            [_jobController handleGatherToken:action withData:data hasWarning:hasWarning];
-                        } else {
-                            syslog(@"[WARN] Unknown Action: %@", action);
-                        }
-                        
-                        NSNumber *emptyGmoCount = [[DeviceState sharedInstance] emptyGmoCount];
-                        NSNumber *maxEmptyGMO = [[Settings sharedInstance] maxEmptyGMO];
-                        if (emptyGmoCount >= maxEmptyGMO) {
-                            syslog(@"[WARN] Got Empty GMO %@ times in a row. Restarting...", emptyGmoCount);
-                            [DeviceState restart];
-                        }
-                        
-                        NSNumber *failedCount = [[DeviceState sharedInstance] failedCount];
-                        if (failedCount >= [[Settings sharedInstance] maxFailedCount]) {
-                            syslog(@"[ERROR] Failed %@ times in a row. Restarting...", failedCount);
-                            [DeviceState restart];
-                        }
-                    } else {
-                        [[DeviceState sharedInstance] setFailedGetJobCount:0];
-                        syslog(@"[WARN] No job left (Result: %@)", result);
-                        [NSThread sleepForTimeInterval:5];
-                    }
-                }];
-            }
+                sleep(2);
+            }];
+            
+            dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+            sleep(3);
         }
     });
-    //dispatch_release(gameStateQueue);
 }
 
 
 #pragma mark Request Handlers
+// TODO: Make request handler class.
 
-+(NSString *)handleLocationRequest:(NSDictionary *)params
++(NSString *)handleLocationRequest
 {
+    syslog(@"[DEBUG] handeLocationRequest");
     NSMutableDictionary *responseData = [[NSMutableDictionary alloc] init];
     //self.lock.lock();
     CLLocation *currentLoc = [[DeviceState sharedInstance] currentLocation];
@@ -619,7 +502,8 @@ static BOOL _invalidScreen = false;
     }
 
     NSString *response = [Utils toJsonString:responseData withPrettyPrint:false];
-    [responseData release];
+    syslog(@"[DEBUG] [LOC] %@", response);
+    //[responseData release];
     return response;
 }
 
@@ -633,19 +517,25 @@ static BOOL _invalidScreen = false;
     CLLocation *currentLoc = [Utils createCoordinate:currentLocation.coordinate.latitude lon: currentLocation.coordinate.longitude];
     //NSNumber *targetMaxDistance = _targetMaxDistance;
     NSString *pokemonEncounterId = [[DeviceState sharedInstance] pokemonEncounterId];
-    NSMutableDictionary *data = [params copy];
+    NSMutableDictionary *data = [params mutableCopy];
     data[@"lat_target"] = @(currentLoc.coordinate.latitude);
     data[@"lon_target"] = @(currentLoc.coordinate.longitude);
     data[@"target_max_distance"] = [[Settings sharedInstance] targetMaxDistance];
     data[@"username"] = [[Device sharedInstance] username] ?: @"";
     data[@"pokemon_encounter_id"] = pokemonEncounterId ?: @"";
     data[@"uuid"] = [[Device sharedInstance] uuid];
-    data[@"ptcToken"] = [[Device sharedInstance] ptcToken];
-
-    NSString *url = [[Settings sharedInstance] backendRawUrl];
-    [Utils postRequest:url dict:data blocking:false completion:^(NSDictionary *result) {
-        NSDictionary *data = result[@"data"];
-        
+    data[@"ptcToken"] = [[Device sharedInstance] ptcToken] ?: @"";
+    
+    [Utils postRequest:[[Settings sharedInstance] backendRawUrl]
+                  dict:data
+              blocking:false
+            completion:^(NSDictionary *result) {
+        syslog(@"[DEBUG] Raw data response: %@", result);
+        if (data == nil) {
+            syslog(@"[ERROR] Raw response nil");
+            return;
+        }
+        NSDictionary *data = [result objectForKey:@"data"];
         bool inArea = data[@"in_area"] ?: false;
         NSNumber *level = data[@"level"] ?: @0;
         NSNumber *nearby = data[@"nearby"] ?: @0;
@@ -735,7 +625,7 @@ static BOOL _invalidScreen = false;
                 [[DeviceState sharedInstance] setEmptyGmoCount:emptyGmoCount];
                 toPrint = @"Got Empty Data";
             } else {
-                [[DeviceState sharedInstance] setEmptyGmoCount:0];
+                [[DeviceState sharedInstance] setEmptyGmoCount:@0];
                 toPrint = @"Got Data outside Target-Area";
             }
         } else {
@@ -831,64 +721,27 @@ static BOOL _invalidScreen = false;
 
 
 #pragma mark Login Handlers
-
-// TODO: Make class/extensions class
+// TODO: Make class
 
 -(void)login
 {
-    syslog(@"[DEBUG] Preparing init postRequest payload");
-    NSMutableDictionary *initData = [[NSMutableDictionary alloc] init];
-    initData[@"uuid"] = [[Device sharedInstance] uuid];
-    initData[@"username"] = [[Device sharedInstance] username];
-    initData[@"type"] = @"init";
-    syslog(@"[DEBUG] Sending init postRequest: %@", initData);
-    [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
-                  dict:initData
-              blocking:true /*true*/
-            completion:^(NSDictionary *result) {
-        syslog(@"[DEBUG] init postRequest sent, response %@", result);
-        if (result == nil) {
-            syslog(@"[ERROR] Failed to connect to Backend!");
-            // TODO: shouldExit = true;
-            sleep(1); // TODO: DelayMultiplier
-            return;
-        } else if (![result[@"status"] isEqualToString:@"ok"]) {
-            NSString *error = result[@"error"] ?: @"? (no error sent)";
-            syslog(@"[ERROR] Backend returned an error: %@", error);
-            // TODO: shouldExit = true;
-            sleep(1); // TODO: DelayMultiplier
-            return;
-        }
-        NSDictionary *data = [result objectForKey:@"data"];
-        if (data == nil) {
-            syslog(@"[ERROR] Backend did not include any data!");
-            // TODO: shouldExit = true;
-            sleep(1); // TODO: DelayMultiplier
-            return;
-        }
-        if (![data[@"assigned"] boolValue]) {
-            syslog(@"[ERROR] Device is not assigned to an instance!");
-            // TODO: shouldExit = true;
-            sleep(1); // TODO: DelayMultiplier
-            return;
-        }
-        syslog(@"[INFO] Connected to Backend successfully!");
-    }];
+    [UIC2 initializeWithBackend];
     
     dispatch_semaphore_t sem = dispatch_semaphore_create(0);
-    syslog(@"[DEBUG] Checking if username is empty and account manager is enabled");
     NSString *username = [[Device sharedInstance] username];
+    syslog(@"[DEBUG] Checking if username is empty and account manager is enabled: %@", username);
     if ([username isNullOrEmpty] && [[Settings sharedInstance] enableAccountManager]) {
+        syslog(@"[DEBUG] Account username is empty and account manager is enabled, starting account request...");
         NSMutableDictionary *getAccountData = [[NSMutableDictionary alloc] init];
         getAccountData[@"uuid"] = [[Device sharedInstance] uuid];
-        getAccountData[@"username"] = username;
+        getAccountData[@"username"] = [[Device sharedInstance] username];
         getAccountData[@"min_level"] = [[Device sharedInstance] minLevel];
         getAccountData[@"max_level"] = [[Device sharedInstance] maxLevel];
         getAccountData[@"type"] = @"get_account";
         syslog(@"[DEBUG] Sending get_account request: %@", getAccountData);
         [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
                       dict:getAccountData
-                  blocking:true /*true*/
+                  blocking:true
                 completion:^(NSDictionary *result) {
             syslog(@"[DEBUG] get_account postRequest sent, response %@", result);
             NSDictionary *data = [result objectForKey:@"data"];
@@ -909,12 +762,14 @@ static BOOL _invalidScreen = false;
             dispatch_semaphore_signal(sem);
         }];
     } else {
+        syslog(@"[DEBUG] Already have an account.");
         dispatch_semaphore_signal(sem);
     }
     
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+    syslog(@"[DEBUG] Got account, starting login sequence.");
     
-    // Start login sequence and detection
+    // Start login sequence and detection after we connect to backend.
     dispatch_queue_t queue = dispatch_queue_create("queue", NULL);
     dispatch_async(queue, ^{
     //dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -1074,6 +929,10 @@ static BOOL _invalidScreen = false;
         syslog(@"[INFO] Found passenger warning.");
         DeviceCoordinate *passenger = [[DeviceConfig sharedInstance] passenger];
         [JarvisTestCase touch:[passenger tapX] withY:[passenger tapY]];
+        sleep(3);
+        DeviceCoordinate *closeNews = [[DeviceConfig sharedInstance] closeNews];
+        [JarvisTestCase touch:[closeNews tapX] withY:[closeNews tapY]]; // Try to click away news
+        sleep(2);
     } else if (isWeather) {
         syslog(@"[INFO] Found weather alert.");
         DeviceCoordinate *closeWeather1 = [[DeviceConfig sharedInstance] closeWeather1];
@@ -1085,6 +944,11 @@ static BOOL _invalidScreen = false;
     } else if ([self isMainScreen]) {
         syslog(@"[INFO] Found main screen.");
         sleep(2);
+        if (!_dataStarted) {
+            syslog(@"[INFO] Starting job handler.");
+            _dataStarted = true;
+            [self getJobHandler];
+        }
     } else if ([self isTutorial]) {
         syslog(@"[INFO] Found tutorial screen.");
         [self doTutorialSelection];
@@ -1312,7 +1176,19 @@ static BOOL _invalidScreen = false;
     [JarvisTestCase touch:[pokestopConfirm tapX] withY:[pokestopConfirm tapY]];
     sleep(2);
     syslog(@"[INFO] [TUT] Tutorial done!");
+    NSMutableDictionary *tutData = [[NSMutableDictionary alloc] init];
+    tutData[@"uuid"] = [[Device sharedInstance] uuid];
+    tutData[@"username"] = [[Device sharedInstance] username];
+    tutData[@"type"] = @"tutorial_done";
+    [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                  dict:tutData
+              blocking:true
+            completion:^(NSDictionary *result) {}];
 }
+
+
+#pragma mark Pixel Check Methods
+// TODO: Make extension class
 
 +(BOOL)isAtPixel:(DeviceCoordinate *)coordinate betweenMin:(ColorOffset *)min andMax:(ColorOffset *)max
 {
@@ -1332,7 +1208,7 @@ static BOOL _invalidScreen = false;
 
 +(BOOL)isStartupPrompt
 {
-    syslog(@"[DEBUG] Starting startup prompt check.");
+    //syslog(@"[DEBUG] Starting startup prompt check.");
     __block bool result = false;
     dispatch_semaphore_t sem = dispatch_semaphore_create(0);
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -1376,7 +1252,7 @@ static BOOL _invalidScreen = false;
 
 +(BOOL)isMainScreen
 {
-    syslog(@"[DEBUG] Starting main screen check.");
+    //syslog(@"[DEBUG] Starting main screen check.");
     __block bool result = false;
     dispatch_semaphore_t sem = dispatch_semaphore_create(0);
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -1399,7 +1275,7 @@ static BOOL _invalidScreen = false;
 
 +(BOOL)isTutorial
 {
-    syslog(@"[DEBUG] Starting tutorial screen check.");
+    //syslog(@"[DEBUG] Starting tutorial screen check.");
     __block bool result = false;
     dispatch_semaphore_t sem = dispatch_semaphore_create(0);
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -1419,7 +1295,7 @@ static BOOL _invalidScreen = false;
 
 +(BOOL)isPassengerWarning
 {
-    syslog(@"[DEBUG] Checking for Passenger warning.");
+    //syslog(@"[DEBUG] Checking for Passenger warning.");
     __block bool result = false;
     dispatch_semaphore_t sem = dispatch_semaphore_create(0);
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -1435,7 +1311,7 @@ static BOOL _invalidScreen = false;
 
 +(BOOL)isArPlusPrompt
 {
-    syslog(@"[DEBUG] Checking for AR(+) prompt.");
+    //syslog(@"[DEBUG] Checking for AR(+) prompt.");
     __block bool result = false;
     dispatch_semaphore_t sem = dispatch_semaphore_create(0);
     dispatch_async(dispatch_get_main_queue(), ^{

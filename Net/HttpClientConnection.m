@@ -10,12 +10,14 @@
 @implementation HttpClientConnection
 
 // HTTP endpoints
-NSString * VALID_GET_ENDPOINTS[3] = {
+NSString * VALID_GET_ENDPOINTS[5] = {
+    @"/loc",
     @"/config",
     @"/restart",
-    @"/reboot"
+    @"/reboot",
+    @"/clear"
 };
-NSString * VALID_POST_ENDPOINTS[6] = {
+NSString * VALID_POST_ENDPOINTS[7] = {
     @"/loc",
     @"/data",
     @"/touch",
@@ -37,13 +39,13 @@ NSString * VALID_POST_ENDPOINTS[6] = {
             [path isEqualToString:@"/pixel"] ||
             [path isEqualToString:@"/test"]) {
             // Let's be extra cautious, and make sure the upload isn't 5 gigs
-            return requestContentLength < 50;
+            //return requestContentLength < 50;
+            return YES;
         }
     }
     
     if ([method isEqualToString:@"GET"]) {
-        if (/*[path isEqualToString:@"/loc"] ||
-            [path isEqualToString:@"/data"] ||*/
+        if ([path isEqualToString:@"/loc"] ||
             [path isEqualToString:@"/config"] ||
             [path isEqualToString:@"/restart"] ||
             [path isEqualToString:@"/reboot"] ||
@@ -84,7 +86,7 @@ NSString * VALID_POST_ENDPOINTS[6] = {
         syslog(@"[DEBUG] postStr: %@", postStr);
         NSString *response;
         if ([path isEqualToString:@"/loc"]) {
-            response = [UIC2 handleLocationRequest:json];
+            response = [UIC2 handleLocationRequest];
         } else if ([path isEqualToString:@"/data"]) {
             response = [UIC2 handleDataRequest:json];
         } else if ([path isEqualToString:@"/touch"]) {
@@ -102,7 +104,9 @@ NSString * VALID_POST_ENDPOINTS[6] = {
         return [[HTTPDataResponse alloc] initWithData:responseData];
     } else {
         NSString *response;
-        if ([path isEqualToString:@"/config"]) {
+        if ([path isEqualToString:@"/loc"]) {
+            response = [UIC2 handleLocationRequest];
+        } else if ([path isEqualToString:@"/config"]) {
             response = [UIC2 handleConfigRequest];
         } else if ([path isEqualToString:@"/restart"] || // TODO: Restart app?
                    [path isEqualToString:@"/reboot"]) { // TODO: Reboot phone?
@@ -110,13 +114,15 @@ NSString * VALID_POST_ENDPOINTS[6] = {
             [DeviceState restart];
         } else if ([path isEqualToString:@"/clear"]) {
             syslog(@"[INFO] Clearing user defaults");
-            syslog(@"[DEBUG] NSUserDefaults Before: %@", [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]);
-            NSString *domainName = [[NSBundle mainBundle] bundleIdentifier];
-            [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:domainName];
-            syslog(@"[DEBUG] NSUserDefaults After: %@", [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]);
+            //NSString *domainName = [[NSBundle mainBundle] bundleIdentifier];
+            //[[NSUserDefaults standardUserDefaults] removePersistentDomainForName:domainName];
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey:LOGIN_USER_DEFAULT_KEY];
+            [[NSUserDefaults standardUserDefaults] removeObjectForKey:TOKEN_USER_DEFAULT_KEY];
             response = @"OK";
         }
         NSData *responseData = [response dataUsingEncoding:NSUTF8StringEncoding];
+        [[httpResponse httpHeaders] setValue:@"application/json" forKey:@"Accept"];
+        [[httpResponse httpHeaders] setValue:@"application/json" forKey:@"Content-Type"];
         return [[HTTPDataResponse alloc] initWithData:responseData];
     }
     

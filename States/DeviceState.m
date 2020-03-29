@@ -14,6 +14,7 @@
     syslog(@"[INFO] init");
     if ((self = [super init]))
     {
+        lastAction = @"";
     }
     
     return self;
@@ -130,8 +131,8 @@
             NSMutableDictionary *payload = [[NSMutableDictionary alloc] init];
             payload[@"uuid"] = [[Device sharedInstance] uuid];
             payload[@"username"] = [[Device sharedInstance] username];
-            payload[@"min_level"] = @1;
-            payload[@"max_level"] = @29;
+            payload[@"min_level"] = [[Device sharedInstance] minLevel];
+            payload[@"max_level"] = [[Device sharedInstance] maxLevel];
             payload[@"type"] = @"get_account";
             syslog(@"[DEBUG] Sending get_account request...");
             [Utils postRequest:backendControllerUrl
@@ -164,27 +165,20 @@
                     }
                 
                     [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
-                    syslog(@"[DEBUG] StartupLocation: %@", startupLocation);
+                    syslog(@"[DEBUG] startupLocation: %@", startupLocation);
                     
+                    //TODO: firstWarningTimestamp
+                    /*
                     NSString *firstWarningTimestamp = data[@"first_warning_timestamp"];
                     syslog(@"[DEBUG] firstWarningTimestamp: %@", firstWarningTimestamp);
-                    if (firstWarningTimestamp != nil && ![firstWarningTimestamp isEqualToString:@"<null>"]) {
+                    if ([firstWarningTimestamp != nil && ![firstWarningTimestamp isEqualToString:@"<null>"]) {
                         NSDate *firstWarningDate = [NSDate dateWithTimeIntervalSince1970:[firstWarningTimestamp ?: 0 doubleValue]];
                         [[DeviceState sharedInstance] setFirstWarningDate:firstWarningDate];
                     }
+                    */
 
-                    syslog(@"[DEBUG] Checking if username is empty or ptcToken is empty.");
-                    if ([username isNullOrEmpty] || [ptcToken isNullOrEmpty]) {
-                        syslog(@"[ERROR] Failed to get account with token. Restarting for normal login.");
-                        [[NSUserDefaults standardUserDefaults] synchronize];
-                        [[NSUserDefaults standardUserDefaults] removeObjectForKey:LOGIN_USER_DEFAULT_KEY];
-                        [[Device sharedInstance] setUsername:username];
-                        [[Device sharedInstance] setPassword:password];
-                        [[Device sharedInstance] setPtcToken:ptcToken];
-                        [[Device sharedInstance] setLevel:level];
-                        [[Device sharedInstance] setIsLoggedIn:false];
-                        [[Device sharedInstance] setShouldExit:true];
-                    } else {
+                    syslog(@"[DEBUG] Checking if username or ptcToken are empty.");
+                    if (![username isNullOrEmpty] && ![ptcToken isNullOrEmpty]) {
                         syslog(@"[INFO] Got account %@ level %@ from backend.", username, level);
                         syslog(@"[DEBUG] Got token %@ from backend.", ptcToken);
                         [[Device sharedInstance] setUsername:username];
@@ -196,11 +190,21 @@
                             [[NSUserDefaults standardUserDefaults] setValue:ptcToken forKey:TOKEN_USER_DEFAULT_KEY];
                             [[NSUserDefaults standardUserDefaults] synchronize];
                         }
+                    } else {
+                        syslog(@"[ERROR] Failed to get account with token. Restarting for normal login.");
+                        [[NSUserDefaults standardUserDefaults] synchronize];
+                        [[NSUserDefaults standardUserDefaults] removeObjectForKey:LOGIN_USER_DEFAULT_KEY];
+                        [[Device sharedInstance] setUsername:username];
+                        [[Device sharedInstance] setPassword:password];
+                        [[Device sharedInstance] setPtcToken:ptcToken];
+                        [[Device sharedInstance] setLevel:level];
+                        [[Device sharedInstance] setIsLoggedIn:false];
+                        [[Device sharedInstance] setShouldExit:true];
                     }
                 } else {
                     syslog(@"[ERROR] Failed to get account, restarting.");
                     [NSThread sleepForTimeInterval:1];
-                    [[Device sharedInstance] setMinLevel:@1]; // Never set to 0 until we can do tutorials.
+                    [[Device sharedInstance] setMinLevel:@0];
                     [[Device sharedInstance] setMaxLevel:@29];
                     [[NSUserDefaults standardUserDefaults] synchronize];
                     [[NSUserDefaults standardUserDefaults] removeObjectForKey:LOGIN_USER_DEFAULT_KEY];

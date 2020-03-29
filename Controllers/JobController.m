@@ -523,8 +523,8 @@
         //self.lock.unlock();
     }
     
-    NSNumber *lat = data[@"lat"] ?: 0;
-    NSNumber *lon = data[@"lon"] ?: 0;
+    NSNumber *lat = data[@"lat"] ?: @0;
+    NSNumber *lon = data[@"lon"] ?: @0;
     syslog(@"[INFO] Scanning for IV at %@ %@", lat, lon);
     
     NSDate *start = [NSDate date];
@@ -548,10 +548,11 @@
             [[DeviceState sharedInstance] setWaitForData:false];
             NSNumber *failedCount = [[DeviceState sharedInstance] failedCount];
             [[DeviceState sharedInstance] setFailedCount:[Utils incrementInt:failedCount]];
-            syslog(@"[WARN] Raids loading timed out.");
+            // TODO: Double check failedCount is being set in DeviceState
+            syslog(@"[WARN] Pokemon loading timed out.");
             NSMutableDictionary *raidData = [[NSMutableDictionary alloc] init];
             raidData[@"uuid"] = [[Device sharedInstance] uuid];
-            raidData[@"action"] = @"scan_raid";
+            raidData[@"action"] = action;
             raidData[@"lat"] = lat;
             raidData[@"lon"] = lon;
             raidData[@"type"] = @"job_failed";
@@ -567,6 +568,7 @@
                 syslog(@"[INFO] Pokemon loaded after %f", timeIntervalSince);
             }
         }
+        sleep(1);
     }
 }
 

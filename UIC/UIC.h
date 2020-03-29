@@ -23,10 +23,9 @@
 
 -(void)start;
 -(void)startHeartbeatLoop;
--(void)startUicLoop;
 
 +(NSString *)handleDataRequest:(NSDictionary *)params;
-+(NSString *)handleLocationRequest:(NSDictionary *)params;
++(NSString *)handleLocationRequest;
 +(NSString *)handleTouchRequest:(NSDictionary *)params;
 +(NSString *)handleTypeRequest:(NSDictionary *)params;
 +(NSString *)handleSwipeRequest;

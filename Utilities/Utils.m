@@ -140,6 +140,16 @@ static double _baseVerticalAccuracy = 200.0; // in meters
     return json;
 }
 
++(NSMutableDictionary *)toDictionary:(NSString *)json
+{
+    NSError *error;
+    NSData *data = [json dataUsingEncoding:NSUTF8StringEncoding];
+    NSMutableDictionary *dict = [NSJSONSerialization JSONObjectWithData:data
+                                                                options:NSJSONReadingMutableContainers
+                                                                  error:&error];
+    return dict;
+}
+
 +(void)touch:(int)x withY:(int)y
 {
     @try {

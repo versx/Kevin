@@ -35,6 +35,7 @@
           completion:(void (^)(NSDictionary* result))completion;
 
 +(NSString *)toJsonString:(NSDictionary *)dict withPrettyPrint:(BOOL)prettyPrint;
++(NSMutableDictionary *)toDictionary:(NSString *)json;
 
 +(void)touch:(int)x withY:(int)y;
 

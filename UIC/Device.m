@@ -54,16 +54,13 @@
 {
     @try {
         if ([[NSUserDefaults standardUserDefaults] objectForKey:@"min_level"] == nil) {
-            return @1;
+            return @0;
         }
-        //if ([[NSUserDefaults standardUserDefaults] objectForKey:@"min_level"] == nil) {
-        //    return 1; // Don't return 0 until we can do tutorials.
-        //}
-        return [[[NSUserDefaults standardUserDefaults] objectForKey:@"min_level"] intValue] ?: 1;
+        return [[NSUserDefaults standardUserDefaults] objectForKey:@"min_level"] ?: @0;
     }
     @catch (NSException *exception) {
         syslog(@"[ERROR] minLevel: %@", exception);
-        return @1;
+        return @0;
     }
 }
 -(void)setMinLevel:(NSNumber *)value
@@ -78,7 +75,7 @@
         if ([[NSUserDefaults standardUserDefaults] objectForKey:@"max_level"] == nil) {
             return @29;
         }
-        return [[[NSUserDefaults standardUserDefaults] objectForKey:@"max_level"] intValue] ?: 29;
+        return [[NSUserDefaults standardUserDefaults] objectForKey:@"max_level"] ?: @29;
     }
     @catch (NSException *exception) {
         syslog(@"[ERROR] maxLevel: %@", exception);
@@ -104,11 +101,11 @@
     if ((self = [super init]))
     {
         // TODO: NSUserDefaults
-        multiplier = 5;
+        multiplier = @5;
         //username = @"";
         //password = @"";
         ptcToken = [[NSUserDefaults standardUserDefaults] valueForKey:TOKEN_USER_DEFAULT_KEY] ?: @"";
-        level = 0;
+        level = @0;
         //minLevel = 1;
         //maxLevel = 29;
     }
