@@ -17,11 +17,11 @@
     return [NSString stringWithFormat:@"[red=%f green=%f blue=%f]", red, green, blue];
 }
 
--(id)init:(double)withRed green:(double)green blue:(double)blue
+-(id)init:(double)red green:(double)green blue:(double)blue
 {
     self = [super init];
     if (self) {
-        self.red = withRed;
+        self.red = red;
         self.green = green;
         self.blue = blue;
     }

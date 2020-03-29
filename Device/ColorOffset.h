@@ -11,6 +11,6 @@
 @property double green;
 @property double blue;
 
--(id)init:(double)withRed green:(double)green blue:(double)blue;
+-(id)init:(double)red green:(double)green blue:(double)blue;
 
 @end

@@ -67,6 +67,12 @@
                       blocking:true
                     completion:^(NSDictionary *result) {}
             ];
+        } else {
+            locked = [[DeviceState sharedInstance] waitForData];
+            if (!locked) {
+                [[DeviceState sharedInstance] setFailedCount:@0];
+                syslog(@"[INFO] Pokemon loaded after %f seconds.", timeIntervalSince);
+            }
         }
     }
 }

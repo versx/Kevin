@@ -123,6 +123,7 @@ static NSString *plistFileName = @"config.plist";
         _pokemonMaxTime = _config[@"pokemonMaxTime"] ?: DEFAULT_POKEMON_MAX_TIME;
         _raidMaxTime = _config[@"raidMaxTime"] ?: DEFAULT_RAID_MAX_TIME;
         _encounterDelay = _config[@"encounterDelay"] ?: DEFAULT_ENCOUNTER_DELAY;
+        _jitterValue = _config[@"jitterValue"] ?: @(5.0e-05); // 5.0e-05 0.000005 // ?: DEFAULT_JITTER_VALUE;
         _maxEmptyGMO = _config[@"maxEmptyGMO"] ?: DEFAULT_MAX_EMPTY_GMO;
         _maxFailedCount = _config[@"maxFailedCount"] ?: DEFAULT_MAX_FAILED_COUNT;
         _maxNoQuestCount = _config[@"maxNoQuestCount"] ?: DEFAULT_MAX_NO_QUEST_COUNT;

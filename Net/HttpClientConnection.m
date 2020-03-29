@@ -57,11 +57,17 @@ NSString * VALID_POST_ENDPOINTS[7] = {
     return [super supportsMethod:method atPath:path];
 }
 
+-(NSData *)preprocessResponse:(HTTPMessage *)response
+{
+    [response setHeaderField:@"Accept" value:@"application/json"];
+    [response setHeaderField:@"Content-Type" value:@"application/json"];
+    return [response messageData];
+}
+
 -(BOOL)expectsRequestBodyFromMethod:(NSString *)method atPath:(NSString *)path
 {
     // Inform HTTP server that we expect a body to accompany a POST request
-    if ([method isEqualToString:@"GET"] ||
-        [method isEqualToString:@"POST"]) {
+    if ([method isEqualToString:@"POST"]) {
         return YES;
     }
     return [super expectsRequestBodyFromMethod:method atPath:path];
@@ -114,15 +120,11 @@ NSString * VALID_POST_ENDPOINTS[7] = {
             [DeviceState restart];
         } else if ([path isEqualToString:@"/clear"]) {
             syslog(@"[INFO] Clearing user defaults");
-            //NSString *domainName = [[NSBundle mainBundle] bundleIdentifier];
-            //[[NSUserDefaults standardUserDefaults] removePersistentDomainForName:domainName];
             [[NSUserDefaults standardUserDefaults] removeObjectForKey:LOGIN_USER_DEFAULT_KEY];
             [[NSUserDefaults standardUserDefaults] removeObjectForKey:TOKEN_USER_DEFAULT_KEY];
             response = @"OK";
         }
         NSData *responseData = [response dataUsingEncoding:NSUTF8StringEncoding];
-        [[httpResponse httpHeaders] setValue:@"application/json" forKey:@"Accept"];
-        [[httpResponse httpHeaders] setValue:@"application/json" forKey:@"Content-Type"];
         return [[HTTPDataResponse alloc] initWithData:responseData];
     }
     

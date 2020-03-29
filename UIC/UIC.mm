@@ -7,6 +7,9 @@
 
 #import "UIC.h"
 
+// TODO: Fix jitter
+// TODO: Break out UIC into more classes
+// TODO: Tap news away
 // TODO: Level check
 // TODO: Make dispatch queues global references
 // TODO: Egg Deploy
@@ -72,18 +75,7 @@ static NSNumber *_jitterCorner = @0;
 
     // Initalize our http server
     _httpServer = [[HTTPServer alloc] init];
-    
-    // Tell the server to broadcast its presence via Bonjour.
-    // This allows browsers such as Safari to automatically discover our service.
     //[_httpServer setType:@"_http._tcp."];
-    
-    // Set the listening interface to the WiFi interface.
-    //[_httpServer setInterface:@"lo0"];
-    //[_httpServer setInterface:@"localhost"];
-    
-    // Normally there's no need to run our server on any specific port.
-    // Technologies like Bonjour allow clients to dynamically discover the server's port at runtime.
-    // However, for easy testing you may want force a certain port so you can just hit the refresh button.
     [_httpServer setPort:[[[Settings sharedInstance] port] intValue]];
     
     // We're going to extend the base HTTPConnection class with our HttpClientConnection class.
@@ -100,7 +92,7 @@ static NSNumber *_jitterCorner = @0;
     [[DeviceState sharedInstance] setEggStart:[NSDate dateWithTimeInterval:-1860 sinceDate:[NSDate date]]];
     
     [self login];
-    [self startHeartbeatLoop];
+    [self startHeartbeatLoop]; // TODO: Start heartbeat first time after receiving data.
 }
 
 -(void)startHeartbeatLoop
@@ -326,7 +318,7 @@ static NSNumber *_jitterCorner = @0;
                     NSNumber *failedGetJobCount = [[DeviceState sharedInstance] failedGetJobCount];
                     if ([failedGetJobCount intValue] == 10) {
                         syslog(@"[ERROR] Failed to get job 10 times in a row. Exiting...");
-                        [[Device sharedInstance] setShouldExit:true];
+                        //[[Device sharedInstance] setShouldExit:true];
                         return;
                     } else {
                         syslog(@"[ERROR] Failed to get a job.");
@@ -341,7 +333,7 @@ static NSNumber *_jitterCorner = @0;
                         [[Device sharedInstance] setMaxLevel:maxLevel];
                         NSNumber *currentLevel = [[Device sharedInstance] level];
                         syslog(@"[DEBUG] Current level %@ (Min: %@, Max: %@)", currentLevel, minLevel, maxLevel);
-                        /* TODO: Fix level being 0
+                        /*
                         if (currentLevel != 0 && (currentLevel < minLevel || currentLevel > maxLevel)) {
                             syslog(@"[WARN] Account is outside min/max level. Current: %@ Min/Max: %@/%@. Logging out!", currentLevel, minLevel, maxLevel);
                             //self.lock.lock();
@@ -355,7 +347,6 @@ static NSNumber *_jitterCorner = @0;
                 }
                 
                 [[DeviceState sharedInstance] setFailedGetJobCount:0];
-                syslog(@"[INFO] Starting data parsing");
                 if (data == nil) {
                     syslog(@"[WARN] No job left (Result: %@)", result);
                     [[DeviceState sharedInstance] setFailedGetJobCount:0];
@@ -363,36 +354,31 @@ static NSNumber *_jitterCorner = @0;
                     return;
                 }
 
-                @try {
-                    NSString *action = data[@"action"];
-                    [[DeviceState sharedInstance] setLastAction:action];
-                    if ([action isEqualToString:@"scan_pokemon"]) {
-                        syslog(@"[DEBUG] [STATUS] Pokemon");
-                        [_jobController handlePokemonJob:action withData:data hasWarning:hasWarning];
-                    } else if ([action isEqualToString:@"scan_raid"]) {
-                        syslog(@"[DEBUG] [STATUS] Raid");
-                        [_jobController handleRaidJob:action withData:data hasWarning:hasWarning];
-                    } else if ([action isEqualToString:@"scan_quest"]) {
-                        syslog(@"[DEBUG] [STATUS] Quest/Leveling");
-                        [_jobController handleQuestJob:action withData:data hasWarning:hasWarning];
-                    } else if ([action isEqualToString:@"switch_account"]) {
-                        syslog(@"[DEBUG] [STATUS] Switching Accounts");
-                        [_jobController handleSwitchAccount:action withData:data hasWarning:hasWarning];
-                    } else if ([action isEqualToString:@"leveling"]) {
-                        syslog(@"[DEBUG] [STATUS] Leveling");
-                        [_jobController handleLeveling:action withData:data hasWarning:hasWarning];
-                    } else if ([action isEqualToString:@"scan_iv"]) {
-                        syslog(@"[DEBUG] [STATUS] IV");
-                        [_jobController handleIVJob:action withData:data hasWarning:hasWarning];
-                    } else if ([action isEqualToString:@"gather_token"]) {
-                        syslog(@"[DEBUG] [STATUS] Token");
-                        [_jobController handleGatherToken:action withData:data hasWarning:hasWarning];
-                    } else {
-                        syslog(@"[WARN] Unknown action received: %@", action);
-                    }
-                }
-                @catch (NSException *exception) {
-                    syslog(@"[ERROR] Exception: %@", exception);
+                NSString *action = data[@"action"];
+                [[DeviceState sharedInstance] setLastAction:action];
+                if ([action isEqualToString:@"scan_pokemon"]) {
+                    syslog(@"[DEBUG] [STATUS] Pokemon");
+                    [_jobController handlePokemonJob:action withData:data hasWarning:hasWarning];
+                } else if ([action isEqualToString:@"scan_raid"]) {
+                    syslog(@"[DEBUG] [STATUS] Raid");
+                    [_jobController handleRaidJob:action withData:data hasWarning:hasWarning];
+                } else if ([action isEqualToString:@"scan_quest"]) {
+                    syslog(@"[DEBUG] [STATUS] Quest/Leveling");
+                    [_jobController handleQuestJob:action withData:data hasWarning:hasWarning];
+                } else if ([action isEqualToString:@"switch_account"]) {
+                    syslog(@"[DEBUG] [STATUS] Switching Accounts");
+                    [_jobController handleSwitchAccount:action withData:data hasWarning:hasWarning];
+                } else if ([action isEqualToString:@"leveling"]) {
+                    syslog(@"[DEBUG] [STATUS] Leveling");
+                    [_jobController handleLeveling:action withData:data hasWarning:hasWarning];
+                } else if ([action isEqualToString:@"scan_iv"]) {
+                    syslog(@"[DEBUG] [STATUS] IV");
+                    [_jobController handleIVJob:action withData:data hasWarning:hasWarning];
+                } else if ([action isEqualToString:@"gather_token"]) {
+                    syslog(@"[DEBUG] [STATUS] Token");
+                    [_jobController handleGatherToken:action withData:data hasWarning:hasWarning];
+                } else {
+                    syslog(@"[WARN] Unknown action received: %@", action);
                 }
                 
                 dispatch_semaphore_signal(sem);
@@ -424,10 +410,10 @@ static NSNumber *_jitterCorner = @0;
 
 +(NSString *)handleLocationRequest
 {
-    syslog(@"[DEBUG] handeLocationRequest");
     NSMutableDictionary *responseData = [[NSMutableDictionary alloc] init];
     //self.lock.lock();
     CLLocation *currentLoc = [[DeviceState sharedInstance] currentLocation];
+    syslog(@"[DEBUG] [LOC] currentLocation: %@", currentLoc);
     if (currentLoc != nil) {
         if ([[DeviceState sharedInstance] waitRequiresPokemon]) {
             //self.lock.unlock();
@@ -459,16 +445,17 @@ static NSNumber *_jitterCorner = @0;
 
             NSNumber *currentLat = @([[NSNumber numberWithDouble:currentLoc.coordinate.latitude] doubleValue] + [jitterLat doubleValue]);
             NSNumber *currentLon = @([[NSNumber numberWithDouble:currentLoc.coordinate.longitude] doubleValue] + [jitterLon doubleValue]);
+            syslog(@"[DEBUG] [LOC] Jittered Location: %@, %@ (jitterCorner: %@", currentLat, currentLon, _jitterCorner);
             responseData[@"latitude"] = currentLat;
             responseData[@"longitude"] = currentLon;
             responseData[@"lat"] = currentLat;
-            responseData[@"lon"] = currentLon;
+            responseData[@"lng"] = currentLon;
 
             //"scan_iv", "scan_pokemon"
             if ([[[Device sharedInstance] level] intValue] >= 30) {
                 responseData[@"actions"] = @[@"pokemon"];
             } else {
-                responseData[@"actions"] = @[];
+                responseData[@"actions"] = @[@"pokemon"]; // TODO: TESTING ONLY Return empty @""
             }
         } else {
             // raids, quests
@@ -478,7 +465,7 @@ static NSNumber *_jitterCorner = @0;
             responseData[@"latitude"] = currentLat;
             responseData[@"longitude"] = currentLon;
             responseData[@"lat"] = currentLat;
-            responseData[@"lon"] = currentLon;
+            responseData[@"lng"] = currentLon;
             
             bool ultraQuests = [[Settings sharedInstance] ultraQuests];
             bool delayQuest = [[DeviceState sharedInstance] delayQuest];
@@ -491,19 +478,26 @@ static NSNumber *_jitterCorner = @0;
                 } else {
                     responseData[@"actions"] = @[@"pokestop"];
                 }
+            } else if (!ultraQuests && [action isEqualToString:@"scan_quest"]) {
+                // Auto-spinning should only happen when ultraQuests is
+                // set and the instance is scan_quest type
+                if ([[[Device sharedInstance] level] intValue] >= 30) {
+                    responseData[@"actions"] = @[@"pokemon"];
+                } else {
+                    responseData[@"actions"] = @[@""];
+                }
             } else if ([action isEqualToString:@"leveling"]) {
                 responseData[@"actions"] = @[@"pokestop"];
             } else if ([action isEqualToString:@"scan_raid"]) {
                 // Raid instances do not need IV encounters, Use scan_pokemon
                 // type if you want to encounter while scanning raids.
-                responseData[@"actions"] = @[];
+                responseData[@"actions"] = @[@""];
             }
         }
     }
 
     NSString *response = [Utils toJsonString:responseData withPrettyPrint:false];
     syslog(@"[DEBUG] [LOC] %@", response);
-    //[responseData release];
     return response;
 }
 
@@ -511,7 +505,8 @@ static NSNumber *_jitterCorner = @0;
 {
     CLLocation *currentLocation = [[DeviceState sharedInstance] currentLocation];
     if (currentLocation == nil) {
-        return @"Error"; // TODO: Return json response { status: error }
+        syslog(@"[ERROR] currentLocation is null");
+        //return @"Error"; // TODO: Return json response { status: error }
     }
     [[DeviceState sharedInstance] setLastUpdate:[NSDate date]];
     CLLocation *currentLoc = [Utils createCoordinate:currentLocation.coordinate.latitude lon: currentLocation.coordinate.longitude];
@@ -929,10 +924,15 @@ static NSNumber *_jitterCorner = @0;
         syslog(@"[INFO] Found passenger warning.");
         DeviceCoordinate *passenger = [[DeviceConfig sharedInstance] passenger];
         [JarvisTestCase touch:[passenger tapX] withY:[passenger tapY]];
-        sleep(3);
-        DeviceCoordinate *closeNews = [[DeviceConfig sharedInstance] closeNews];
-        [JarvisTestCase touch:[closeNews tapX] withY:[closeNews tapY]]; // Try to click away news
         sleep(2);
+        //DeviceCoordinate *closeNews = [[DeviceConfig sharedInstance] closeMenu]; // closeNews / closeMenu
+        //[JarvisTestCase touch:[closeNews tapX] withY:[closeNews tapY]];
+        //sleep(2);
+        if (!_dataStarted) {
+            syslog(@"[INFO] Starting job handler.");
+            _dataStarted = true;
+            [self getJobHandler];
+        }
     } else if (isWeather) {
         syslog(@"[INFO] Found weather alert.");
         DeviceCoordinate *closeWeather1 = [[DeviceConfig sharedInstance] closeWeather1];
@@ -967,7 +967,7 @@ static NSNumber *_jitterCorner = @0;
         loop = false;
         [DeviceState restart];
     } else {
-        syslog(@"[WARN] Nothing found");
+        //syslog(@"[WARN] Nothing found");
         sleep(5);
         loop = true;
     }
