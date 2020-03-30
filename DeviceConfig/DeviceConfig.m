@@ -7,8 +7,6 @@
 
 #import "DeviceConfig.h"
 
-// TODO: Support multiple device configs
-
 @implementation DeviceConfig
 
 static DeviceCoordinateScalar *scalar;
@@ -241,6 +239,15 @@ static DeviceCoordinateScalar *scalar;
 -(DeviceCoordinate *)tutorialPokestopConfirm {
     return [[DeviceCoordinate alloc] init:327 withY:765 andDeviceCoordinateScalar:scalar];
 }
+-(DeviceCoordinate *)checkArPeristence {
+    return [[DeviceCoordinate alloc] init:557 withY:101 andDeviceCoordinateScalar:scalar];
+}
+-(DeviceCoordinate *)tutorialPokemonAtFeet {
+    return [[DeviceCoordinate alloc] init:324 withY:818 andDeviceCoordinateScalar:scalar];
+}
+-(DeviceCoordinate *)tutorialWillowPrompt {
+    return [[DeviceCoordinate alloc] init:320 withY:320 andDeviceCoordinateScalar:scalar];
+}
 
 
 #pragma mark Pokemon Encounter
@@ -251,7 +258,9 @@ static DeviceCoordinateScalar *scalar;
 -(DeviceCoordinate *)encounterNoArConfirm {
     return [[DeviceCoordinate alloc] init:320 withY:645 andDeviceCoordinateScalar:scalar];
 }
-
+-(DeviceCoordinate *)encounterTmp {
+    return [[DeviceCoordinate alloc] init:575 withY:107 andDeviceCoordinateScalar:scalar];
+}
 
 #pragma mark Account
 

@@ -6,6 +6,7 @@
 //
 
 #import "Consts.h"
+#import "../States/DeviceState.h"
 
 @interface Settings : NSObject
 

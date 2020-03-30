@@ -5,8 +5,8 @@
 //  Created by versx on 3/22/20.
 //
 
+#import "../DeviceConfig/Configs/DeviceRatio1775.h"
 #import "../DeviceCoordinate/DeviceCoordinate.h"
-#import "../Device/Configs/DeviceRatio1775.h"
 
 @interface DeviceConfig : NSObject
 
@@ -123,12 +123,20 @@
 -(DeviceCoordinate *)tutorialCatchConfirm;
 /**  */
 -(DeviceCoordinate *)tutorialPokestopConfirm;
+/** Check White pixel in AR button above scroll bar of toggle. */
+-(DeviceCoordinate *)checkArPeristence;
+/** Check if Pokemon spawn on top of trainers feet. */
+-(DeviceCoordinate *)tutorialPokemonAtFeet;
+/** Willow Prompt. */
+-(DeviceCoordinate *)tutorialWillowPrompt;
 
 // Pokemon Encounter
 /** Green pixel in green button of no AR(+) button. */
 -(DeviceCoordinate *)encounterNoAr;
 /** Green button of no AR(+) confirm button. */
 -(DeviceCoordinate *)encounterNoArConfirm;
+/** Temp! Exit AR-Mode. */
+-(DeviceCoordinate *)encounterTmp;
 
 // Accounts
 /** White pixel in the last `n` of termination  */

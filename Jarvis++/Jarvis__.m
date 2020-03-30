@@ -24,7 +24,6 @@ static void __attribute__((constructor)) initialize(void) {
         NSSetUncaughtExceptionHandler(&onUncaughtException);
         
         _uic = [[UIC2 alloc] init];
-        [_uic start];
         syslog(@"[INFO] started...");
     }
     

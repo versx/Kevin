@@ -22,12 +22,8 @@
 @property (nonatomic, assign) NSString *osVersion;
 @property (nonatomic, assign) NSNumber *multiplier;
 
-//@property (nonatomic, readwrite, assign) NSString *username;
-//@property (nonatomic, readwrite, assign) NSString *password;
 @property (nonatomic, readwrite, assign) NSString *ptcToken;
 @property (nonatomic, readwrite, assign) NSNumber *level;
-//@property (nonatomic, readwrite, assign) NSNumber *minLevel;
-//@property (nonatomic, readwrite, assign) NSNumber *maxLevel;
 @property (nonatomic, readwrite, assign) BOOL isLoggedIn;
 @property (nonatomic, readwrite, assign) BOOL shouldExit;
 

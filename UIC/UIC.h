@@ -7,10 +7,10 @@
 
 #import "Consts.h"
 #import "Device.h"
-#import "Settings.h"
 #import "../Controllers/JobController.h"
-#import "../Device/DeviceConfig.h"
+#import "../DeviceConfig/DeviceConfig.h"
 #import "../Net/HttpClientConnection.h"
+#import "../Settings/Settings.h"
 
 #import <CocoaHTTPServer/HTTPServer.h>
 #import <CoreLocation/CoreLocation.h>
@@ -21,16 +21,8 @@
 
 @interface UIC2 : NSObject
 
--(void)start;
+-(void)login;
+-(void)startPixelCheckLoop;
 -(void)startHeartbeatLoop;
-
-+(NSString *)handleDataRequest:(NSDictionary *)params;
-+(NSString *)handleLocationRequest;
-+(NSString *)handleTouchRequest:(NSDictionary *)params;
-+(NSString *)handleTypeRequest:(NSDictionary *)params;
-+(NSString *)handleSwipeRequest;
-+(NSString *)handlePixelRequest:(NSDictionary *)params;
-+(NSString *)handleConfigRequest;
-+(NSString *)handleTestRequest:(NSDictionary *)params;
 
 @end

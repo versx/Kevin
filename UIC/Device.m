@@ -100,14 +100,9 @@
     NSLog(@"[INFO] init");
     if ((self = [super init]))
     {
-        // TODO: NSUserDefaults
         multiplier = @5;
-        //username = @"";
-        //password = @"";
         ptcToken = [[NSUserDefaults standardUserDefaults] valueForKey:TOKEN_USER_DEFAULT_KEY] ?: @"";
         level = @0;
-        //minLevel = 1;
-        //maxLevel = 29;
     }
     return self;
 }

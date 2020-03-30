@@ -37,6 +37,10 @@
 		C0339C912427EE5B0046D0AD /* DeviceConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C0339C902427EE5B0046D0AD /* DeviceConfig.m */; };
 		C0339C93242803D80046D0AD /* ColorOffset.h in Headers */ = {isa = PBXBuildFile; fileRef = C0339C92242803D80046D0AD /* ColorOffset.h */; };
 		C0339C95242803E40046D0AD /* ColorOffset.m in Sources */ = {isa = PBXBuildFile; fileRef = C0339C94242803E40046D0AD /* ColorOffset.m */; };
+		C03E44DF2431132700B467BB /* RequestController.h in Headers */ = {isa = PBXBuildFile; fileRef = C03E44DE2431132700B467BB /* RequestController.h */; };
+		C03E44E12431133800B467BB /* RequestController.m in Sources */ = {isa = PBXBuildFile; fileRef = C03E44E02431133800B467BB /* RequestController.m */; };
+		C03E44E42432595200B467BB /* PixelSettings.h in Headers */ = {isa = PBXBuildFile; fileRef = C03E44E32432595200B467BB /* PixelSettings.h */; };
+		C03E44E62432596900B467BB /* PixelSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = C03E44E52432596900B467BB /* PixelSettings.m */; };
 		C065AE40242ECD2A007114C8 /* DeviceRatio1775.h in Headers */ = {isa = PBXBuildFile; fileRef = C065AE3F242ECD2A007114C8 /* DeviceRatio1775.h */; };
 		C065AE42242ECD3B007114C8 /* DeviceRatio1775.m in Sources */ = {isa = PBXBuildFile; fileRef = C065AE41242ECD3B007114C8 /* DeviceRatio1775.m */; };
 		C065AE44242EFCCA007114C8 /* NSString+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = C065AE43242EFCCA007114C8 /* NSString+Extensions.h */; };
@@ -107,6 +111,10 @@
 		C0339C902427EE5B0046D0AD /* DeviceConfig.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceConfig.m; sourceTree = "<group>"; };
 		C0339C92242803D80046D0AD /* ColorOffset.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ColorOffset.h; sourceTree = "<group>"; };
 		C0339C94242803E40046D0AD /* ColorOffset.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ColorOffset.m; sourceTree = "<group>"; };
+		C03E44DE2431132700B467BB /* RequestController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RequestController.h; sourceTree = "<group>"; };
+		C03E44E02431133800B467BB /* RequestController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RequestController.m; sourceTree = "<group>"; };
+		C03E44E32432595200B467BB /* PixelSettings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PixelSettings.h; sourceTree = "<group>"; };
+		C03E44E52432596900B467BB /* PixelSettings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PixelSettings.m; sourceTree = "<group>"; };
 		C065AE3F242ECD2A007114C8 /* DeviceRatio1775.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceRatio1775.h; sourceTree = "<group>"; };
 		C065AE41242ECD3B007114C8 /* DeviceRatio1775.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceRatio1775.m; sourceTree = "<group>"; };
 		C065AE43242EFCCA007114C8 /* NSString+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+Extensions.h"; sourceTree = "<group>"; };
@@ -216,6 +224,8 @@
 			children = (
 				C0025AC22414846B007813F7 /* JobController.h */,
 				C0025AC424148477007813F7 /* JobController.m */,
+				C03E44DE2431132700B467BB /* RequestController.h */,
+				C03E44E02431133800B467BB /* RequestController.m */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -226,7 +236,7 @@
 				C019482824161E730094A2C8 /* config.plist */,
 				C0BAF0942418B62C003E2419 /* Jarvis++.pch */,
 				C0025AC124148455007813F7 /* Controllers */,
-				C0339C8D2427EE410046D0AD /* Device */,
+				C0339C8D2427EE410046D0AD /* DeviceConfig */,
 				C0339C842427E8F30046D0AD /* DeviceCoordinate */,
 				C0025ABC241483A2007813F7 /* Extensions */,
 				C01B4963240ACF5D00633B45 /* Frameworks */,
@@ -235,6 +245,7 @@
 				91E40CCDBD064A40A2555622 /* Pods */,
 				C01B4962240ACF5D00633B45 /* Products */,
 				C067ACD6241EAFF6007E3055 /* PTFakeTouch */,
+				C03E44E22432592200B467BB /* Settings */,
 				C0025AB52414393B007813F7 /* States */,
 				C01B497D240ACF9400633B45 /* UIC */,
 				C0025AAC241421D5007813F7 /* Utilities */,
@@ -327,8 +338,6 @@
 				C0AC1CF1240BB365008F4DFB /* Device.m */,
 				C00EE48C241D4830001771AB /* JarvisTestCase.h */,
 				C00EE48E241D4855001771AB /* JarvisTestCase.m */,
-				C0AC1CF7240BB97A008F4DFB /* Settings.h */,
-				C0AC1CF5240BB96C008F4DFB /* Settings.m */,
 				C01B497E240ACF9400633B45 /* UIC.h */,
 				C01B497F240ACF9400633B45 /* UIC.mm */,
 			);
@@ -346,7 +355,7 @@
 			path = DeviceCoordinate;
 			sourceTree = "<group>";
 		};
-		C0339C8D2427EE410046D0AD /* Device */ = {
+		C0339C8D2427EE410046D0AD /* DeviceConfig */ = {
 			isa = PBXGroup;
 			children = (
 				C065AE3E242ECD04007114C8 /* Configs */,
@@ -355,7 +364,18 @@
 				C0339C8E2427EE510046D0AD /* DeviceConfig.h */,
 				C0339C902427EE5B0046D0AD /* DeviceConfig.m */,
 			);
-			path = Device;
+			path = DeviceConfig;
+			sourceTree = "<group>";
+		};
+		C03E44E22432592200B467BB /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				C03E44E32432595200B467BB /* PixelSettings.h */,
+				C03E44E52432596900B467BB /* PixelSettings.m */,
+				C0AC1CF7240BB97A008F4DFB /* Settings.h */,
+				C0AC1CF5240BB96C008F4DFB /* Settings.m */,
+			);
+			path = Settings;
 			sourceTree = "<group>";
 		};
 		C065AE3E242ECD04007114C8 /* Configs */ = {
@@ -425,6 +445,8 @@
 				C0025AAE241421E9007813F7 /* Utils.h in Headers */,
 				C067ACF0241EAFF7007E3055 /* UIView-KIFAdditions.h in Headers */,
 				C067ACF9241EAFF7007E3055 /* LoadableCategory.h in Headers */,
+				C03E44DF2431132700B467BB /* RequestController.h in Headers */,
+				C03E44E42432595200B467BB /* PixelSettings.h in Headers */,
 				C0BAF0952418B62C003E2419 /* Jarvis++.pch in Headers */,
 				C065AE44242EFCCA007114C8 /* NSString+Extensions.h in Headers */,
 				C0025AC32414846B007813F7 /* JobController.h in Headers */,
@@ -553,8 +575,10 @@
 				C0025AB224143917007813F7 /* DeviceState.m in Sources */,
 				C01B4981240ACF9400633B45 /* UIC.mm in Sources */,
 				C067ACEE241EAFF7007E3055 /* UIWindow-KIFAdditions.m in Sources */,
+				C03E44E62432596900B467BB /* PixelSettings.m in Sources */,
 				C067ACEF241EAFF7007E3055 /* UITouch-KIFAdditions.m in Sources */,
 				C065AE46242EFCD8007114C8 /* NSString+Extensions.m in Sources */,
+				C03E44E12431133800B467BB /* RequestController.m in Sources */,
 				C0B68E042414C632009B5970 /* Consts.m in Sources */,
 				C0339C882427E9220046D0AD /* DeviceCoordinate.m in Sources */,
 				C065AE42242ECD3B007114C8 /* DeviceRatio1775.m in Sources */,

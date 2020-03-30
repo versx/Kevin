@@ -7,6 +7,8 @@
 
 @interface NSString (Extensions)
 
++(BOOL)stringIsNullOrEmpty:(NSString *)value;
+
 -(BOOL)isNullOrEmpty;
 
 @end

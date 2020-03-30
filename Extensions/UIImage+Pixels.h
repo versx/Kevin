@@ -7,14 +7,14 @@
 
 #import <UIKit/UIKit.h>
 
-#import "../Device/ColorOffset.h"
+#import "../DeviceConfig/ColorOffset.h"
 #import "../DeviceCoordinate/DeviceCoordinate.h"
 
 @interface UIImage (Pixels)
 
-//-(UIColor *)getPixelColor:(CGFloat *)pos;
 -(UIColor *)getPixelColor:(int)x withY:(int)y;
 
+// Can probably remove, not used currently.
 -(UIImage *)resize:(int)x withY:(int)y;
 
 -(bool)rgbAtLocation:(DeviceCoordinate *)deviceCoordinate

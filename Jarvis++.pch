@@ -5,7 +5,11 @@
 //  Created by versx on 3/10/20.
 //
 
-#define JARVIS_VERSION @"0.5.90"
+#define JARVIS_VERSION @"0.5.145"
+
+//#define DEFAULT_MIN_LEVEL @0
+//#define DEFAULT_MAX_LEVEL @29
+// TODO: Either move all other default consts here or fix min/max_level in consts class.
 
 #import <Foundation/Foundation.h>
 #import "Utilities/Utils.h"
@@ -19,7 +23,7 @@
 // You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
 
 #ifdef DEBUG
-#   define ULog(fmt, ...)  { UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%s\n [Line %d] ", __PRETTY_FUNCTION__, __LINE__] message:[NSString stringWithFormat:fmt, ##__VA_ARGS__]  delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil]; [alert show]; }
+#   define ULog(fmt, ...)  { UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%s\n [Line %d] ", __PRETTY_FUNCTION__, __LINE__] message:[NSString stringWithFormat:fmt, ##__VA_ARGS__]  delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil]; [alert show]; }
 #endif
 
 #endif /* Jarvis___pch */

@@ -113,6 +113,12 @@ static NSString *plistFileName = @"config.plist";
     dispatch_once(&onceToken, ^{
         sharedInstance = [[Settings alloc] init];
         NSString *remoteConfigUrl = [sharedInstance getRemoteConfigUrl];
+        if (remoteConfigUrl == nil) {
+            NSLog(@"[Jarvis] [FATAL] Failed to fetch remote config, waiting 10 seconds then restarting...");
+            sleep(10);
+            [DeviceState restart];
+            return;
+        }
         _config = [sharedInstance fetchRemoteConfig:remoteConfigUrl];//[sharedInstance loadSettings];
         _enableAccountManager = [_config[@"enableAccountManager"] boolValue] ?: DEFAULT_ENABLE_ACCOUNT_MANAGER;
         _backendControllerUrl = _config[@"backendControllerURL"];

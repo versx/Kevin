@@ -9,6 +9,7 @@
 
 @implementation HttpClientConnection
 
+/* Unused, make sure of them.
 // HTTP endpoints
 NSString * VALID_GET_ENDPOINTS[5] = {
     @"/loc",
@@ -26,6 +27,7 @@ NSString * VALID_POST_ENDPOINTS[7] = {
     @"/pixel",
     @"/test"
 };
+*/
 
 -(BOOL)supportsMethod:(NSString *)method atPath:(NSString *)path
 {
@@ -75,7 +77,7 @@ NSString * VALID_POST_ENDPOINTS[7] = {
 
 -(NSObject<HTTPResponse> *)httpResponseForMethod:(NSString *)method URI:(NSString *)path
 {
-    syslog(@"[INFO] %@ %@", method, path);
+    //syslog(@"[INFO] %@ %@", method, path);
     
     if ([method isEqualToString:@"POST"]) {
         NSDictionary *json;
@@ -86,43 +88,42 @@ NSString * VALID_POST_ENDPOINTS[7] = {
             postStr = [[NSString alloc] initWithData:postData encoding:NSUTF8StringEncoding];
             json = [NSJSONSerialization JSONObjectWithData:postData
                                                     options:kNilOptions
-                                                      error:&error
-            ];
+                                                      error:&error];
         }
         syslog(@"[DEBUG] postStr: %@", postStr);
         NSString *response;
         if ([path isEqualToString:@"/loc"]) {
-            response = [UIC2 handleLocationRequest];
+            response = [[RequestController sharedInstance] handleLocationRequest]; // [UIC2 handleLocationRequest];
         } else if ([path isEqualToString:@"/data"]) {
-            response = [UIC2 handleDataRequest:json];
+            response = [[RequestController sharedInstance] handleDataRequest:json]; //[UIC2 handleDataRequest:json];
         } else if ([path isEqualToString:@"/touch"]) {
-            response = [UIC2 handleTouchRequest:json];
+            response = [[RequestController sharedInstance] handleTouchRequest:json]; //[UIC2 handleTouchRequest:json];
         } else if ([path isEqualToString:@"/type"]) {
-            response = [UIC2 handleTypeRequest:json];
+            response = [[RequestController sharedInstance] handleTypeRequest:json]; //[UIC2 handleTypeRequest:json];
         } else if ([path isEqualToString:@"/swipe"]) {
-            response = [UIC2 handleSwipeRequest];
+            response = [[RequestController sharedInstance] handleSwipeRequest]; //[UIC2 handleSwipeRequest];
         } else if ([path isEqualToString:@"/pixel"]) {
-            response = [UIC2 handlePixelRequest:json];
+            response = [[RequestController sharedInstance] handlePixelRequest:json]; //[UIC2 handlePixelRequest:json];
         } else if ([path isEqualToString:@"/test"]) {
-            response = [UIC2 handleTestRequest:json];
+            response = [[RequestController sharedInstance] handleTestRequest:json]; //[UIC2 handleTestRequest:json];
         }
         NSData *responseData = [response dataUsingEncoding:NSUTF8StringEncoding];
         return [[HTTPDataResponse alloc] initWithData:responseData];
     } else {
         NSString *response;
         if ([path isEqualToString:@"/loc"]) {
-            response = [UIC2 handleLocationRequest];
+            response = [[RequestController sharedInstance] handleLocationRequest]; //[UIC2 handleLocationRequest];
         } else if ([path isEqualToString:@"/config"]) {
-            response = [UIC2 handleConfigRequest];
+            response = [[RequestController sharedInstance] handleConfigRequest]; //[UIC2 handleConfigRequest];
         } else if ([path isEqualToString:@"/restart"] || // TODO: Restart app?
                    [path isEqualToString:@"/reboot"]) { // TODO: Reboot phone?
-            response = @"OK";
+            response = JSON_OK;
             [DeviceState restart];
         } else if ([path isEqualToString:@"/clear"]) {
             syslog(@"[INFO] Clearing user defaults");
             [[NSUserDefaults standardUserDefaults] removeObjectForKey:LOGIN_USER_DEFAULT_KEY];
             [[NSUserDefaults standardUserDefaults] removeObjectForKey:TOKEN_USER_DEFAULT_KEY];
-            response = @"OK";
+            response = JSON_OK;
         }
         NSData *responseData = [response dataUsingEncoding:NSUTF8StringEncoding];
         return [[HTTPDataResponse alloc] initWithData:responseData];

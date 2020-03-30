@@ -15,6 +15,7 @@
     if ((self = [super init]))
     {
         lastAction = @"";
+        eggStart = [NSDate dateWithTimeInterval:-1860 sinceDate:[NSDate date]];
     }
     
     return self;
@@ -43,7 +44,6 @@
     dispatch_once(&onceToken, ^{
         sharedInstance = [[DeviceState alloc] init];
         [sharedInstance setLastUpdate:[NSDate date]];
-        // TODO: Set Defaults? [sharedInstance setDelayQuest:false];
     });
     return sharedInstance;
 }
@@ -65,6 +65,7 @@
 @synthesize ultraQuestSpin;
 @synthesize newCreated;
 @synthesize needsLogout;
+@synthesize isStartup;
 
 @synthesize failedGetJobCount;
 @synthesize failedCount;
@@ -88,7 +89,6 @@
 +(void)restart
 {
     syslog(@"[INFO] Restarting...");
-    // TODO: Restart
     dispatch_async(dispatch_get_main_queue(), ^{
         while (true) { // REVIEW: Uhh this doesn't look safe. ;-|
             // TODO: UIControl().sendAction(#selector(NSXPCConnection.invalidate) to:UIApplication.shared for:nil);
@@ -111,7 +111,6 @@
     dispatch_async(dispatch_get_main_queue(), ^{
         NSString *backendControllerUrl = [[Settings sharedInstance] backendControllerUrl];
         [[Device sharedInstance] setIsLoggedIn:false];
-        //_action = nil;
         [[DeviceState sharedInstance] setDelayQuest:false];
         NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
         dict[@"uuid"] = [[Device sharedInstance] uuid];
@@ -167,20 +166,11 @@
                     [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
                     syslog(@"[DEBUG] startupLocation: %@", startupLocation);
                     
-                    //TODO: firstWarningTimestamp
-                    /*
-                    NSString *firstWarningTimestamp = data[@"first_warning_timestamp"];
-                    syslog(@"[DEBUG] firstWarningTimestamp: %@", firstWarningTimestamp);
-                    if ([firstWarningTimestamp != nil && ![firstWarningTimestamp isEqualToString:@"<null>"]) {
-                        NSDate *firstWarningDate = [NSDate dateWithTimeIntervalSince1970:[firstWarningTimestamp ?: 0 doubleValue]];
-                        [[DeviceState sharedInstance] setFirstWarningDate:firstWarningDate];
-                    }
-                    */
+                    [self checkWarning:data[@"first_warning_timestamp"]];
 
                     syslog(@"[DEBUG] Checking if username or ptcToken are empty.");
                     if (![username isNullOrEmpty] && ![ptcToken isNullOrEmpty]) {
-                        syslog(@"[INFO] Got account %@ level %@ from backend.", username, level);
-                        syslog(@"[DEBUG] Got token %@ from backend.", ptcToken);
+                        syslog(@"[INFO] Got account %@ level %@ from backend. ptcToken: %@", username, level, ptcToken);
                         [[Device sharedInstance] setUsername:username];
                         [[Device sharedInstance] setPassword:password];
                         [[Device sharedInstance] setPtcToken:ptcToken];
@@ -221,6 +211,16 @@
     syslog(@"[DEBUG] Restarting...");
     [NSThread sleepForTimeInterval:1];
     [self restart];
+}
+
++(void)checkWarning:(NSString *)timestamp
+{
+    NSString *firstWarningTimestamp = timestamp;
+    if (firstWarningTimestamp != (id)[NSNull null]) {
+        NSDate *firstWarningDate = [NSDate dateWithTimeIntervalSince1970:[firstWarningTimestamp ?: 0 intValue]];
+        syslog(@"[DEBUG] firstWarningDate: %@", firstWarningDate);
+        [[DeviceState sharedInstance] setFirstWarningDate:firstWarningDate];
+    }
 }
 
 @end

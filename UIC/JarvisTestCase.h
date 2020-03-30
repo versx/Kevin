@@ -12,7 +12,7 @@
 #import <UIKit/UIDevice.h>
 #import <UIKit/UIKit.h>
 
-#import "../Device/DeviceConfig.h"
+#import "../DeviceConfig/DeviceConfig.h"
 #import "../DeviceCoordinate/DeviceCoordinate.h"
 
 @interface JarvisTestCase : KIFTestCase

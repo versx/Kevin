@@ -7,7 +7,6 @@
 
 #import "../UIC/UIC.h"
 #import "../UIC/JarvisTestCase.h"
-#import "../Extensions/UIImage+Pixels.h"
 
 @interface Jarvis__ : NSObject
 

@@ -8,9 +8,9 @@
 #import <CoreLocation/CoreLocation.h>
 
 #import "../Extensions/NSString+Extensions.h"
+#import "../Settings/Settings.h"
 #import "../States/DeviceState.h"
 #import "../UIC/Device.h"
-#import "../UIC/Settings.h"
 
 @interface DeviceState : NSObject
 
@@ -33,6 +33,7 @@
 @property (nonatomic, readwrite, assign) BOOL ultraQuestSpin;
 @property (nonatomic, readwrite, assign) BOOL newCreated;
 @property (nonatomic, readwrite, assign) BOOL needsLogout;
+@property (nonatomic, readwrite, assign) BOOL isStartup;
 //static BOOL _newLogIn;
 
 @property (nonatomic, readwrite, assign) NSNumber *failedGetJobCount;
@@ -56,5 +57,6 @@
 
 +(void)logout;
 +(void)restart;
++(void)checkWarning:(NSString *)timestamp;
 
 @end

@@ -12,13 +12,11 @@
 
 #import "../Extensions/NSString+Extensions.h"
 #import "../PTFakeTouch/PTFakeTouch.h"
+#import "../Settings/Settings.h"
 #import "../UIC/Consts.h"
 #import "../UIC/Device.h"
-#import "../UIC/Settings.h"
 
 @interface Utils : NSObject
-
-//+(instancetype)sharedInstance;
 
 +(NSNumber *)incrementInt:(NSNumber *)value;
 +(NSNumber *)decrementInt:(NSNumber *)value;
@@ -45,7 +43,5 @@
 +(void)showAlert:(id)obj withMessage:(NSString *)message;
 
 +(void)syslog:(NSString *)fmt;
-
-//+(UIColor *)getPixelColor:(int)x withY:(int)y;
 
 @end

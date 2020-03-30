@@ -18,29 +18,13 @@
 
 -(BOOL)isNullOrEmpty
 {
-    return [self length] == 0;
-    
-    //if ( ( ![myString isEqual:[NSNull null]] ) && ( [myString length] != 0 ) ) {
-    //}
-    
-    //if (!value)
-    //    return true;
-    //return [value isEqualToString:@""];
-    
-    //if (!self.length) {
-    //    return true;
-    //}
-    //return false;
-    /*
     if (self == nil) {
         return true;
     }
-    //if ([self isKindOfClass:[NSNull class]]) {
-    if (self == NULL) { // REVIEW: Probably not needed?
+    if ([self isMemberOfClass:[NSNull class]]) {
         return true;
     }
-    return false;
-    */
+    return [self length] == 0;
 }
 
 @end

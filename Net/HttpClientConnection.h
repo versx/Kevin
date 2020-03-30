@@ -9,7 +9,8 @@
 #import <CocoaHTTPServer/HTTPConnection.h>
 #import <CocoaHTTPServer/HTTPDataResponse.h>
 
-#import "../UIC/UIC.h"
+#import "../Controllers/RequestController.h"
+//#import "../UIC/UIC.h"
 
 @interface HttpClientConnection : HTTPConnection
 

@@ -9,15 +9,280 @@
 
 @implementation JobController
 
+static dispatch_queue_t _getJobQueue;
+
++(JobController *)sharedInstance
+{
+    static JobController *sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[JobController alloc] init];
+    });
+    return sharedInstance;
+}
+
+
 -(id)init
 {
     syslog(@"[INFO] init");
-    if ((self = [super init]))
-    {
+    if ((self = [super init])) {
+        _getJobQueue = dispatch_queue_create("getjob_queue", NULL);
     }
     
     return self;
 }
+
+-(void)initialize
+{
+    NSMutableDictionary *initData = [[NSMutableDictionary alloc] init];
+    initData[@"uuid"] = [[Device sharedInstance] uuid];
+    initData[@"username"] = [[Device sharedInstance] username];
+    initData[@"type"] = @"init";
+    [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                  dict:initData
+              blocking:true
+            completion:^(NSDictionary *result) {
+        syslog(@"[DEBUG] Response from init: %@", result);
+        if (result == nil) {
+            syslog(@"[ERROR] Failed to connect to backend!");
+            [[Device sharedInstance] setShouldExit:true];
+            [NSThread sleepForTimeInterval:5];
+            [DeviceState restart];
+            return;
+        } else if (![(result[@"status"] ?: @"fail") isEqualToString:@"ok"]) {
+            NSString *error = result[@"error"] ?: @"? (No error sent)";
+            syslog(@"[ERROR] Backend returned error: %@", error);
+            [[Device sharedInstance] setShouldExit:true];
+            sleep(1);
+            return;
+        }
+        
+        NSDictionary *data = [result objectForKey:@"data"];
+        if (data == nil) {
+            syslog(@"[ERROR] Backend did not include data in response.");
+            [[Device sharedInstance] setShouldExit:true];
+            sleep(1);
+            return;
+        }
+        
+        if (!(data[@"assigned"] ?: false)) {
+            syslog(@"[WARN] Device is not assigned to an instance!");
+            [[Device sharedInstance] setShouldExit:true];
+            sleep(1);
+            return;
+        }
+        
+        [DeviceState checkWarning:data[@"first_warning_timestamp"]];
+        
+        syslog(@"[INFO] Connected to backend successfully!");
+        [[Device sharedInstance] setShouldExit:false];
+    }];
+    
+    if ([[Device sharedInstance] shouldExit]) {
+        [[Device sharedInstance] setShouldExit:false];
+        [NSThread sleepForTimeInterval:5];
+        [DeviceState restart];
+    }
+}
+
+-(void)getAccount
+{
+    syslog(@"[INFO] Sending 'get_account' post request.");
+    if (([[[Device sharedInstance] username] isNullOrEmpty] ||
+         [[[Device sharedInstance] username] isEqualToString:@"fail"]) &&
+         [[Settings sharedInstance] enableAccountManager]) {
+        NSMutableDictionary *getAccountData = [[NSMutableDictionary alloc] init];
+        getAccountData[@"uuid"] = [[Device sharedInstance] uuid];
+        getAccountData[@"username"] = [[Device sharedInstance] username];
+        getAccountData[@"min_level"] = [[Device sharedInstance] minLevel];
+        getAccountData[@"max_level"] = [[Device sharedInstance] maxLevel];
+        getAccountData[@"type"] = @"get_account";
+        [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                      dict:getAccountData
+                  blocking:true
+                completion:^(NSDictionary *result) {
+            NSDictionary *data = result[@"data"];
+            if (data != nil) {
+                NSString *username = data[@"username"];
+                NSString *password = data[@"password"];
+                NSNumber *level = data[@"level"];
+                NSDictionary *job = data[@"job"];
+                NSNumber *startLat = job[@"lat"];
+                NSNumber *startLon = job[@"lon"];
+                NSNumber *lastLat = data[@"last_encounter_lat"];
+                NSNumber *lastLon = data[@"last_encounter_lon"];
+                
+                if (username != nil) {
+                    syslog(@"[DEBUG] Got account %@ level %@ from backend.", username, level);
+                } else {
+                    syslog(@"[ERROR] Failed to get account and not logged in.");
+                    [[Device sharedInstance] setShouldExit:true];
+                }
+                [[Device sharedInstance] setUsername:username];
+                [[Device sharedInstance] setPassword:password];
+                [[Device sharedInstance] setLevel:level];
+                [[Device sharedInstance] setIsLoggedIn:false];
+                CLLocation *startupLocation;
+                if ([startLat doubleValue] != 0.0 && [startLon doubleValue] != 0.0) {
+                    startupLocation = [Utils createCoordinate:[startLat doubleValue] lon:[startLon doubleValue]];
+                } else if ([lastLat doubleValue] != 0.0 && [lastLon doubleValue] != 0.0) {
+                    startupLocation = [Utils createCoordinate:[lastLat doubleValue] lon:[lastLon doubleValue]];
+                } else {
+                    startupLocation = [Utils createCoordinate:[startLat doubleValue] lon:[startLon doubleValue]];
+                }
+                [[DeviceState sharedInstance] setStartupLocation:startupLocation];
+                [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
+                syslog(@"[DEBUG] startupLocation: %@", startupLocation);
+                [DeviceState checkWarning:data[@"first_warning_timestamp"]];
+            } else {
+                syslog(@"[WARN] Failed to get account and not logged in.");
+                [[Device sharedInstance] setMinLevel:@0];
+                [[Device sharedInstance] setMaxLevel:@29];
+                [NSThread sleepForTimeInterval:1];
+                [[NSUserDefaults standardUserDefaults] removeObjectForKey:LOGIN_USER_DEFAULT_KEY];
+                [NSThread sleepForTimeInterval:5];
+                [[Device sharedInstance] setIsLoggedIn:false];
+                [DeviceState restart];
+            }
+        }];
+    }
+}
+
+-(void)getJobs
+{
+    [[DeviceState sharedInstance] setIsStartup:false];
+
+    dispatch_async(_getJobQueue, ^{
+        bool hasWarning = false;
+        [[DeviceState sharedInstance] setFailedGetJobCount:@0];
+        [[DeviceState sharedInstance] setFailedCount:@0];
+        [[DeviceState sharedInstance] setEmptyGmoCount:@0];
+        [[DeviceState sharedInstance] setNoQuestCount:@0];
+        //_noEncounterCount = 0;
+
+        // Grab an account from the backend controller.
+        [self getAccount];
+        
+        syslog(@"[INFO] Starting job handler.");
+        // Start grabbing jobs from the backend controller.
+        while (![[Device sharedInstance] shouldExit]) {
+            dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+            __block NSDictionary *data = nil;
+            if ([[DeviceState sharedInstance] needsLogout]) {
+                syslog(@"[INFO] Logging out...");
+                //self.lock.lock();
+                CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
+                [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
+                //self.lock.unlock();
+                [DeviceState logout];
+            }
+            NSMutableDictionary *jobData = [[NSMutableDictionary alloc] init];
+            jobData[@"uuid"] = [[Device sharedInstance] uuid];
+            jobData[@"username"] = [[Device sharedInstance] username];
+            jobData[@"type"] = @"get_job";
+            [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                          dict:jobData
+                      blocking:true
+                    completion:^(NSDictionary *result) {
+                syslog(@"[DEBUG] get_job response: %@", result);
+                if (result == nil) {
+                    NSNumber *failedGetJobCount = [[DeviceState sharedInstance] failedGetJobCount];
+                    if ([failedGetJobCount intValue] == 10) {
+                        syslog(@"[ERROR] Failed to get job 10 times in a row. Exiting...");
+                        //[[Device sharedInstance] setShouldExit:true];
+                        dispatch_semaphore_signal(sem);
+                        return;
+                    } else {
+                        syslog(@"[ERROR] Failed to get a job.");
+                        dispatch_semaphore_signal(sem);
+                        return;
+                    }
+                } else if ([[Settings sharedInstance] enableAccountManager]) {
+                    data = result[@"data"];
+                    if (data != nil) {
+                        NSNumber *currentLevel = [[Device sharedInstance] level];
+                        NSNumber *minLevel = [data objectForKey:@"min_level"];
+                        NSNumber *maxLevel = [data objectForKey:@"max_level"];
+                        if (minLevel && maxLevel) {
+                            [[Device sharedInstance] setMinLevel:minLevel];
+                            [[Device sharedInstance] setMaxLevel:maxLevel];
+                            syslog(@"[DEBUG] Current level %@ (Min: %@, Max: %@)", currentLevel, minLevel, maxLevel);
+                            if ([currentLevel intValue] != 0 &&
+                                ([currentLevel intValue] < [minLevel intValue] ||
+                                 [currentLevel intValue] > [maxLevel intValue])) {
+                                syslog(@"[WARN] Account is outside min/max level range. Logging out!");
+                                //self.lock.lock();
+                                CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
+                                [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
+                                [DeviceState logout];
+                                //self.lock.unlock();
+                            }
+                        }
+                    }
+                }
+                
+                [[DeviceState sharedInstance] setFailedGetJobCount:@0];
+                if (data == nil) {
+                    syslog(@"[WARN] No job left (Result: %@)", result);
+                    [NSThread sleepForTimeInterval:5];
+                    dispatch_semaphore_signal(sem);
+                    return;
+                }
+
+                // Parse job based on type.
+                NSString *action = data[@"action"];
+                [[DeviceState sharedInstance] setLastAction:action];
+                if ([action isEqualToString:@"scan_pokemon"]) {
+                    syslog(@"[DEBUG] [STATUS] Pokemon");
+                    [self handlePokemonJob:action withData:data hasWarning:hasWarning];
+                } else if ([action isEqualToString:@"scan_raid"]) {
+                    syslog(@"[DEBUG] [STATUS] Raid");
+                    [self handleRaidJob:action withData:data hasWarning:hasWarning];
+                } else if ([action isEqualToString:@"scan_quest"]) {
+                    syslog(@"[DEBUG] [STATUS] Quest/Leveling");
+                    [self handleQuestJob:action withData:data hasWarning:hasWarning];
+                } else if ([action isEqualToString:@"switch_account"]) {
+                    syslog(@"[DEBUG] [STATUS] Switching Accounts");
+                    [self handleSwitchAccount:action withData:data hasWarning:hasWarning];
+                } else if ([action isEqualToString:@"leveling"]) {
+                    syslog(@"[DEBUG] [STATUS] Leveling");
+                    [self handleLeveling:action withData:data hasWarning:hasWarning];
+                } else if ([action isEqualToString:@"scan_iv"]) {
+                    syslog(@"[DEBUG] [STATUS] IV");
+                    [self handleIVJob:action withData:data hasWarning:hasWarning];
+                } else if ([action isEqualToString:@"gather_token"]) {
+                    syslog(@"[DEBUG] [STATUS] Token");
+                    [self handleGatherToken:action withData:data hasWarning:hasWarning];
+                } else {
+                    syslog(@"[WARN] Unknown action received: %@", action);
+                }
+                
+                dispatch_semaphore_signal(sem);
+                
+                NSNumber *emptyGmoCount = [[DeviceState sharedInstance] emptyGmoCount];
+                NSNumber *maxEmptyGMO = [[Settings sharedInstance] maxEmptyGMO];
+                if ([emptyGmoCount intValue] >= [maxEmptyGMO intValue]) {
+                    syslog(@"[WARN] Got Empty GMO %@ times in a row. Restarting...", emptyGmoCount);
+                    [DeviceState restart];
+                }
+                
+                NSNumber *failedCount = [[DeviceState sharedInstance] failedCount];
+                NSNumber *maxFailedCount = [[Settings sharedInstance] maxFailedCount];
+                if ([failedCount intValue] >= [maxFailedCount intValue]) {
+                    syslog(@"[ERROR] Failed %@ times in a row. Restarting...", failedCount);
+                    [DeviceState restart];
+                }
+                sleep(2);
+            }];
+            
+            dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+            sleep(1);
+        }
+    });
+}
+
+
+#pragma mark Job Handlers
 
 -(void)handlePokemonJob:(NSString *)action withData:(NSDictionary *)data hasWarning:(BOOL)hasWarning
 {
@@ -49,7 +314,7 @@
         [NSThread sleepForTimeInterval:1];
         //self.lock.lock();
         NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:start];
-        if (timeIntervalSince >= 30) {
+        if (timeIntervalSince >= 30) { // TODO: Make constant
             locked = false;
             [[DeviceState sharedInstance] setWaitForData:false];
             NSNumber *failedCount = [[DeviceState sharedInstance] failedCount];
@@ -58,7 +323,7 @@
             NSMutableDictionary *failedData = [[NSMutableDictionary alloc] init];
             failedData[@"uuid"] = [[Device sharedInstance] uuid];
             failedData[@"username"] = [[Device sharedInstance] username];
-            failedData[@"action"] = action;// TODO: @"scan_pokemon",
+            failedData[@"action"] = action;
             failedData[@"lat"] = lat;
             failedData[@"lon"] = lon;
             failedData[@"type"] = @"job_failed";
@@ -163,6 +428,7 @@
         [[DeviceState sharedInstance] eggStart] < [NSDate date] &&
         [[[Device sharedInstance] level] intValue] >= 9 &&
         [[[Device sharedInstance] level] intValue] < 30) {
+        /* TODO: Egg Deploy
         NSNumber *i = @(arc4random_uniform(60));
         [NSThread sleepForTimeInterval:2];
         if ([Jarvis__ getToMainScreen]) {
@@ -184,6 +450,7 @@
             NSDate *eggStart = [NSDate dateWithTimeInterval:(960 + [i intValue]) sinceDate:[NSDate date]];
             [[DeviceState sharedInstance] setEggStart:eggStart];
         }
+         */
         syslog(@"[INFO] Egg timer set to %@ UTC for a recheck.", [[DeviceState sharedInstance] eggStart]);
     }
     
@@ -217,6 +484,7 @@
     [[DeviceState sharedInstance] setPokemonEncounterId:nil];
     //_targetMaxDistance = [[Settings sharedInstance] targetMaxDistance];
     [[DeviceState sharedInstance] setWaitForData:true];
+    [[DeviceState sharedInstance] setGotQuest:false];
     //self.lock.unlock();
     syslog(@"[INFO] Scanning prepared");
     
@@ -225,7 +493,7 @@
     BOOL locked = true;
     BOOL found = false;
     while (locked) {
-        usleep(100000);
+        sleep(2); // TODO: DelayMultiplier
         NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:start];
         if (timeIntervalSince <= 5) {
             continue;
@@ -236,12 +504,12 @@
             //NSDate *end = [[NSDate date] initWithTimeIntervalSince1970:[delayDouble doubleValue]];
             syslog(@"[INFO] Delaying by %@ seconds.", left);
 
-            while (!found && (timeIntervalSince <= [delay doubleValue])) {
+            while (!found && ([[NSDate date] timeIntervalSinceDate:start]/*timeIntervalSince*/ <= [delay doubleValue])) {
                 //self.lock.lock();
                 locked = [[DeviceState sharedInstance] gotQuestEarly];
                 //self.lock.unlock();
                 if (locked) {
-                    usleep(100000);
+                    sleep(1);
                 } else {
                     found = true;
                 }
@@ -289,6 +557,7 @@
             [[DeviceState sharedInstance] setNoQuestCount:[Utils incrementInt:noQuestCount]];
         }
         [[DeviceState sharedInstance] setGotQuest:false];
+
         if ([[DeviceState sharedInstance] noQuestCount] >= [[Settings sharedInstance] maxNoQuestCount]) {
             //self.lock.unlock();
             syslog(@"[WARN] Stuck somewhere. Restarting...");
@@ -297,19 +566,19 @@
         
         //self.lock.unlock();
         if (success) {
-            NSNumber *attempts = 0;
-            while ([attempts intValue] < 5) {
-                attempts = [Utils incrementInt:attempts];
+            int attempts = 0;
+            while (attempts < 5) {
+                attempts++;
                 //self.lock.lock();
                 BOOL gotQuest = [[DeviceState sharedInstance] gotQuest];
                 syslog(@"[INFO] Got quest data: %@", gotQuest ? @"Yes" : @"No");
                 if (!gotQuest) {
-                    syslog(@"[DEBUG] UltraQuests pokestop re-attempt: %@", attempts);
+                    syslog(@"[DEBUG] UltraQuests pokestop re-attempt: %d", attempts);
                     //self.lock.unlock();
-                    [NSThread sleepForTimeInterval:2];
+                    sleep(2);
                 } else {
                     //self.lock.unlock();
-                    //break;
+                    break;
                 }
             }
         }
@@ -322,7 +591,6 @@
     //degreePerMeter = 83267.0991559005
     NSNumber *lat = data[@"lat"] ?: 0;
     NSNumber *lon = data[@"lon"] ?: 0;
-    syslog(@"[INFO] Scanning for IV at %@ %@", lat, lon);
     NSNumber *delay = data[@"delay"] ?: @0.0;
     NSString *fortType = data[@"fort_type"] ?: @"P";
     NSString *targetFortId = data[@"fort_id"] ?: @"";
@@ -420,12 +688,12 @@
         bool success = false;
         bool locked = true;
         while (locked) {
-            usleep(100000);
+            sleep(1);
             NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:start];
             if (timeIntervalSince >= [delayTemp intValue]) {
                 NSNumber *left = @([delayTemp intValue] - timeIntervalSince);
                 syslog(@"[DEBUG] Delaying by %@", left);
-                // TODO: usleep(UInt32(min(10.0, left) * 100000.0));
+                sleep(MIN(10, [left intValue]));
                 continue;
             }
             //self.lock.lock();
@@ -454,7 +722,7 @@
                     [[DeviceState sharedInstance] setDelayQuest:true];
                     [[DeviceState sharedInstance] setFailedCount:0];
                     syslog(@"[INFO] Pokestop loaded after %f", [[NSDate date] timeIntervalSinceDate:start]);
-                    [NSThread sleepForTimeInterval:1];
+                    sleep(1);
                 }
             }
             //self.lock.unlock();
@@ -468,6 +736,7 @@
             NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:lastDeployTime];
             if (([luckyEggsCount intValue] >= 1 && timeIntervalSince >= 2000) ||
                 ([spinCount intValue] >= 400 && [[[Device sharedInstance] level] intValue] >= 20)) {
+                /* TODO: Egg Deploy
                 [Jarvis__ getToMainScreen];
                 syslog(@"[INFO] Clearing Items for UQ");
                 if ([Jarvis__ eggDeploy]) {
@@ -476,11 +745,11 @@
                 } else {
                     [[DeviceState sharedInstance] setLuckyEggsCount:0];
                 }
+                */
                 [[DeviceState sharedInstance] setSpinCount:0];
                 [[DeviceState sharedInstance] setUltraQuestSpin:true];
                 [NSThread sleepForTimeInterval:1];
                 NSNumber *attempts = @0;
-                NSNumber *sleepUsleep = @200000; // 200ms
                 while ([[NSDate date] timeIntervalSinceDate:start] < 15.0 + [delay intValue]) {
                     //self.lock.lock();
                     if (![[DeviceState sharedInstance] gotItems]) {
@@ -488,7 +757,7 @@
                         if ([attempts intValue] % 5 == 0) {
                             syslog(@"[DEBUG] Waiting to spin...");
                         }
-                        usleep([sleepUsleep intValue]);
+                        sleep(2);
                     } else {
                         //self.lock.unlock();
                         syslog(@"[INFO] Successfully spun Pokestop");
@@ -554,7 +823,6 @@
             [[DeviceState sharedInstance] setWaitForData:false];
             NSNumber *failedCount = [[DeviceState sharedInstance] failedCount];
             [[DeviceState sharedInstance] setFailedCount:[Utils incrementInt:failedCount]];
-            // TODO: Double check failedCount is being set in DeviceState
             syslog(@"[WARN] Pokemon loading timed out.");
             NSMutableDictionary *raidData = [[NSMutableDictionary alloc] init];
             raidData[@"uuid"] = [[Device sharedInstance] uuid];
@@ -589,21 +857,18 @@
 
 -(void)handleGatherToken:(NSString *)action withData:(NSDictionary *)data hasWarning:(BOOL)hasWarning
 {
-    //if (_menuButton) {
-    //    _menuButton = false;
-        NSMutableDictionary *tokenData = [[NSMutableDictionary alloc] init];
-        tokenData[@"uuid"] = [[Device sharedInstance] uuid];
-        tokenData[@"username"] = [[Device sharedInstance] username];
-        tokenData[@"ptcToken"] = [[Device sharedInstance] ptcToken];
-        tokenData[@"type"] = @"ptcToken";
-        [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
-                      dict:tokenData
-                  blocking:true
-                completion:^(NSDictionary *result) {}
-        ];
-        syslog(@"[INFO] Received ptcToken, swapping account...");
-        [DeviceState logout];
-    //}
+    NSMutableDictionary *tokenData = [[NSMutableDictionary alloc] init];
+    tokenData[@"uuid"] = [[Device sharedInstance] uuid];
+    tokenData[@"username"] = [[Device sharedInstance] username];
+    tokenData[@"ptcToken"] = [[Device sharedInstance] ptcToken];
+    tokenData[@"type"] = @"ptcToken";
+    [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                  dict:tokenData
+              blocking:true
+            completion:^(NSDictionary *result) {}
+    ];
+    syslog(@"[INFO] Received ptcToken, swapping account...");
+    [DeviceState logout];
 }
 
 @end

@@ -88,7 +88,7 @@ static double _baseVerticalAccuracy = 200.0; // in meters
         NSString *responseData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         //syslog(@"[DEBUG] postRequest response: %@", responseData);
         [responseData release];
-        if (data != nil) { // TODO: Check if json parsed
+        if (data != nil) {
             NSError *jsonError;
             NSDictionary *resultJson = [NSJSONSerialization JSONObjectWithData:data
                                                                        options:NSJSONReadingMutableContainers
