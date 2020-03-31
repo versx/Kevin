@@ -529,7 +529,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\n/Users/helpdesk/Desktop/Projects/Jarvis/inject.sh\n";
+			shellScript = "\n/Users/helpdesk/Desktop/Projects/Jarvis/build.sh\n";
 		};
 		DD19E334717C3F402AC7920B /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;

@@ -10,12 +10,6 @@
 
 @interface Jarvis__ : NSObject
 
-//+(BOOL)clickButton:(NSString *)buttonName;
-//+(BOOL)findButton:(NSString *)buttonName;
-//+(NSString *)getMenuButton;
-//+(BOOL)eggDeploy;
-//+(BOOL)getToMainScreen;
-
 +(void)typeUsername;
 +(void)typePassword;
 

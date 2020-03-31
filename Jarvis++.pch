@@ -5,7 +5,7 @@
 //  Created by versx on 3/10/20.
 //
 
-#define JARVIS_VERSION @"0.5.145"
+#define JARVIS_VERSION @"0.6.1"
 
 //#define DEFAULT_MIN_LEVEL @0
 //#define DEFAULT_MAX_LEVEL @29

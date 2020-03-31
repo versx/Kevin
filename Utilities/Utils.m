@@ -52,6 +52,7 @@ static double _baseVerticalAccuracy = 200.0; // in meters
     //    @autoreleasepool {
     //__block BOOL done = false;
     //__block NSDictionary *resultDict;
+    // TODO: Add semaphore
     
     // Create the URLSession on the default configuration
     NSURLSessionConfiguration *defaultSessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
