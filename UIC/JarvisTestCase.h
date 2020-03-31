@@ -8,7 +8,6 @@
 #import <CoreLocation/CoreLocation.h>
 #import <KIF/KIFUIViewTestActor.h>
 #import <KIF/XCTestCase-KIFAdditions.h>
-//#import <KIF/UIView-KIFAdditions.h>
 #import <UIKit/UIDevice.h>
 #import <UIKit/UIKit.h>
 

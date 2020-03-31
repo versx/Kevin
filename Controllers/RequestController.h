@@ -21,7 +21,9 @@
 -(NSString *)handleTypeRequest:(NSDictionary *)params;
 -(NSString *)handleSwipeRequest;
 -(NSString *)handlePixelRequest:(NSDictionary *)params;
+-(NSString *)handleClearRequest;
 -(NSString *)handleConfigRequest;
+-(NSString *)handleRestartRequest;
 -(NSString *)handleTestRequest:(NSDictionary *)params;
 
 @end

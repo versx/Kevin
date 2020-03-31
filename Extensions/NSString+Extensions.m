@@ -18,10 +18,10 @@
 
 -(BOOL)isNullOrEmpty
 {
-    if (self == nil) {
+    if ([self isMemberOfClass:[NSNull class]]) {
         return true;
     }
-    if ([self isMemberOfClass:[NSNull class]]) {
+    if (self == nil) {
         return true;
     }
     return [self length] == 0;

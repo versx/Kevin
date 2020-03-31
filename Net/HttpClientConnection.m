@@ -41,7 +41,7 @@ NSString * VALID_POST_ENDPOINTS[7] = {
             [path isEqualToString:@"/pixel"] ||
             [path isEqualToString:@"/test"]) {
             // Let's be extra cautious, and make sure the upload isn't 5 gigs
-            //return requestContentLength < 50;
+            //return requestContentLength < (10 * 1024 * 1024); // 10 MB
             return YES;
         }
     }
@@ -63,6 +63,7 @@ NSString * VALID_POST_ENDPOINTS[7] = {
 {
     [response setHeaderField:@"Accept" value:@"application/json"];
     [response setHeaderField:@"Content-Type" value:@"application/json"];
+    // TODO: Add token
     return [response messageData];
 }
 
@@ -78,7 +79,6 @@ NSString * VALID_POST_ENDPOINTS[7] = {
 -(NSObject<HTTPResponse> *)httpResponseForMethod:(NSString *)method URI:(NSString *)path
 {
     //syslog(@"[INFO] %@ %@", method, path);
-    
     if ([method isEqualToString:@"POST"]) {
         NSDictionary *json;
         NSString *postStr = nil;
@@ -90,40 +90,36 @@ NSString * VALID_POST_ENDPOINTS[7] = {
                                                     options:kNilOptions
                                                       error:&error];
         }
-        syslog(@"[DEBUG] postStr: %@", postStr);
+        //syslog(@"[DEBUG] postStr: %@", postStr);
         NSString *response;
         if ([path isEqualToString:@"/loc"]) {
-            response = [[RequestController sharedInstance] handleLocationRequest]; // [UIC2 handleLocationRequest];
+            response = [[RequestController sharedInstance] handleLocationRequest];
         } else if ([path isEqualToString:@"/data"]) {
-            response = [[RequestController sharedInstance] handleDataRequest:json]; //[UIC2 handleDataRequest:json];
+            response = [[RequestController sharedInstance] handleDataRequest:json];
         } else if ([path isEqualToString:@"/touch"]) {
-            response = [[RequestController sharedInstance] handleTouchRequest:json]; //[UIC2 handleTouchRequest:json];
+            response = [[RequestController sharedInstance] handleTouchRequest:json];
         } else if ([path isEqualToString:@"/type"]) {
-            response = [[RequestController sharedInstance] handleTypeRequest:json]; //[UIC2 handleTypeRequest:json];
+            response = [[RequestController sharedInstance] handleTypeRequest:json];
         } else if ([path isEqualToString:@"/swipe"]) {
-            response = [[RequestController sharedInstance] handleSwipeRequest]; //[UIC2 handleSwipeRequest];
+            response = [[RequestController sharedInstance] handleSwipeRequest];
         } else if ([path isEqualToString:@"/pixel"]) {
-            response = [[RequestController sharedInstance] handlePixelRequest:json]; //[UIC2 handlePixelRequest:json];
+            response = [[RequestController sharedInstance] handlePixelRequest:json];
         } else if ([path isEqualToString:@"/test"]) {
-            response = [[RequestController sharedInstance] handleTestRequest:json]; //[UIC2 handleTestRequest:json];
+            response = [[RequestController sharedInstance] handleTestRequest:json];
         }
         NSData *responseData = [response dataUsingEncoding:NSUTF8StringEncoding];
         return [[HTTPDataResponse alloc] initWithData:responseData];
     } else {
         NSString *response;
         if ([path isEqualToString:@"/loc"]) {
-            response = [[RequestController sharedInstance] handleLocationRequest]; //[UIC2 handleLocationRequest];
+            response = [[RequestController sharedInstance] handleLocationRequest];
         } else if ([path isEqualToString:@"/config"]) {
-            response = [[RequestController sharedInstance] handleConfigRequest]; //[UIC2 handleConfigRequest];
-        } else if ([path isEqualToString:@"/restart"] || // TODO: Restart app?
-                   [path isEqualToString:@"/reboot"]) { // TODO: Reboot phone?
-            response = JSON_OK;
-            [DeviceState restart];
+            response = [[RequestController sharedInstance] handleConfigRequest];
+        } else if ([path isEqualToString:@"/restart"] ||
+                   [path isEqualToString:@"/reboot"]) {
+            response = [[RequestController sharedInstance] handleRestartRequest];
         } else if ([path isEqualToString:@"/clear"]) {
-            syslog(@"[INFO] Clearing user defaults");
-            [[NSUserDefaults standardUserDefaults] removeObjectForKey:LOGIN_USER_DEFAULT_KEY];
-            [[NSUserDefaults standardUserDefaults] removeObjectForKey:TOKEN_USER_DEFAULT_KEY];
-            response = JSON_OK;
+            response = [[RequestController sharedInstance] handleClearRequest];
         }
         NSData *responseData = [response dataUsingEncoding:NSUTF8StringEncoding];
         return [[HTTPDataResponse alloc] initWithData:responseData];

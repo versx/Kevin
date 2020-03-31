@@ -4,7 +4,7 @@
 
 appDir="/Users/helpdesk/Desktop/Projects/Jarvis/app.zip" # Path to app.zip
 payloadDir="/Users/helpdesk/Desktop/Projects/Jarvis/Payload/" # Path to Payload/ directory of unzipped app.zip
-DEVELOPER="iPhone Developer: ()" # This can be found by running `security find-identity -p codesigning`
+#DEVELOPER="iPhone Developer: ()" # This can be found by running `security find-identity -p codesigning`
 MOBILEPROV="/Users/helpdesk/Desktop/deployer-redux/profile/DevProfile.mobileprovision" # path to provisioning profile
 
 rm -rf "$payloadDir"

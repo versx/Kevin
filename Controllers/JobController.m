@@ -46,7 +46,7 @@ static dispatch_queue_t _getJobQueue;
         if (result == nil) {
             syslog(@"[ERROR] Failed to connect to backend!");
             [[Device sharedInstance] setShouldExit:true];
-            [NSThread sleepForTimeInterval:5];
+            sleep(5);
             [DeviceState restart];
             return;
         } else if (![(result[@"status"] ?: @"fail") isEqualToString:@"ok"]) {
@@ -80,7 +80,7 @@ static dispatch_queue_t _getJobQueue;
     
     if ([[Device sharedInstance] shouldExit]) {
         [[Device sharedInstance] setShouldExit:false];
-        [NSThread sleepForTimeInterval:5];
+        sleep(5);
         [DeviceState restart];
     }
 }
@@ -138,9 +138,9 @@ static dispatch_queue_t _getJobQueue;
                 syslog(@"[WARN] Failed to get account and not logged in.");
                 [[Device sharedInstance] setMinLevel:@0];
                 [[Device sharedInstance] setMaxLevel:@29];
-                [NSThread sleepForTimeInterval:1];
+                sleep(1);
                 [[NSUserDefaults standardUserDefaults] removeObjectForKey:LOGIN_USER_DEFAULT_KEY];
-                [NSThread sleepForTimeInterval:5];
+                sleep(5);
                 [[Device sharedInstance] setIsLoggedIn:false];
                 [DeviceState restart];
             }
@@ -184,7 +184,7 @@ static dispatch_queue_t _getJobQueue;
                           dict:jobData
                       blocking:true
                     completion:^(NSDictionary *result) {
-                syslog(@"[DEBUG] get_job response: %@", result);
+                //syslog(@"[DEBUG] get_job response: %@", result);
                 if (result == nil) {
                     NSNumber *failedGetJobCount = [[DeviceState sharedInstance] failedGetJobCount];
                     if ([failedGetJobCount intValue] == 10) {
@@ -224,7 +224,7 @@ static dispatch_queue_t _getJobQueue;
                 [[DeviceState sharedInstance] setFailedGetJobCount:@0];
                 if (data == nil) {
                     syslog(@"[WARN] No job left (Result: %@)", result);
-                    [NSThread sleepForTimeInterval:5];
+                    sleep(5);
                     dispatch_semaphore_signal(sem);
                     return;
                 }
@@ -311,7 +311,7 @@ static dispatch_queue_t _getJobQueue;
     
     BOOL locked = true;
     while (locked) {
-        [NSThread sleepForTimeInterval:1];
+        sleep(1);
         //self.lock.lock();
         NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:start];
         if (timeIntervalSince >= 30) { // TODO: Make constant
@@ -428,29 +428,19 @@ static dispatch_queue_t _getJobQueue;
         [[DeviceState sharedInstance] eggStart] < [NSDate date] &&
         [[[Device sharedInstance] level] intValue] >= 9 &&
         [[[Device sharedInstance] level] intValue] < 30) {
-        /* TODO: Egg Deploy
-        NSNumber *i = @(arc4random_uniform(60));
-        [NSThread sleepForTimeInterval:2];
-        if ([Jarvis__ getToMainScreen]) {
-            syslog(@"[INFO] Deploying an egg");
-            if ([Jarvis__ eggDeploy]) {
-                // If an egg was found, set the timer to 31 minutes.
-                //NSDate *eggStart = [[NSDate date] initWithTimeInterval:(1860 + [i intValue]) sinceDate:[NSDate date]];
-                NSDate *eggStart = [NSDate dateWithTimeInterval:(1860 + [i intValue]) sinceDate:[NSDate date]];
-                [[DeviceState sharedInstance] setEggStart:eggStart];
-            } else {
-                // If no egg was used, set the timer to 16 minutes so it rechecks.
-                // Useful if you get more eggs from leveling up.
-                NSDate *eggStart = [NSDate dateWithTimeInterval:(960 + [i intValue]) sinceDate:[NSDate date]];
-                [[DeviceState sharedInstance] setEggStart:eggStart];
-            }
-            syslog(@"[INFO] Egg timer set to %@ UTC for a recheck.", [[DeviceState sharedInstance] eggStart]);
+        int i = arc4random_uniform(60);
+        sleep(2);
+        syslog(@"[INFO] Deploying an egg");
+        if ([UIC2 eggDeploy]) {
+            // If an egg was found, set the timer to 31 minutes.
+            NSDate *eggStart = [NSDate dateWithTimeInterval:(1860 + i) sinceDate:[NSDate date]];
+            [[DeviceState sharedInstance] setEggStart:eggStart];
         } else {
-            
-            NSDate *eggStart = [NSDate dateWithTimeInterval:(960 + [i intValue]) sinceDate:[NSDate date]];
+            // If no egg was used, set the timer to 16 minutes so it rechecks.
+            // Useful if you get more eggs from leveling up.
+            NSDate *eggStart = [NSDate dateWithTimeInterval:(960 + i) sinceDate:[NSDate date]];
             [[DeviceState sharedInstance] setEggStart:eggStart];
         }
-         */
         syslog(@"[INFO] Egg timer set to %@ UTC for a recheck.", [[DeviceState sharedInstance] eggStart]);
     }
     
@@ -503,7 +493,6 @@ static dispatch_queue_t _getJobQueue;
             //NSNumber *delayDouble = [NSNumber numberWithDouble:[delay doubleValue]];
             //NSDate *end = [[NSDate date] initWithTimeIntervalSince1970:[delayDouble doubleValue]];
             syslog(@"[INFO] Delaying by %@ seconds.", left);
-
             while (!found && ([[NSDate date] timeIntervalSinceDate:start]/*timeIntervalSince*/ <= [delay doubleValue])) {
                 //self.lock.lock();
                 locked = [[DeviceState sharedInstance] gotQuestEarly];
@@ -592,10 +581,10 @@ static dispatch_queue_t _getJobQueue;
     NSNumber *lat = data[@"lat"] ?: 0;
     NSNumber *lon = data[@"lon"] ?: 0;
     NSNumber *delay = data[@"delay"] ?: @0.0;
-    NSString *fortType = data[@"fort_type"] ?: @"P";
+    //NSString *fortType = data[@"fort_type"] ?: @"P";
     NSString *targetFortId = data[@"fort_id"] ?: @"";
     [[DeviceState sharedInstance] setTargetFortId:targetFortId];
-    syslog(@"[DEBUG] [RES1] Location: %@ %@ Delay: %@ FortType: %@ FortId: %@", lat, lon, delay, fortType, targetFortId);
+    //syslog(@"[DEBUG] [RES1] Location: %@ %@ Delay: %@ FortType: %@ FortId: %@", lat, lon, delay, fortType, targetFortId);
     
     if (![[DeviceState sharedInstance] isQuestInit]) {
         [[DeviceState sharedInstance] setIsQuestInit:true];
@@ -628,7 +617,7 @@ static dispatch_queue_t _getJobQueue;
         
         [[DeviceState sharedInstance] setSkipSpin:false];
         syslog(@"[DEBUG] Quest Distance: %@", questDistance);
-        if ([questDistance intValue] <= 5.0) {
+        if ([questDistance doubleValue] <= 5.0) {
             delay = @0.0;
             [[DeviceState sharedInstance] setSkipSpin:true];
             syslog(@"[DEBUG] Quest Distance: %@m < 30.0m Already spun this pokestop. Go to next pokestop.", questDistance);
@@ -638,13 +627,13 @@ static dispatch_queue_t _getJobQueue;
         } else if ([questDistance intValue] <= 1000.0) {
             delay = @(([questDistance intValue] / 1000.0) * 60.0);
         } else if ([questDistance intValue] <= 2000.0) {
-            delay = @(([questDistance intValue] / 2000.0) * 60.0);
+            delay = @(([questDistance intValue] / 2000.0) * 90.0);
         } else if ([questDistance intValue] <= 4000.0) {
-            delay = @(([questDistance intValue] / 4000.0) * 60.0);
+            delay = @(([questDistance intValue] / 4000.0) * 120.0);
         } else if ([questDistance intValue] <= 5000.0) {
-            delay = @(([questDistance intValue] / 5000.0) * 60.0);
+            delay = @(([questDistance intValue] / 5000.0) * 150.0);
         } else if ([questDistance intValue] <= 8000.0) {
-            delay = @(([questDistance intValue] / 8000.0) * 60.0);
+            delay = @(([questDistance intValue] / 8000.0) * 360.0);
         } else {
             delay = @7200.0;
         }
@@ -661,7 +650,7 @@ static dispatch_queue_t _getJobQueue;
             firstWarningDate != nil &&
             timeSince >= [maxWarningTimeRaid intValue] &&
             [[Settings sharedInstance] enableAccountManager]) {
-            syslog(@"[WARN] Account has warning and is over maxWarningTimeRaid (%@). Logging out!", maxWarningTimeRaid);
+            syslog(@"[WARN] Account has a warning and is over maxWarningTimeRaid (%@). Logging out!", maxWarningTimeRaid);
             //self.lock.lock();
             CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
             [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
@@ -690,10 +679,11 @@ static dispatch_queue_t _getJobQueue;
         while (locked) {
             sleep(1);
             NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:start];
-            if (timeIntervalSince >= [delayTemp intValue]) {
+            if (timeIntervalSince <= [delayTemp intValue]) {
                 NSNumber *left = @([delayTemp intValue] - timeIntervalSince);
                 syslog(@"[DEBUG] Delaying by %@", left);
                 sleep(MIN(10, [left intValue]));
+                //usleep(MIN(10.0, left) * 1000000));
                 continue;
             }
             //self.lock.lock();
@@ -720,7 +710,7 @@ static dispatch_queue_t _getJobQueue;
                 if (!locked) {
                     success = true;
                     [[DeviceState sharedInstance] setDelayQuest:true];
-                    [[DeviceState sharedInstance] setFailedCount:0];
+                    [[DeviceState sharedInstance] setFailedCount:@0];
                     syslog(@"[INFO] Pokestop loaded after %f", [[NSDate date] timeIntervalSinceDate:start]);
                     sleep(1);
                 }
@@ -734,39 +724,41 @@ static dispatch_queue_t _getJobQueue;
             NSNumber *luckyEggsCount = [[DeviceState sharedInstance] luckyEggsCount];
             NSNumber *spinCount = [[DeviceState sharedInstance] spinCount];
             NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:lastDeployTime];
-            if (([luckyEggsCount intValue] >= 1 && timeIntervalSince >= 2000) ||
-                ([spinCount intValue] >= 400 && [[[Device sharedInstance] level] intValue] >= 20)) {
-                /* TODO: Egg Deploy
-                [Jarvis__ getToMainScreen];
-                syslog(@"[INFO] Clearing Items for UQ");
-                if ([Jarvis__ eggDeploy]) {
+            NSNumber *level = [[Device sharedInstance] level];
+            syslog(@"[INFO] Lucky Eggs Count: %@ TimeSince: %f SpinCount: %@ Level: %@ LastDeploy: %@",
+                   luckyEggsCount, timeIntervalSince, spinCount, level, lastDeployTime);
+            if (/*[luckyEggsCount intValue] >= 1 &&*/ timeIntervalSince >= 900 && // TODO: Check eggStart property
+                [level intValue] >= 9 && [level intValue] < 30) {
+                syslog(@"[INFO] Deploying lucky egg.");
+                if ([UIC2 eggDeploy]) {
                     [[DeviceState sharedInstance] setLastDeployTime:[NSDate date]];
                     [[DeviceState sharedInstance] setLuckyEggsCount:[Utils decrementInt:luckyEggsCount]];
                 } else {
-                    [[DeviceState sharedInstance] setLuckyEggsCount:0];
+                    syslog(@"[ERROR] Failed to deploy lucky egg.");
+                    // TODO: [[DeviceState sharedInstance] setLuckyEggsCount:@0];
                 }
-                */
-                [[DeviceState sharedInstance] setSpinCount:0];
+                // TODO: [[DeviceState sharedInstance] setSpinCount:@0];
                 [[DeviceState sharedInstance] setUltraQuestSpin:true];
-                [NSThread sleepForTimeInterval:1];
-                NSNumber *attempts = @0;
+                sleep(1);
+                int attempts = 0;
                 while ([[NSDate date] timeIntervalSinceDate:start] < 15.0 + [delay intValue]) {
                     //self.lock.lock();
                     if (![[DeviceState sharedInstance] gotItems]) {
                         //self.lock.unlock();
-                        if ([attempts intValue] % 5 == 0) {
+                        if (attempts % 5 == 0) {
                             syslog(@"[DEBUG] Waiting to spin...");
                         }
-                        sleep(2);
+                        sleep(1);
                     } else {
                         //self.lock.unlock();
                         syslog(@"[INFO] Successfully spun Pokestop");
                         [[DeviceState sharedInstance] setUltraQuestSpin:false];
-                        //_spins = _spins + 1;
+                        NSNumber *spins = [[DeviceState sharedInstance] spinCount];
+                        [[DeviceState sharedInstance] setSpinCount:[Utils incrementInt:spins]];
                         //sleep(3 * [[Device sharedInstance] delayMultiplier;
                         break;
                     }
-                    attempts = [Utils incrementInt:attempts];
+                    attempts++;
                 }
                 [[DeviceState sharedInstance] setUltraQuestSpin:false];
                 if (![[DeviceState sharedInstance] gotItems]) {
@@ -777,7 +769,7 @@ static dispatch_queue_t _getJobQueue;
         
     } else {
         syslog(@"[DEBUG] Sleep 3 seconds before skipping...");
-        [NSThread sleepForTimeInterval:3];
+        sleep(3);
     }
 }
 

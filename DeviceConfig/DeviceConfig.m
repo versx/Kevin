@@ -214,6 +214,12 @@ static DeviceCoordinateScalar *scalar;
 -(DeviceCoordinate *)trackerMenu {
     return [[DeviceCoordinate alloc] init:600 withY:1040 andDeviceCoordinateScalar:scalar];
 }
+-(DeviceCoordinate *)trackerTopCenter {
+    return [[DeviceCoordinate alloc] init:320 withY:143 andDeviceCoordinateScalar:scalar];
+}
+-(DeviceCoordinate *)trackerBottomCenter {
+    return [[DeviceCoordinate alloc] init:320 withY:1110 andDeviceCoordinateScalar:scalar];
+}
 
 
 #pragma mark Tutorial
@@ -261,11 +267,48 @@ static DeviceCoordinateScalar *scalar;
 -(DeviceCoordinate *)encounterTmp {
     return [[DeviceCoordinate alloc] init:575 withY:107 andDeviceCoordinateScalar:scalar];
 }
+-(DeviceCoordinate *)encounterPokemonRun {
+    return [[DeviceCoordinate alloc] init:50 withY:75 andDeviceCoordinateScalar:scalar];
+}
+
+
+#pragma mark Items
+
+-(DeviceCoordinate *)openItems {
+    return [[DeviceCoordinate alloc] init:500 withY:950 andDeviceCoordinateScalar:scalar];
+}
+-(DeviceCoordinate *)itemEggMenuItem {
+    return [[DeviceCoordinate alloc] init:325 withY:225 andDeviceCoordinateScalar:scalar];
+}
+-(DeviceCoordinate *)itemEggDeploy {
+    return [[DeviceCoordinate alloc] init:315 withY:880 andDeviceCoordinateScalar:scalar];
+}
+-(NSNumber *)itemEggX {
+    return [scalar scaleX:148];
+}
+-(NSNumber *)itemEggY {
+    return [scalar scaleY:215];
+}
+-(DeviceCoordinate *)itemEgg {
+    return [[DeviceCoordinate alloc] init:148 withY:215 andDeviceCoordinateScalar:scalar];
+}
+
 
 #pragma mark Account
 
 -(DeviceCoordinate *)loginPermanentBan {
     return [[DeviceCoordinate alloc] init:308 withY:329 andDeviceCoordinateScalar:scalar];
 }
+
+
+#pragma mark Adventure Sync
+
+-(DeviceCoordinate *)adventureSyncRewards {
+    return [[DeviceCoordinate alloc] init:320 withY:300 andDeviceCoordinateScalar:scalar];
+}
+-(DeviceCoordinate *)adventureSyncButton {
+    return [[DeviceCoordinate alloc] init:320 withY:978 andDeviceCoordinateScalar:scalar];
+}
+
 
 @end

@@ -147,6 +147,7 @@ static int _jitterCorner;
     data[@"username"] = [[Device sharedInstance] username] ?: @"";
     data[@"pokemon_encounter_id"] = pokemonEncounterId ?: @"";
     data[@"uuid"] = [[Device sharedInstance] uuid];
+    data[@"uuid_control"] = [[Device sharedInstance] uuid];
     data[@"ptcToken"] = [[Device sharedInstance] ptcToken] ?: @"";
     
     //dispatch_semaphore_t sem = dispatch_semaphore_create(0);
@@ -154,7 +155,7 @@ static int _jitterCorner;
                   dict:data
               blocking:false
             completion:^(NSDictionary *result) {
-        syslog(@"[DEBUG] Raw data response: %@", result);
+        //syslog(@"[DEBUG] Raw data response: %@", result);
         if (data == nil) {
             syslog(@"[WARN] Raw response null");
             return;
@@ -182,29 +183,48 @@ static int _jitterCorner;
         NSNumber *diffLon = @(currentLoc.coordinate.longitude - [targetLon doubleValue]);
         
         // MIZU tut stuff
-        NSString *spinFortId = data[@"spin_fort_id"] ?: @"";
-        NSNumber *spinFortLat = data[@"spin_fort_lat"] ?: @0.0;
-        NSNumber *spinFortLon = data[@"spin_fort_lon"] ?: @0.0;
+        //NSString *spinFortId = data[@"spin_fort_id"] ?: @"";
+        //NSNumber *spinFortLat = data[@"spin_fort_lat"] ?: @0.0;
+        //NSNumber *spinFortLon = data[@"spin_fort_lon"] ?: @0.0;
         if ([level intValue] > 0) {
+            // TODO: Use luckyegg_count from lorgnette
             if ([[Device sharedInstance] level] != level) {
-                NSArray *luckyEggLevels = @[ @9, @10, @15, @20, @25 ];
-                if ([luckyEggLevels containsObject:level]) {
-                    NSNumber *luckyEggsCount = [[DeviceState sharedInstance] luckyEggsCount];
-                    [[DeviceState sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount]];
+                NSNumber *luckyEggsCount = [[DeviceState sharedInstance] luckyEggsCount];
+                switch ([level intValue]) {
+                    case 9:
+                        [[DeviceState sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount]];
+                        break;
+                    case 10:
+                        [[DeviceState sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount withAmount:@2]];
+                        break;
+                    case 15:
+                        [[DeviceState sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount withAmount:@3]];
+                        break;
+                    case 20:
+                        [[DeviceState sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount withAmount:@4]];
+                        break;
+                    case 25:
+                        [[DeviceState sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount withAmount:@5]];
+                        break;
                 }
             }
             [[Device sharedInstance] setLevel:level];
         }
 
-        syslog(@"[DEBUG] [RES1] inArea: %s level: %@ nearby: %@ wild: %@ quests: %@ encounters: %@ plat: %@ plon: %@ encounterResponseId: %@ tarlat: %@ tarlon: %@ emptyGMO: %s invalidGMO: %s containsGMO: %s", (inArea ? "Yes" : "No"), level, nearby, wild, quests, encounters, pokemonLat, pokemonLon, pokemonEncounterIdResult, targetLat, targetLon, (onlyEmptyGmos ? "Yes" : "No"), (onlyInvalidGmos ? "Yes" : "No"), (containsGmo ? "Yes" : "No"));
+        //syslog(@"[DEBUG] [RES1] inArea: %s level: %@ nearby: %@ wild: %@ quests: %@ encounters: %@ plat: %@ plon: %@ encounterResponseId: %@ tarlat: %@ tarlon: %@ emptyGMO: %s invalidGMO: %s containsGMO: %s", (inArea ? "Yes" : "No"), level, nearby, wild, quests, encounters, pokemonLat, pokemonLon, pokemonEncounterIdResult, targetLat, targetLon, (onlyEmptyGmos ? "Yes" : "No"), (onlyInvalidGmos ? "Yes" : "No"), (containsGmo ? "Yes" : "No"));
         //syslog(@"[DEBUG] SpinFortLat: %@ SpinFortLon: %@", spinFortLat, spinFortLon);
 
         //NSNumber *itemDistance = @10000.0;
-        if (![spinFortId isNullOrEmpty] && [spinFortLat doubleValue] != 0.0) {
-            CLLocation *fortLocation = [Utils createCoordinate:[spinFortLat doubleValue] lon:[spinFortLon doubleValue]];
-            NSNumber *itemDistance = [NSNumber numberWithDouble:[fortLocation distanceFromLocation:currentLoc]];
-            syslog(@"[DEBUG] ItemDistance: %@", itemDistance);
+        /*
+        if (![spinFortId isMemberOfClass:[NSNull class]] && ![spinFortLat isMemberOfClass:[NSNull class]]) {
+            if ([spinFortLat doubleValue] != 0.0) {
+                CLLocation *fortLocation = [Utils createCoordinate:[spinFortLat doubleValue] lon:[spinFortLon doubleValue]];
+                NSNumber *itemDistance = [NSNumber numberWithDouble:[fortLocation distanceFromLocation:currentLoc]];
+                syslog(@"[DEBUG] ItemDistance: %@", itemDistance);
+            }
         }
+        */
+        // End MIZU tut stuff
         
         NSString *msg;
         NSNumber *pokemonFoundCount = @([wild intValue] + [nearby intValue]);
@@ -337,6 +357,24 @@ static int _jitterCorner;
             syslog(@"[DEBUG] rgbAtLocation: x=%@ y=%@ color=%@", x, y, color);
         }
     });
+    return JSON_OK;
+}
+
+-(NSString *)handleClearRequest
+{
+    syslog(@"[INFO] Clearing user defaults");
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:LOGIN_USER_DEFAULT_KEY];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TOKEN_USER_DEFAULT_KEY];
+    [[Device sharedInstance] setUsername:nil];
+    [[Device sharedInstance] setPassword:nil];
+    [DeviceState restart];
+    return JSON_OK;
+}
+
+-(NSString *)handleRestartRequest
+{
+    syslog(@"[INFO] Restarting per user request");
+    [DeviceState restart];
     return JSON_OK;
 }
 

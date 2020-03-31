@@ -15,7 +15,17 @@
     if ((self = [super init]))
     {
         lastAction = @"";
-        eggStart = [NSDate dateWithTimeInterval:-1860 sinceDate:[NSDate date]];
+        luckyEggsCount = @0;
+        spinCount = @0;
+        failedCount = @0;
+        failedGetJobCount = @0;
+        emptyGmoCount = @0;
+        noQuestCount = @0;
+        noItemsCount = @0;
+        //eggStart = [NSDate dateWithTimeInterval:-1860 sinceDate:[NSDate date]];
+        eggStart = [NSDate date];
+        //lastDeployTime = [NSDate dateWithTimeInterval:-1860 sinceDate:[NSDate date]];
+        lastDeployTime = [NSDate date];
     }
     
     return self;
@@ -193,12 +203,12 @@
                     }
                 } else {
                     syslog(@"[ERROR] Failed to get account, restarting.");
-                    [NSThread sleepForTimeInterval:1];
+                    sleep(1);
                     [[Device sharedInstance] setMinLevel:@0];
                     [[Device sharedInstance] setMaxLevel:@29];
                     [[NSUserDefaults standardUserDefaults] synchronize];
                     [[NSUserDefaults standardUserDefaults] removeObjectForKey:LOGIN_USER_DEFAULT_KEY];
-                    [NSThread sleepForTimeInterval:5];
+                    sleep(5);
                     [[Device sharedInstance] setIsLoggedIn:false];
                     [self restart];
                 }
@@ -209,7 +219,7 @@
     
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
     syslog(@"[DEBUG] Restarting...");
-    [NSThread sleepForTimeInterval:1];
+    sleep(1);
     [self restart];
 }
 

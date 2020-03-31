@@ -7,10 +7,10 @@
 
 #import "UIC.h"
 
+// TODO: Detect different tutorial stages for incomplete tuts
+// TODO: Handle invalid usernames
 // TODO: Benchmark/Performance/Profile monitor
 // TODO: Move constants to consts class
-// TODO: Handle adventure sync rewards popup
-// TODO: Egg Deploy
 // TODO: Remove PTFakeTouch
 // TODO: Support multiple device configs
 // TODO: Pixel offsets in remote config
@@ -147,7 +147,7 @@ static BOOL _dataStarted = false;
     
     // Start login sequence and detection after we connect to backend.
     dispatch_async(_pixelCheckQueue, ^{
-        [NSThread sleepForTimeInterval:5];
+        sleep(5);
         [self startPixelCheckLoop];
     });
 }
@@ -167,8 +167,8 @@ static BOOL _dataStarted = false;
     ];
     dispatch_async(_heartbeatQueue, ^{
         while (heartbeatRunning) {
-            // Check if time since last checking was within 2 minutes, if not reboot device.
-            [NSThread sleepForTimeInterval:15];
+            // Check if time since last check-in was within 2 minutes, if not reboot device.
+            sleep(15);
             NSDate *lastUpdate = [[DeviceState sharedInstance] lastUpdate];
             NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:lastUpdate];
             if (timeIntervalSince >= 120) { // TODO: Make constant in Consts class
@@ -200,6 +200,10 @@ static BOOL _dataStarted = false;
     __block bool isTosUpdate = false;
     __block bool isPrivacy = false;
     __block bool isPrivacyUpdate = false;
+    __block bool isLevelUp = false;
+    __block bool isPokestopOpen = false;
+    __block bool isAdventureSyncRewards = false;
+    __block bool isPokemonEncounter = false;
     dispatch_semaphore_t sem = dispatch_semaphore_create(0);
     dispatch_async(dispatch_get_main_queue(), ^{
         UIImage *image = [Utils takeScreenshot];
@@ -265,6 +269,21 @@ static BOOL _dataStarted = false;
                           [image rgbAtLocation:[[DeviceConfig sharedInstance] loginPrivacyUpdateText]
                                     betweenMin:[[ColorOffset alloc] init:0.22 green:0.36 blue:0.37]
                                         andMax:[[ColorOffset alloc] init:0.32 green:0.46 blue:0.47]];
+        isLevelUp = [image rgbAtLocation:[[DeviceConfig sharedInstance] closeMenu] // close: 0.588235 0.52549 0.113725 1
+                              betweenMin:[[ColorOffset alloc] init:0.10 green:0.51 blue:0.57]
+                                  andMax:[[ColorOffset alloc] init:0.13 green:0.54 blue:0.60]];
+        isPokestopOpen = [image rgbAtLocation:[[DeviceConfig sharedInstance] closeMenu] //close: 0.94902 0.984314 0.882353 1 | 0.941176 0.945098 0.917647 1 | 0.909804 0.909804 0.890196 1
+                                   betweenMin:[[ColorOffset alloc] init:0.87 green:0.89 blue:0.89]
+                                       andMax:[[ColorOffset alloc] init:0.92 green:0.99 blue:0.96]];// &&
+                        //![image rgbAtLocation:[[DeviceConfig sharedInstance] mainScreenPokeballRed]
+                        //           betweenMin:[[ColorOffset alloc] init:0.80 green:0.10 blue:0.17]
+                        //               andMax:[[ColorOffset alloc] init:1.00 green:0.34 blue:0.37]];
+        isAdventureSyncRewards = [image rgbAtLocation:[[DeviceConfig sharedInstance] adventureSyncRewards]
+                                           betweenMin:[[ColorOffset alloc] init:0.98 green:0.30 blue:0.45]
+                                               andMax:[[ColorOffset alloc] init:1.00 green:0.50 blue:0.60]];
+        isPokemonEncounter = [image rgbAtLocation:[[DeviceConfig sharedInstance] encounterPokemonRun]
+                                       betweenMin:[[ColorOffset alloc] init:0.98 green:0.98 blue:0.98]
+                                           andMax:[[ColorOffset alloc] init:1.00 green:1.00 blue:1.00]];
         dispatch_semaphore_signal(sem);
     });
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
@@ -333,6 +352,10 @@ static BOOL _dataStarted = false;
         syslog(@"[INFO] Closing news.");
         DeviceCoordinate *closeNews = [[DeviceConfig sharedInstance] closeNews];
         [JarvisTestCase touch:[closeNews tapX] withY:[closeNews tapY]];
+        sleep(2);
+        syslog(@"[INFO] Opening nearby tracker.");
+        DeviceCoordinate *tracker = [[DeviceConfig sharedInstance] trackerMenu];
+        [JarvisTestCase touch:[tracker tapX] withY:[tracker tapY]];
         if (!_dataStarted) {
             _dataStarted = true;
             [[JobController sharedInstance] getJobs];
@@ -379,6 +402,32 @@ static BOOL _dataStarted = false;
         syslog(@"[INFO] Found warning pop-up.");
         DeviceCoordinate *closeWarning = [[DeviceConfig sharedInstance] closeWarning];
         [JarvisTestCase touch:[closeWarning tapX] withY:[closeWarning tapY]];
+        sleep(2);
+    } else if ((isLevelUp || isPokestopOpen) && ![UIC2 isTracker]) {
+        syslog(@"[INFO] Found level up/Pokestop spin screen.");
+        // TODO: Check for white pixel in tracker to skip closing tracker window.
+        DeviceCoordinate *closeMenu = [[DeviceConfig sharedInstance] closeMenu];
+        [JarvisTestCase touch:[closeMenu tapX] withY:[closeMenu tapY]];
+        sleep(2);
+    } else if (isAdventureSyncRewards) {
+        syslog(@"[INFO] Found Adventure sync rewards pop-up.");
+        DeviceCoordinate *advSyncButton = [[DeviceConfig sharedInstance] adventureSyncButton];
+        if ([UIC2 isAtPixel:advSyncButton
+                 betweenMin:[[ColorOffset alloc] init:0.40 green:0.80 blue:0.50]
+                     andMax:[[ColorOffset alloc] init:0.50 green:0.90 blue:0.70]]) {
+            [JarvisTestCase touch:[advSyncButton tapX] withY:[advSyncButton tapY]];
+            sleep(2);
+            [JarvisTestCase touch:[advSyncButton tapX] withY:[advSyncButton tapY]];
+        } else if ([UIC2 isAtPixel:advSyncButton
+                        betweenMin:[[ColorOffset alloc] init:0.05 green:0.45 blue:0.50]
+                            andMax:[[ColorOffset alloc] init:0.20 green:0.60 blue:0.65]]) {
+            [JarvisTestCase touch:[advSyncButton tapX] withY:[advSyncButton tapY]];
+        }
+        sleep(2);
+    } else if (isPokemonEncounter) {
+        syslog(@"[INFO] Oops, must have clicked a Pokemon, exiting encounter.");
+        DeviceCoordinate *encounterRun = [[DeviceConfig sharedInstance] encounterPokemonRun];
+        [JarvisTestCase touch:[encounterRun tapX] withY:[encounterRun tapY]];
         sleep(2);
     } else {
         //syslog(@"[WARN] Nothing found");
@@ -678,14 +727,10 @@ static BOOL _dataStarted = false;
         UIImage *image = [Utils takeScreenshot];
         result = [image rgbAtLocation:[[DeviceConfig sharedInstance] closeMenu]
                            betweenMin:[[ColorOffset alloc] init:0.98 green:0.98 blue:0.98]
-                               andMax:[[ColorOffset alloc] init:1.00 green:1.00 blue:1.00]] &&//|| //&&
-                ([image rgbAtLocation:[[DeviceConfig sharedInstance] mainScreenPokeballRed]
-                           betweenMin:[[ColorOffset alloc] init:0.80 green:0.10 blue:0.17]
-                               andMax:[[ColorOffset alloc] init:1.00 green:0.34 blue:0.37]]);/* ||
+                               andMax:[[ColorOffset alloc] init:1.00 green:1.00 blue:1.00]] &&
                  [image rgbAtLocation:[[DeviceConfig sharedInstance] mainScreenPokeballRed]
-                           betweenMin:[[ColorOffset alloc] init:0.75 green:0.72 blue:0.12]
-                               andMax:[[ColorOffset alloc] init:0.95 green:0.84 blue:0.33]
-                 ]);*/
+                           betweenMin:[[ColorOffset alloc] init:0.80 green:0.10 blue:0.17]
+                               andMax:[[ColorOffset alloc] init:1.00 green:0.34 blue:0.37]];
         dispatch_semaphore_signal(sem);
     });
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
@@ -798,6 +843,16 @@ static BOOL _dataStarted = false;
     ];
 }
 
++(BOOL)isTracker
+{
+    return [self isAtPixel:[[DeviceConfig sharedInstance] trackerTopCenter] //0.980392 1 0.984314
+                betweenMin:[[ColorOffset alloc] init:0.97 green:0.97 blue:0.97]
+                    andMax:[[ColorOffset alloc] init:1.00 green:1.00 blue:1.00]] &&
+           [self isAtPixel:[[DeviceConfig sharedInstance] trackerBottomCenter] //0.933333 1 0.941176 1
+                betweenMin:[[ColorOffset alloc] init:0.93 green:0.98 blue:0.92]
+                    andMax:[[ColorOffset alloc] init:0.95 green:1.00 blue:0.94]];
+}
+
 +(BOOL)findAndClickPokemon
 {
     syslog(@"[INFO] [TUT] Starting to look for Pokemon to click.");
@@ -863,6 +918,59 @@ static BOOL _dataStarted = false;
         dispatch_semaphore_signal(sem);
     });
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+    return result;
+}
+
++(BOOL)hasEgg
+{
+    return [self isAtPixel:[[DeviceConfig sharedInstance] itemEgg] // TODO: egg offset
+                betweenMin:[[ColorOffset alloc] init:0.45 green:0.60 blue:0.65]
+                    andMax:[[ColorOffset alloc] init:0.60 green:0.70 blue:0.75]];
+}
+
++(BOOL)eggDeploy
+{
+    syslog(@"[INFO] Deploying lucky egg...");
+    bool result = false;
+    if (![[Settings sharedInstance] deployEggs]) {
+        return result;
+    }
+    
+    // TODO: Check if has egg, if not closeMenu
+    DeviceCoordinate *closeMenu = [[DeviceConfig sharedInstance] closeMenu];
+    // Check if not the main screen, tracker menu likely open, close it.
+    //while (![self isMainScreen]) {
+    if (![self isMainScreen]) {
+        // TODO: Close passenger too?
+        [JarvisTestCase touch:[closeMenu tapX] withY:[closeMenu tapY]];
+        sleep(1);
+    } else {
+        [JarvisTestCase touch:[closeMenu tapX] withY:[closeMenu tapY]];
+        sleep(1);
+    }
+    
+    // Open items menu
+    DeviceCoordinate *openItems = [[DeviceConfig sharedInstance] openItems];
+    [JarvisTestCase touch:[openItems tapX] withY:[openItems tapY]];
+    sleep(2);
+    
+    // Check if egg is in 1st item slot
+    if (![self hasEgg]) {
+        return result;
+    }
+    
+    // Start deploying egg
+
+    // Click egg menu item
+    DeviceCoordinate *eggMenuItem = [[DeviceConfig sharedInstance] itemEggMenuItem];
+    [JarvisTestCase touch:[eggMenuItem tapX] withY:[eggMenuItem tapY]];
+    sleep(2);
+    // Touch egg to deploy
+    DeviceCoordinate *eggDeploy = [[DeviceConfig sharedInstance] itemEggDeploy];
+    [JarvisTestCase touch:[eggDeploy tapX] withY:[eggDeploy tapY]];
+    sleep(2);
+    result = true;
+    syslog(@"[INFO] Deployed egg");
     return result;
 }
 

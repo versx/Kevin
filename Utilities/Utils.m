@@ -17,6 +17,11 @@ static double _baseVerticalAccuracy = 200.0; // in meters
     return [NSNumber numberWithInt:[value intValue] + 1];
 }
 
++(NSNumber *)incrementInt:(NSNumber *)value withAmount:(NSNumber *)amount
+{
+    return [NSNumber numberWithInt:[value intValue] + [amount intValue]];
+}
+
 +(NSNumber *)decrementInt:(NSNumber *)value
 {
     return [NSNumber numberWithInt:[value intValue] - 1];

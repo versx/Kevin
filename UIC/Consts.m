@@ -27,7 +27,7 @@ NSString *TYPE_ACCOUNT_INVALID_CREDENTIALS = @"account_invalid_credentials";
 NSString *TYPE_PTC_TOKEN = @"ptcToken";
 
 // Status Responses
-NSString *JSON_OK = @"{\"status\": \"ok\"";
+NSString *JSON_OK = @"{\"status\": \"ok\"}";
 NSString *JSON_ERROR = @"{\"status\": \"error\", \"message\": \"currentLocation is null\"}";
 
 NSNumber *DEFAULT_BDAY = 19710101;

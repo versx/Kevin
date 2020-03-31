@@ -5,10 +5,10 @@
 //  Created by versx on 3/7/20.
 //
 
-#import "../Jarvis++/Jarvis__.h"
 #import "../Settings/Settings.h"
 #import "../States/DeviceState.h"
 #import "../UIC/Device.h"
+#import "../UIC/UIC.h"
 
 @interface JobController : NSObject
 

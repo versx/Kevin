@@ -19,6 +19,7 @@
 @interface Utils : NSObject
 
 +(NSNumber *)incrementInt:(NSNumber *)value;
++(NSNumber *)incrementInt:(NSNumber *)value withAmount:(NSNumber *)amount;
 +(NSNumber *)decrementInt:(NSNumber *)value;
 
 +(CLLocation *)createCoordinate:(double)lat lon:(double)lon;

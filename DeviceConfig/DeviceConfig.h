@@ -107,6 +107,10 @@
 -(DeviceCoordinate *)settingsPageCloseButton;
 /** Nearby Pokemon tracker. */
 -(DeviceCoordinate *)trackerMenu;
+/** Top center white pixel above 'Nearby' title. */
+-(DeviceCoordinate *)trackerTopCenter;
+/** Bottom center white pixel below close button. */
+-(DeviceCoordinate *)trackerBottomCenter;
 
 // Tutorial
 /** Dark pixel in warning initial Tutorial screen on the left side. */
@@ -137,9 +141,29 @@
 -(DeviceCoordinate *)encounterNoArConfirm;
 /** Temp! Exit AR-Mode. */
 -(DeviceCoordinate *)encounterTmp;
+/** White pixel in run from Pokemon button. */
+-(DeviceCoordinate *)encounterPokemonRun;
+
+// Items
+/** Open items button in menu. */
+-(DeviceCoordinate *)openItems;
+/** Luck Egg menu item: Will always be first after deletion unless active. */
+-(DeviceCoordinate *)itemEggMenuItem;
+/** Tap location for Egg deployment. */
+-(DeviceCoordinate *)itemEggDeploy;
+/** Blue pixel in egg at itemDeleteYs. */
+-(NSNumber *)itemEggX;
+/**  */
+-(DeviceCoordinate *)itemEgg;
 
 // Accounts
-/** White pixel in the last `n` of termination  */
+/** White pixel in the last `n` of termination. TODO: Fix, find white pixel in permanent instead. */
 -(DeviceCoordinate *)loginPermanentBan;
+
+// Adventure Sync
+/** Pink pixel in background of "Rewards" in adventure sync pop-up. */
+-(DeviceCoordinate *)adventureSyncRewards;
+/** Green/Blue pixel in claim/close button of adventure sync pop-up. */
+-(DeviceCoordinate *)adventureSyncButton;
 
 @end
