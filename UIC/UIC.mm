@@ -191,6 +191,7 @@ static BOOL _dataStarted = false;
 
 -(void)startPixelCheckLoop
 {
+    NSDate *start = [NSDate date];
     __block bool isAgeVerification = false;
     __block bool isStartupLoggedOut = false;
     __block bool isStartup = false;
@@ -278,20 +279,20 @@ static BOOL _dataStarted = false;
                                   andMax:[[ColorOffset alloc] init:0.13 green:0.54 blue:0.60]];
         isPokestopOpen = [image rgbAtLocation:[[DeviceConfig sharedInstance] closeMenu] //close: 0.94902 0.984314 0.882353 1 | 0.941176 0.945098 0.917647 1 | 0.909804 0.909804 0.890196 1
                                    betweenMin:[[ColorOffset alloc] init:0.87 green:0.89 blue:0.89]
-                                       andMax:[[ColorOffset alloc] init:0.92 green:0.99 blue:0.96]];// &&
-                        //![image rgbAtLocation:[[DeviceConfig sharedInstance] mainScreenPokeballRed]
-                        //           betweenMin:[[ColorOffset alloc] init:0.80 green:0.10 blue:0.17]
-                        //               andMax:[[ColorOffset alloc] init:1.00 green:0.34 blue:0.37]];
+                                       andMax:[[ColorOffset alloc] init:0.92 green:0.99 blue:0.96]];
         isAdventureSyncRewards = [image rgbAtLocation:[[DeviceConfig sharedInstance] adventureSyncRewards]
                                            betweenMin:[[ColorOffset alloc] init:0.98 green:0.30 blue:0.45]
                                                andMax:[[ColorOffset alloc] init:1.00 green:0.50 blue:0.60]];
         isPokemonEncounter = [image rgbAtLocation:[[DeviceConfig sharedInstance] encounterPokemonRun]
                                        betweenMin:[[ColorOffset alloc] init:0.98 green:0.98 blue:0.98]
-                                           andMax:[[ColorOffset alloc] init:1.00 green:1.00 blue:1.00]];
+                                           andMax:[[ColorOffset alloc] init:1.00 green:1.00 blue:1.00]] &&
+                             [image rgbAtLocation:[[DeviceConfig sharedInstance] encounterPokeball]
+                                       betweenMin:[[ColorOffset alloc] init:0.70 green:0.05 blue:0.05]
+                                           andMax:[[ColorOffset alloc] init:0.95 green:0.30 blue:0.35]];
         dispatch_semaphore_signal(sem);
     });
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
-    bool loop = true;
+    //bool loop = true;
     if (isAgeVerification) {
         syslog(@"[INFO] Age verification screen.");
         [UIC2 ageVerification];
@@ -400,7 +401,7 @@ static BOOL _dataStarted = false;
                   blocking:true
                 completion:^(NSDictionary *result) {}];
         sleep(2);
-        loop = false;
+        //loop = false;
         [DeviceState restart];
     } else if ([UIC2 isWarningScreen]) {
         syslog(@"[INFO] Found warning pop-up.");
@@ -429,19 +430,21 @@ static BOOL _dataStarted = false;
         }
         sleep(2);
     } else if (isPokemonEncounter) {
-        syslog(@"[INFO] Oops, must have clicked a Pokemon, exiting encounter.");
+        syslog(@"[INFO] Oopsie, must have clicked a Pokemon, exiting encounter.");
         DeviceCoordinate *encounterRun = [[DeviceConfig sharedInstance] encounterPokemonRun];
         [JarvisTestCase touch:[encounterRun tapX] withY:[encounterRun tapY]];
         sleep(2);
     } else {
         //syslog(@"[WARN] Nothing found");
         sleep(5);
-        loop = true;
+        //loop = true;
     }
+    
+    syslog(@"[VERBOSE] Pixel check loop took %f seconds", [[NSDate date] timeIntervalSinceDate:start]);
 
-    if (loop) {
-        [self startPixelCheckLoop];
-    }
+    //if (loop) {
+    [self startPixelCheckLoop];
+    //}
 }
 
 // TODO: Move to DeviceState
@@ -925,11 +928,25 @@ static BOOL _dataStarted = false;
     return result;
 }
 
-+(BOOL)hasEgg
++(NSNumber *)hasEgg
 {
-    return [self isAtPixel:[[DeviceConfig sharedInstance] itemEgg] // TODO: egg offset
-                betweenMin:[[ColorOffset alloc] init:0.45 green:0.60 blue:0.65]
-                    andMax:[[ColorOffset alloc] init:0.60 green:0.70 blue:0.75]];
+    __block NSNumber *result = @0;
+    dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIImage *image = [Utils takeScreenshot];
+        ColorOffset *min = [[ColorOffset alloc] init:0.45 green:0.60 blue:0.65];
+        ColorOffset *max = [[ColorOffset alloc] init:0.60 green:0.70 blue:0.75];
+        if ([image rgbAtLocation:[[DeviceConfig sharedInstance] itemEgg] betweenMin:min andMax:max]) {
+            result = @1;
+        } else if ([image rgbAtLocation:[[DeviceConfig sharedInstance] itemEgg2] betweenMin:min andMax:max]) {
+            result = @2;
+        } else if ([image rgbAtLocation:[[DeviceConfig sharedInstance] itemEgg3] betweenMin:min andMax:max]) {
+            result = @3;
+        }
+        dispatch_semaphore_signal(sem);
+    });
+    dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+    return result;
 }
 
 +(BOOL)eggDeploy
@@ -940,6 +957,12 @@ static BOOL _dataStarted = false;
         return result;
     }
     
+    //[[DeviceState sharedInstance] setLastDeployTime:[NSDate date]];
+    //if ([[NSDate date] timeIntervalSinceDate:[[DeviceState sharedInstance] lastDeployTime]] < 900) {
+    //    syslog(@"[DEBUG] Egg already deployed");
+    //    return false;
+    //}
+    
     // TODO: Check if has egg, if not closeMenu
     DeviceCoordinate *closeMenu = [[DeviceConfig sharedInstance] closeMenu];
     // Check if not the main screen, tracker menu likely open, close it.
@@ -948,25 +971,38 @@ static BOOL _dataStarted = false;
         // TODO: Close passenger too?
         [JarvisTestCase touch:[closeMenu tapX] withY:[closeMenu tapY]];
         sleep(1);
-    } else {
-        [JarvisTestCase touch:[closeMenu tapX] withY:[closeMenu tapY]];
-        sleep(1);
     }
+    
+    // Open main menu
+    [JarvisTestCase touch:[closeMenu tapX] withY:[closeMenu tapY]];
+    sleep(1);
     
     // Open items menu
     DeviceCoordinate *openItems = [[DeviceConfig sharedInstance] openItems];
     [JarvisTestCase touch:[openItems tapX] withY:[openItems tapY]];
-    sleep(2);
+    sleep(1);
     
     // Check if egg is in 1st item slot
-    if (![self hasEgg]) {
+    NSNumber *hasEgg = [self hasEgg];
+    if ([hasEgg intValue] == 0) {
+        [JarvisTestCase touch:[closeMenu tapX] withY:[closeMenu tapY]];
+        sleep(1);
         return result;
     }
-    
-    // Start deploying egg
 
     // Click egg menu item
-    DeviceCoordinate *eggMenuItem = [[DeviceConfig sharedInstance] itemEggMenuItem];
+    DeviceCoordinate *eggMenuItem;
+    switch ([hasEgg intValue]) {
+        case 1:
+            eggMenuItem = [[DeviceConfig sharedInstance] itemEgg];
+            break;
+        case 2:
+            eggMenuItem = [[DeviceConfig sharedInstance] itemEgg2];
+            break;
+        case 3:
+            eggMenuItem = [[DeviceConfig sharedInstance] itemEgg3];
+            break;
+    }
     [JarvisTestCase touch:[eggMenuItem tapX] withY:[eggMenuItem tapY]];
     sleep(2);
     // Touch egg to deploy

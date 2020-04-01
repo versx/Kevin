@@ -9,7 +9,7 @@
 
 // TODO: Implement correct values
 
-@implementation DeviceIPhoneNormal
+@implementation DeviceIPhonePlus
 
 static DeviceCoordinateScalar *scalar;
 
@@ -242,14 +242,14 @@ static DeviceCoordinateScalar *scalar;
 -(DeviceCoordinate *)itemEggDeploy {
     return [[DeviceCoordinate alloc] init:315 withY:880 andDeviceCoordinateScalar:scalar];
 }
-//-(NSNumber *)itemEggX {
-//    return [scalar scaleX:148];
-//}
-//-(NSNumber *)itemEggY {
-//    return [scalar scaleY:215];
-//}
 -(DeviceCoordinate *)itemEgg {
     return [[DeviceCoordinate alloc] init:173 withY:215 andDeviceCoordinateScalar:scalar];
+}
+-(DeviceCoordinate *)itemEgg2 {
+    return [[DeviceCoordinate alloc] init:173 withY:450 andDeviceCoordinateScalar:scalar];
+}
+-(DeviceCoordinate *)itemEgg3 {
+    return [[DeviceCoordinate alloc] init:173 withY:980 andDeviceCoordinateScalar:scalar];
 }
 
 

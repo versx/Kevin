@@ -152,6 +152,8 @@
 -(DeviceCoordinate *)encounterTmp;
 /** White pixel in run from Pokemon button. */
 -(DeviceCoordinate *)encounterPokemonRun;
+/** Red pixel in switch Pokeball button. */
+-(DeviceCoordinate *)encounterPokeball;
 
 
 #pragma mark Item Coordinates
@@ -162,11 +164,12 @@
 -(DeviceCoordinate *)itemEggMenuItem;
 /** Tap location for Egg deployment. */
 -(DeviceCoordinate *)itemEggDeploy;
-/** Blue pixel in egg at itemDeleteYs. */
-//-(NSNumber *)itemEggX;
-/**  */
+/** Blue pixel in egg at 1st slot. */
 -(DeviceCoordinate *)itemEgg;
-
+/** Blue pixel in egg at 2nd slot. */
+-(DeviceCoordinate *)itemEgg2;
+/** Blue pixel in egg at 3rd slot. */
+-(DeviceCoordinate *)itemEgg3;
 
 #pragma mark Accounts Coordinates
 

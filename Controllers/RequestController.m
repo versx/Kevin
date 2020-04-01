@@ -175,6 +175,7 @@ static int _jitterCorner;
         bool onlyEmptyGmos = [data[@"only_empty_gmos"] boolValue] ?: true;
         bool onlyInvalidGmos = [data[@"only_invalid_gmos"] boolValue] ?: false;
         bool containsGmo = [data[@"contains_gmos"] boolValue] ?: true;
+        NSNumber *luckyEggs = data[@"lucky_eggs"] ?: @0;
 
         [[Device sharedInstance] setLevel:level];
         
@@ -207,6 +208,9 @@ static int _jitterCorner;
                         [[DeviceState sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount withAmount:@5]];
                         break;
                 }
+            }
+            if (luckyEggs != nil) {
+                [[DeviceState sharedInstance] setLuckyEggsCount:luckyEggs];
             }
             [[Device sharedInstance] setLevel:level];
         }

@@ -32,7 +32,7 @@ static DeviceCoordinateScalar *scalar;
     return [[DeviceCoordinate alloc] init:320 withY:785 andDeviceCoordinateScalar:scalar];
 }
 -(DeviceCoordinate *)loginPTC {
-    return [[DeviceCoordinate alloc] init:320 withY:800 andDeviceCoordinateScalar:scalar];
+    return [[DeviceCoordinate alloc] init:320 withY:800/*0.171.1 = 725*/ andDeviceCoordinateScalar:scalar];
 }
 -(DeviceCoordinate *)loginUsernameTextfield {
     return [[DeviceCoordinate alloc] init:320 withY:500 andDeviceCoordinateScalar:scalar];
@@ -227,6 +227,9 @@ static DeviceCoordinateScalar *scalar;
 -(DeviceCoordinate *)encounterPokemonRun {
     return [[DeviceCoordinate alloc] init:50 withY:75 andDeviceCoordinateScalar:scalar];
 }
+-(DeviceCoordinate *)encounterPokeball {
+    return [[DeviceCoordinate alloc] init:570 withY:990 andDeviceCoordinateScalar:scalar];
+}
 
 
 #pragma mark Items
@@ -240,14 +243,14 @@ static DeviceCoordinateScalar *scalar;
 -(DeviceCoordinate *)itemEggDeploy {
     return [[DeviceCoordinate alloc] init:315 withY:880 andDeviceCoordinateScalar:scalar];
 }
-//-(NSNumber *)itemEggX {
-//    return [scalar scaleX:148];
-//}
-//-(NSNumber *)itemEggY {
-//    return [scalar scaleY:215];
-//}
 -(DeviceCoordinate *)itemEgg {
     return [[DeviceCoordinate alloc] init:148 withY:215 andDeviceCoordinateScalar:scalar];
+}
+-(DeviceCoordinate *)itemEgg2 {
+    return [[DeviceCoordinate alloc] init:148 withY:443 andDeviceCoordinateScalar:scalar];
+}
+-(DeviceCoordinate *)itemEgg3 {
+    return [[DeviceCoordinate alloc] init:148 withY:670 andDeviceCoordinateScalar:scalar];
 }
 
 

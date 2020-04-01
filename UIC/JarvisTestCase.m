@@ -131,7 +131,7 @@
 
 +(void)drag:(int)x withY:(int)y andX:(int)x2 withY:(int)y2
 {
-    syslog(@"[DEBUG] drag [x=%d y=%@] => [x2=%@ y2=%@]", x, y, x2, y2);
+    syslog(@"[DEBUG] drag [x=%d y=%d] => [x2=%d y2=%d]", x, y, x2, y2);
     @try {
         [viewTester dragFromPoint:CGPointMake(x, y)
                           toPoint:CGPointMake(x2, y2)
