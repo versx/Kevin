@@ -1,13 +1,15 @@
 //
-//  DeviceRatio1775.m
+//  DeviceIPhoneNormal.m
 //  Jarvis++
 //
-//  Created by versx on 3/27/20.
+//  Created by versx on 3/31/20.
 //
 
-#import "DeviceRatio1775.h"
+#import "DeviceIPhoneNormal.h"
 
-@implementation DeviceRatio1775
+// TODO: Implement correct values
+
+@implementation DeviceIPhoneNormal
 
 static DeviceCoordinateScalar *scalar;
 
@@ -16,8 +18,8 @@ static DeviceCoordinateScalar *scalar;
     if ((self = [super init])) {
         scalar = [[DeviceCoordinateScalar alloc] init:width
                                             heightNow:height
-                                          widthTarget:320
-                                         heightTarget:568
+                                          widthTarget:750
+                                         heightTarget:1334
                                            multiplier:multiplier
                                         tapMultiplier:tapMultiplier
         ];
@@ -29,7 +31,7 @@ static DeviceCoordinateScalar *scalar;
 #pragma mark Login Coordinates
 
 -(DeviceCoordinate *)loginNewPlayer {
-    return [[DeviceCoordinate alloc] init:320 withY:785 andDeviceCoordinateScalar:scalar];
+    return [[DeviceCoordinate alloc] init:320 withY:925 andDeviceCoordinateScalar:scalar];
 }
 -(DeviceCoordinate *)loginPTC {
     return [[DeviceCoordinate alloc] init:320 withY:800 andDeviceCoordinateScalar:scalar];
@@ -71,7 +73,7 @@ static DeviceCoordinateScalar *scalar;
     return [[DeviceCoordinate alloc] init:297 withY:526 andDeviceCoordinateScalar:scalar];
 }
 -(DeviceCoordinate *)loginFailed {
-    return [[DeviceCoordinate alloc] init:320 withY:670 andDeviceCoordinateScalar:scalar];
+    return [[DeviceCoordinate alloc] init:320 withY:740 andDeviceCoordinateScalar:scalar];
 }
 -(DeviceCoordinate *)loginPrivacyText {
     return [[DeviceCoordinate alloc] init:328 withY:748 andDeviceCoordinateScalar:scalar];
@@ -80,10 +82,10 @@ static DeviceCoordinateScalar *scalar;
     return [[DeviceCoordinate alloc] init:320 withY:625 andDeviceCoordinateScalar:scalar];
 }
 -(DeviceCoordinate *)loginPrivacyUpdateText {
-    return [[DeviceCoordinate alloc] init:110 withY:389 andDeviceCoordinateScalar:scalar];
+    return [[DeviceCoordinate alloc] init:133 withY:459 andDeviceCoordinateScalar:scalar];
 }
 -(DeviceCoordinate *)loginPrivacyUpdate {
-    return [[DeviceCoordinate alloc] init:320 withY:625 andDeviceCoordinateScalar:scalar];
+    return [[DeviceCoordinate alloc] init:375 withY:745 andDeviceCoordinateScalar:scalar];
 }
 -(DeviceCoordinate *)unableAuthText {
     return [[DeviceCoordinate alloc] init:330 withY:530 andDeviceCoordinateScalar:scalar];
@@ -96,10 +98,10 @@ static DeviceCoordinateScalar *scalar;
 #pragma mark Startup Coordinates
 
 -(DeviceCoordinate *)startup {
-    return [[DeviceCoordinate alloc] init:280 withY:800 andDeviceCoordinateScalar:scalar];
+    return [[DeviceCoordinate alloc] init:325 withY:960 andDeviceCoordinateScalar:scalar];
 }
 -(DeviceCoordinate *)startupLoggedOut {
-    return [[DeviceCoordinate alloc] init:320 withY:175 andDeviceCoordinateScalar:scalar];
+    return [[DeviceCoordinate alloc] init:400 withY:115 andDeviceCoordinateScalar:scalar];
 }
 -(DeviceCoordinate *)startupOldCornerTest {
     return [[DeviceCoordinate alloc] init:610 withY:715 andDeviceCoordinateScalar:scalar];
@@ -108,10 +110,10 @@ static DeviceCoordinateScalar *scalar;
     return [[DeviceCoordinate alloc] init:320 withY:650 andDeviceCoordinateScalar:scalar];
 }
 -(DeviceCoordinate *)startupNewButton {
-    return [[DeviceCoordinate alloc] init:400 withY:820 andDeviceCoordinateScalar:scalar];
+    return [[DeviceCoordinate alloc] init:475 withY:960 andDeviceCoordinateScalar:scalar];
 }
 -(DeviceCoordinate *)startupNewCautionSign {
-    return [[DeviceCoordinate alloc] init:320 withY:320 andDeviceCoordinateScalar:scalar];
+    return [[DeviceCoordinate alloc] init:375 withY:385 andDeviceCoordinateScalar:scalar];
 }
 -(DeviceCoordinate *)ageVerification {
     return [[DeviceCoordinate alloc] init:222 withY:815 andDeviceCoordinateScalar:scalar];
@@ -153,7 +155,7 @@ static DeviceCoordinateScalar *scalar;
     return [[DeviceCoordinate alloc] init:550 withY:950 andDeviceCoordinateScalar:scalar];
 }
 -(DeviceCoordinate *)closeFailedLogin {
-    return [[DeviceCoordinate alloc] init:318 withY:663 andDeviceCoordinateScalar:scalar];
+    return [[DeviceCoordinate alloc] init:374 withY:777 andDeviceCoordinateScalar:scalar];
 }
 
 
@@ -222,7 +224,7 @@ static DeviceCoordinateScalar *scalar;
     return [[DeviceCoordinate alloc] init:320 withY:645 andDeviceCoordinateScalar:scalar];
 }
 -(DeviceCoordinate *)encounterTmp {
-    return [[DeviceCoordinate alloc] init:575 withY:107 andDeviceCoordinateScalar:scalar];
+    return [[DeviceCoordinate alloc] init:0 withY:0 andDeviceCoordinateScalar:scalar];
 }
 -(DeviceCoordinate *)encounterPokemonRun {
     return [[DeviceCoordinate alloc] init:50 withY:75 andDeviceCoordinateScalar:scalar];
@@ -247,7 +249,7 @@ static DeviceCoordinateScalar *scalar;
 //    return [scalar scaleY:215];
 //}
 -(DeviceCoordinate *)itemEgg {
-    return [[DeviceCoordinate alloc] init:148 withY:215 andDeviceCoordinateScalar:scalar];
+    return [[DeviceCoordinate alloc] init:173 withY:215 andDeviceCoordinateScalar:scalar];
 }
 
 

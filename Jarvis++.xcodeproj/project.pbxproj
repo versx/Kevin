@@ -41,6 +41,13 @@
 		C03E44E12431133800B467BB /* RequestController.m in Sources */ = {isa = PBXBuildFile; fileRef = C03E44E02431133800B467BB /* RequestController.m */; };
 		C03E44E42432595200B467BB /* PixelSettings.h in Headers */ = {isa = PBXBuildFile; fileRef = C03E44E32432595200B467BB /* PixelSettings.h */; };
 		C03E44E62432596900B467BB /* PixelSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = C03E44E52432596900B467BB /* PixelSettings.m */; };
+		C03E44EC24340FD800B467BB /* DeviceConfigProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = C03E44EB24340FD800B467BB /* DeviceConfigProtocol.h */; };
+		C03E44EE2434286500B467BB /* DeviceRatio1333.h in Headers */ = {isa = PBXBuildFile; fileRef = C03E44ED2434286500B467BB /* DeviceRatio1333.h */; };
+		C03E44F02434287600B467BB /* DeviceRatio1333.m in Sources */ = {isa = PBXBuildFile; fileRef = C03E44EF2434287600B467BB /* DeviceRatio1333.m */; };
+		C03E44F224342D4400B467BB /* DeviceIPhoneNormal.h in Headers */ = {isa = PBXBuildFile; fileRef = C03E44F124342D4400B467BB /* DeviceIPhoneNormal.h */; };
+		C03E44F424342D5100B467BB /* DeviceIPhoneNormal.m in Sources */ = {isa = PBXBuildFile; fileRef = C03E44F324342D5100B467BB /* DeviceIPhoneNormal.m */; };
+		C03E44F624342F9E00B467BB /* DeviceIPhonePlus.h in Headers */ = {isa = PBXBuildFile; fileRef = C03E44F524342F9E00B467BB /* DeviceIPhonePlus.h */; };
+		C03E44F824342FAC00B467BB /* DeviceIPhonePlus.m in Sources */ = {isa = PBXBuildFile; fileRef = C03E44F724342FAC00B467BB /* DeviceIPhonePlus.m */; };
 		C065AE40242ECD2A007114C8 /* DeviceRatio1775.h in Headers */ = {isa = PBXBuildFile; fileRef = C065AE3F242ECD2A007114C8 /* DeviceRatio1775.h */; };
 		C065AE42242ECD3B007114C8 /* DeviceRatio1775.m in Sources */ = {isa = PBXBuildFile; fileRef = C065AE41242ECD3B007114C8 /* DeviceRatio1775.m */; };
 		C065AE44242EFCCA007114C8 /* NSString+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = C065AE43242EFCCA007114C8 /* NSString+Extensions.h */; };
@@ -115,6 +122,13 @@
 		C03E44E02431133800B467BB /* RequestController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RequestController.m; sourceTree = "<group>"; };
 		C03E44E32432595200B467BB /* PixelSettings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PixelSettings.h; sourceTree = "<group>"; };
 		C03E44E52432596900B467BB /* PixelSettings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PixelSettings.m; sourceTree = "<group>"; };
+		C03E44EB24340FD800B467BB /* DeviceConfigProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceConfigProtocol.h; sourceTree = "<group>"; };
+		C03E44ED2434286500B467BB /* DeviceRatio1333.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceRatio1333.h; sourceTree = "<group>"; };
+		C03E44EF2434287600B467BB /* DeviceRatio1333.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceRatio1333.m; sourceTree = "<group>"; };
+		C03E44F124342D4400B467BB /* DeviceIPhoneNormal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceIPhoneNormal.h; sourceTree = "<group>"; };
+		C03E44F324342D5100B467BB /* DeviceIPhoneNormal.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceIPhoneNormal.m; sourceTree = "<group>"; };
+		C03E44F524342F9E00B467BB /* DeviceIPhonePlus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceIPhonePlus.h; sourceTree = "<group>"; };
+		C03E44F724342FAC00B467BB /* DeviceIPhonePlus.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceIPhonePlus.m; sourceTree = "<group>"; };
 		C065AE3F242ECD2A007114C8 /* DeviceRatio1775.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceRatio1775.h; sourceTree = "<group>"; };
 		C065AE41242ECD3B007114C8 /* DeviceRatio1775.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceRatio1775.m; sourceTree = "<group>"; };
 		C065AE43242EFCCA007114C8 /* NSString+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+Extensions.h"; sourceTree = "<group>"; };
@@ -363,6 +377,7 @@
 				C0339C94242803E40046D0AD /* ColorOffset.m */,
 				C0339C8E2427EE510046D0AD /* DeviceConfig.h */,
 				C0339C902427EE5B0046D0AD /* DeviceConfig.m */,
+				C03E44EB24340FD800B467BB /* DeviceConfigProtocol.h */,
 			);
 			path = DeviceConfig;
 			sourceTree = "<group>";
@@ -381,6 +396,12 @@
 		C065AE3E242ECD04007114C8 /* Configs */ = {
 			isa = PBXGroup;
 			children = (
+				C03E44F124342D4400B467BB /* DeviceIPhoneNormal.h */,
+				C03E44F324342D5100B467BB /* DeviceIPhoneNormal.m */,
+				C03E44F524342F9E00B467BB /* DeviceIPhonePlus.h */,
+				C03E44F724342FAC00B467BB /* DeviceIPhonePlus.m */,
+				C03E44ED2434286500B467BB /* DeviceRatio1333.h */,
+				C03E44EF2434287600B467BB /* DeviceRatio1333.m */,
 				C065AE3F242ECD2A007114C8 /* DeviceRatio1775.h */,
 				C065AE41242ECD3B007114C8 /* DeviceRatio1775.m */,
 			);
@@ -433,12 +454,14 @@
 				C0AC1CF8240BB97A008F4DFB /* Settings.h in Headers */,
 				C0B68E022414C33E009B5970 /* Consts.h in Headers */,
 				C0339C8A2427E9300046D0AD /* DeviceCoordinateScalar.h in Headers */,
+				C03E44F224342D4400B467BB /* DeviceIPhoneNormal.h in Headers */,
 				C067ACF4241EAFF7007E3055 /* FixCategoryBug.h in Headers */,
 				C067ACED241EAFF7007E3055 /* UIApplication-KIFAdditions.h in Headers */,
 				C067ACEA241EAFF6007E3055 /* PTFakeTouch.h in Headers */,
 				C0339C93242803D80046D0AD /* ColorOffset.h in Headers */,
 				C065AE40242ECD2A007114C8 /* DeviceRatio1775.h in Headers */,
 				C0339C862427E9140046D0AD /* DeviceCoordinate.h in Headers */,
+				C03E44EC24340FD800B467BB /* DeviceConfigProtocol.h in Headers */,
 				C0025ABE241483B7007813F7 /* UIImage+Pixels.h in Headers */,
 				C01B4971240ACF5D00633B45 /* Jarvis__.h in Headers */,
 				C00EE48D241D4830001771AB /* JarvisTestCase.h in Headers */,
@@ -446,6 +469,7 @@
 				C067ACF0241EAFF7007E3055 /* UIView-KIFAdditions.h in Headers */,
 				C067ACF9241EAFF7007E3055 /* LoadableCategory.h in Headers */,
 				C03E44DF2431132700B467BB /* RequestController.h in Headers */,
+				C03E44EE2434286500B467BB /* DeviceRatio1333.h in Headers */,
 				C03E44E42432595200B467BB /* PixelSettings.h in Headers */,
 				C0BAF0952418B62C003E2419 /* Jarvis++.pch in Headers */,
 				C065AE44242EFCCA007114C8 /* NSString+Extensions.h in Headers */,
@@ -456,6 +480,7 @@
 				C0025AB424143923007813F7 /* DeviceState.h in Headers */,
 				C0AC1CF4240BB37C008F4DFB /* Device.h in Headers */,
 				C067ACF7241EAFF7007E3055 /* UITouch-KIFAdditions.h in Headers */,
+				C03E44F624342F9E00B467BB /* DeviceIPhonePlus.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -529,7 +554,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#/Users/helpdesk/Desktop/Projects/Jarvis/inject.sh\n/Users/helpdesk/Desktop/Projects/Jarvis/build.sh\n";
+			shellScript = "/Users/helpdesk/Desktop/Projects/Jarvis/inject.sh\n#/Users/helpdesk/Desktop/Projects/Jarvis/build.sh\n";
 		};
 		DD19E334717C3F402AC7920B /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -563,6 +588,7 @@
 				C0339C95242803E40046D0AD /* ColorOffset.m in Sources */,
 				C01B4973240ACF5D00633B45 /* Jarvis__.m in Sources */,
 				C0AC1CF6240BB96C008F4DFB /* Settings.m in Sources */,
+				C03E44F424342D5100B467BB /* DeviceIPhoneNormal.m in Sources */,
 				C00EE48B241C70C5001771AB /* HttpClientConnection.m in Sources */,
 				C067ACF3241EAFF7007E3055 /* UIApplication-KIFAdditions.m in Sources */,
 				C0025AC524148477007813F7 /* JobController.m in Sources */,
@@ -575,6 +601,8 @@
 				C0025AB224143917007813F7 /* DeviceState.m in Sources */,
 				C01B4981240ACF9400633B45 /* UIC.mm in Sources */,
 				C067ACEE241EAFF7007E3055 /* UIWindow-KIFAdditions.m in Sources */,
+				C03E44F824342FAC00B467BB /* DeviceIPhonePlus.m in Sources */,
+				C03E44F02434287600B467BB /* DeviceRatio1333.m in Sources */,
 				C03E44E62432596900B467BB /* PixelSettings.m in Sources */,
 				C067ACEF241EAFF7007E3055 /* UITouch-KIFAdditions.m in Sources */,
 				C065AE46242EFCD8007114C8 /* NSString+Extensions.m in Sources */,

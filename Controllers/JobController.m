@@ -727,7 +727,7 @@ static dispatch_queue_t _getJobQueue;
             NSNumber *level = [[Device sharedInstance] level];
             syslog(@"[INFO] Lucky Eggs Count: %@ TimeSince: %f SpinCount: %@ Level: %@ LastDeploy: %@",
                    luckyEggsCount, timeIntervalSince, spinCount, level, lastDeployTime);
-            if (/*[luckyEggsCount intValue] >= 1 &&*/ timeIntervalSince >= 900 && // TODO: Check eggStart property
+            if (/*[luckyEggsCount intValue] >= 1 &&*/ timeIntervalSince >= 600 && // TODO: Check eggStart property
                 [level intValue] >= 9 && [level intValue] < 30) {
                 syslog(@"[INFO] Deploying lucky egg.");
                 if ([UIC2 eggDeploy]) {

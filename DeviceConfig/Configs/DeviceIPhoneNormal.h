@@ -1,14 +1,14 @@
 //
-//  DeviceRatio1775.h
+//  DeviceIPhoneNormal.h
 //  Jarvis++
 //
-//  Created by versx on 3/27/20.
+//  Created by versx on 3/31/20.
 //
 
 #import "../DeviceConfig.h"
 #import "../DeviceConfigProtocol.h"
 #import "../../DeviceCoordinate/DeviceCoordinateScalar.h"
 
-@interface DeviceRatio1775 : NSObject<DeviceConfigProtocol>
+@interface DeviceIPhoneNormal : NSObject<DeviceConfigProtocol>
 
 @end

@@ -7,12 +7,12 @@
 
 #import "UIC.h"
 
+// TODO: Resize image if not SE/5S
 // TODO: Detect different tutorial stages for incomplete tuts
 // TODO: Handle invalid usernames
 // TODO: Benchmark/Performance/Profile monitor
 // TODO: Move constants to consts class
 // TODO: Remove PTFakeTouch
-// TODO: Support multiple device configs
 // TODO: Pixel offsets in remote config
 // TODO: Fix https://developer.apple.com/documentation/xctest/xctestcase/1496273-adduiinterruptionmonitorwithdesc
 // TODO: Use https://github.com/mattstevens/RoutingHTTPServer for routes
@@ -49,6 +49,10 @@ static BOOL _dataStarted = false;
         
         // Print settings
         [[Settings sharedInstance] config];
+        
+        if ([DeviceConfig sharedInstance] == nil) {
+            return nil;
+        }
         
         //JarvisTestCase *jarvis = [[JarvisTestCase alloc] init];
         //[jarvis runTest];

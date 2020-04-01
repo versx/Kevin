@@ -1,8 +1,8 @@
 //
-//  DeviceRatio1775.h
+//  DeviceRatio1333.h
 //  Jarvis++
 //
-//  Created by versx on 3/27/20.
+//  Created by versx on 3/31/20.
 //
 
 #import "../DeviceConfig.h"

@@ -5,11 +5,7 @@
 //  Created by versx on 3/10/20.
 //
 
-#define JARVIS_VERSION @"0.6.37"
-
-//#define DEFAULT_MIN_LEVEL @0
-//#define DEFAULT_MAX_LEVEL @29
-// TODO: Either move all other default consts here or fix min/max_level in consts class.
+#define JARVIS_VERSION @"0.6.43"
 
 #import <Foundation/Foundation.h>
 #import "Utilities/Utils.h"

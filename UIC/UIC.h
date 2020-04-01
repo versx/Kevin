@@ -9,6 +9,7 @@
 #import "Device.h"
 #import "../Controllers/JobController.h"
 #import "../DeviceConfig/DeviceConfig.h"
+#import "../DeviceConfig/DeviceConfigProtocol.h"
 #import "../Jarvis++/Jarvis__.h"
 #import "../Net/HttpClientConnection.h"
 #import "../Settings/Settings.h"
