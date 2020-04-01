@@ -727,12 +727,12 @@ static dispatch_queue_t _getJobQueue;
             NSTimeInterval eggTimeIntervalSince = [[NSDate date] timeIntervalSinceDate:lastDeployTime];
             syslog(@"[INFO] Lucky Eggs Count: %@ EggTimeSince: %f Level: %@ LastDeploy: %@",
             luckyEggsCount, eggTimeIntervalSince, level, lastDeployTime);
-            NSNumber *eggInterval = @480; // 8 mins
+            NSNumber *eggInterval = @300; // 5 mins
             if ([level intValue] >= 9 && [level intValue] < 30 &&
                 (lastDeployTime == nil ||
                 eggTimeIntervalSince == NAN ||
                 eggTimeIntervalSince >= [eggInterval intValue])) {
-            //if (/*[luckyEggsCount intValue] >= 1 &&*/ timeIntervalSince >= 300 &&
+            //if ([luckyEggsCount intValue] >= 1 &&
                 syslog(@"[INFO] Deploying lucky egg.");
                 if ([UIC2 eggDeploy]) {
                     [[DeviceState sharedInstance] setLastDeployTime:[NSDate date]];

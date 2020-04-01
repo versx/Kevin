@@ -7,6 +7,7 @@
 
 #import "UIC.h"
 
+// TODO: 5S delays
 // TODO: Resize image if not SE/5S
 // TODO: Detect different tutorial stages for incomplete tuts
 // TODO: Handle invalid usernames
@@ -191,7 +192,7 @@ static BOOL _dataStarted = false;
 
 -(void)startPixelCheckLoop
 {
-    NSDate *start = [NSDate date];
+    //NSDate *start = [NSDate date];
     __block bool isAgeVerification = false;
     __block bool isStartupLoggedOut = false;
     __block bool isStartup = false;
@@ -209,6 +210,7 @@ static BOOL _dataStarted = false;
     __block bool isPokestopOpen = false;
     __block bool isAdventureSyncRewards = false;
     __block bool isPokemonEncounter = false;
+    __block bool isTeamSelect = false;
     dispatch_semaphore_t sem = dispatch_semaphore_create(0);
     dispatch_async(dispatch_get_main_queue(), ^{
         UIImage *image = [Utils takeScreenshot];
@@ -289,6 +291,12 @@ static BOOL _dataStarted = false;
                              [image rgbAtLocation:[[DeviceConfig sharedInstance] encounterPokeball]
                                        betweenMin:[[ColorOffset alloc] init:0.70 green:0.05 blue:0.05]
                                            andMax:[[ColorOffset alloc] init:0.95 green:0.30 blue:0.35]];
+        isTeamSelect = [image rgbAtLocation:[[DeviceConfig sharedInstance] teamSelectBackgroundL]
+                                 betweenMin:[[ColorOffset alloc] init:0.00 green:0.20 blue:0.25]
+                                     andMax:[[ColorOffset alloc] init:0.05 green:0.35 blue:0.35]] &&
+                       [image rgbAtLocation:[[DeviceConfig sharedInstance] teamSelectBackgroundR]
+                                 betweenMin:[[ColorOffset alloc] init:0.00 green:0.20 blue:0.25]
+                                     andMax:[[ColorOffset alloc] init:0.05 green:0.35 blue:0.35]];
         dispatch_semaphore_signal(sem);
     });
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
@@ -302,6 +310,9 @@ static BOOL _dataStarted = false;
         [UIC2 loginAccount];
     } else if (isStartup) {
         syslog(@"[INFO] App still in startup logged in, waiting...");
+        if (![[Device sharedInstance] isLoggedIn]) {
+            [[Device sharedInstance] setIsLoggedIn:true];
+        }
         sleep(2);
     } else if (isFailedLogin) {
         syslog(@"[INFO] Found failed to login screen or banned screen.");
@@ -408,8 +419,10 @@ static BOOL _dataStarted = false;
         DeviceCoordinate *closeWarning = [[DeviceConfig sharedInstance] closeWarning];
         [JarvisTestCase touch:[closeWarning tapX] withY:[closeWarning tapY]];
         sleep(2);
-    } else if ((isLevelUp || isPokestopOpen) && ![UIC2 isTracker]) {
-        syslog(@"[INFO] Found level up/Pokestop spin screen.");
+    } else if ([[Device sharedInstance] isLoggedIn] &&
+               (isLevelUp || isPokestopOpen) &&
+               ![UIC2 isTracker]) {
+        syslog(@"[INFO] Found level up/Pokestop open/badge screen.");
         // TODO: Check for white pixel in tracker to skip closing tracker window.
         DeviceCoordinate *closeMenu = [[DeviceConfig sharedInstance] closeMenu];
         [JarvisTestCase touch:[closeMenu tapX] withY:[closeMenu tapY]];
@@ -434,13 +447,43 @@ static BOOL _dataStarted = false;
         DeviceCoordinate *encounterRun = [[DeviceConfig sharedInstance] encounterPokemonRun];
         [JarvisTestCase touch:[encounterRun tapX] withY:[encounterRun tapY]];
         sleep(2);
+    } else if (isTeamSelect) {
+        syslog(@"[INFO] Looks like we don't have a team and clicked a gym, starting team selection.");
+        DeviceCoordinate *teamSelectNext = [[DeviceConfig sharedInstance] teamSelectNext];
+        for (int i = 0; i < 6; i++) {
+            [JarvisTestCase touch:[teamSelectNext tapX] withY:[teamSelectNext tapY]];
+            sleep(1);
+        }
+        sleep(3);
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 5; j++) {
+                [JarvisTestCase touch:[teamSelectNext tapX] withY:[teamSelectNext tapY]];
+                sleep(1);
+            }
+            sleep(4);
+        }
+        
+        double tapMultiplier = 1.0;
+        if (@available(iOS 13.0, *)) {
+            tapMultiplier = 0.5;
+        }
+        int x = arc4random_uniform([UIScreen mainScreen].bounds.size.width);
+        int teamSelectY = [[DeviceConfig sharedInstance] teamSelectY];
+        [JarvisTestCase touch:x * tapMultiplier withY:teamSelectY * tapMultiplier];
+        sleep(3);
+        [JarvisTestCase touch:[teamSelectNext tapX] withY:[teamSelectNext tapY]];
+        sleep(2);
+        DeviceCoordinate *welcomeOk = [[DeviceConfig sharedInstance] teamSelectWelcomeOk];
+        [JarvisTestCase touch:[welcomeOk tapX] withY:[welcomeOk tapY]];
+        syslog(@"[INFO] Team selection finished.");
+        sleep(2);
     } else {
         //syslog(@"[WARN] Nothing found");
         sleep(5);
         //loop = true;
     }
     
-    syslog(@"[VERBOSE] Pixel check loop took %f seconds", [[NSDate date] timeIntervalSinceDate:start]);
+    //syslog(@"[VERBOSE] Pixel check loop took %f seconds", [[NSDate date] timeIntervalSinceDate:start]);
 
     //if (loop) {
     [self startPixelCheckLoop];

@@ -185,4 +185,18 @@
 -(DeviceCoordinate *)adventureSyncButton;
 
 
+#pragma mark Team Selection
+
+
+/** Background of team select screen. (Left side) */
+-(DeviceCoordinate *)teamSelectBackgroundL;
+/** Background of team select screen. (Right side) */
+-(DeviceCoordinate *)teamSelectBackgroundR;
+/** Next button in Team select. */
+-(DeviceCoordinate *)teamSelectNext;
+/** Y value of team leaders */
+-(int)teamSelectY;
+/** Ok button in welcome to team. */
+-(DeviceCoordinate *)teamSelectWelcomeOk;
+
 @end

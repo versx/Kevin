@@ -25,7 +25,7 @@
         //eggStart = [NSDate dateWithTimeInterval:-1860 sinceDate:[NSDate date]];
         eggStart = [NSDate date];
         //lastDeployTime = [NSDate dateWithTimeInterval:-1860 sinceDate:[NSDate date]];
-        lastDeployTime = [NSDate date];
+        lastDeployTime = nil;//[NSDate date];
     }
     
     return self;

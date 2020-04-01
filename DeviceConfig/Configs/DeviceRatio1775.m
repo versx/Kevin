@@ -271,4 +271,23 @@ static DeviceCoordinateScalar *scalar;
 }
 
 
+#pragma mark Team Selection
+
+-(DeviceCoordinate *)teamSelectBackgroundL {
+    return [[DeviceCoordinate alloc] init:100 withY:800 andDeviceCoordinateScalar:scalar];
+}
+-(DeviceCoordinate *)teamSelectBackgroundR {
+    return [[DeviceCoordinate alloc] init:550 withY:800 andDeviceCoordinateScalar:scalar];
+}
+-(DeviceCoordinate *)teamSelectNext {
+    return [[DeviceCoordinate alloc] init:550 withY:1055 andDeviceCoordinateScalar:scalar];
+}
+-(int)teamSelectY {
+    return [scalar scaleY:700];
+}
+-(DeviceCoordinate *)teamSelectWelcomeOk {
+    return [[DeviceCoordinate alloc] init:320 withY:610 andDeviceCoordinateScalar:scalar];
+}
+
+
 @end
