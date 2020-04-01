@@ -42,11 +42,9 @@
 @property (nonatomic, readwrite, assign) NSNumber *noItemsCount;
 @property (nonatomic, readwrite, assign) NSNumber *spinCount;
 @property (nonatomic, readwrite, assign) NSNumber *emptyGmoCount;
-@property (nonatomic, readwrite, assign) NSNumber *luckyEggsCount;
 
 @property (nonatomic, readwrite, copy) NSDate *firstWarningDate;
 @property (nonatomic, readwrite, copy) NSDate *eggStart;
-@property (nonatomic, readwrite, copy) NSDate *lastDeployTime;
 @property (nonatomic, readwrite, copy) NSDate *lastUpdate;
 
 @property (nonatomic, readwrite, copy) NSString *lastAction;
@@ -56,6 +54,7 @@
 
 
 +(void)logout;
++(void)logout:(BOOL)skipRestart;
 +(void)restart;
 +(void)checkWarning:(NSString *)timestamp;
 

@@ -16,4 +16,6 @@
 
 +(id<DeviceConfigProtocol>)sharedInstance;
 
++(double)tapMultiplier;
+
 @end

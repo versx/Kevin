@@ -229,6 +229,9 @@ static DeviceCoordinateScalar *scalar;
 -(DeviceCoordinate *)encounterPokemonRun {
     return [[DeviceCoordinate alloc] init:100 withY:170 andDeviceCoordinateScalar:scalar];
 }
+-(DeviceCoordinate *)encounterPokeball {
+    return [[DeviceCoordinate alloc] init:0 withY:0 andDeviceCoordinateScalar:scalar];
+}
 
 
 #pragma mark Items
@@ -267,6 +270,25 @@ static DeviceCoordinateScalar *scalar;
 }
 -(DeviceCoordinate *)adventureSyncButton {
     return [[DeviceCoordinate alloc] init:768 withY:1740 andDeviceCoordinateScalar:scalar];
+}
+
+
+#pragma mark Team Selection
+
+-(DeviceCoordinate *)teamSelectBackgroundL {
+    return [[DeviceCoordinate alloc] init:0 withY:0 andDeviceCoordinateScalar:scalar];
+}
+-(DeviceCoordinate *)teamSelectBackgroundR {
+    return [[DeviceCoordinate alloc] init:0 withY:0 andDeviceCoordinateScalar:scalar];
+}
+-(DeviceCoordinate *)teamSelectNext {
+    return [[DeviceCoordinate alloc] init:0 withY:0 andDeviceCoordinateScalar:scalar];
+}
+-(DeviceCoordinate *)teamSelectWelcomeOk {
+    return [[DeviceCoordinate alloc] init:0 withY:0 andDeviceCoordinateScalar:scalar];
+}
+-(int)teamSelectY {
+    return [[DeviceCoordinate alloc] init:0 withY:0 andDeviceCoordinateScalar:scalar];
 }
 
 

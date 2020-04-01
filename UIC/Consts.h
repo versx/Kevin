@@ -30,6 +30,7 @@ extern NSNumber *DEFAULT_BDAY;
 //extern NSNumber *DEFAULT_MIN_LEVEL;
 //extern NSNumber *DEFAULT_MAX_LEVEL;
 extern NSNumber *DEFAULT_PORT;
+extern NSNumber *DEFAULT_DELAY_MULTIPLIER;
 extern NSNumber *DEFAULT_TARGET_MAX_DISTANCE;
 extern NSNumber *DEFAULT_POKEMON_MAX_TIME;
 extern NSNumber *DEFAULT_RAID_MAX_TIME;

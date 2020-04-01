@@ -15,17 +15,13 @@
     if ((self = [super init]))
     {
         lastAction = @"";
-        luckyEggsCount = @0;
         spinCount = @0;
         failedCount = @0;
         failedGetJobCount = @0;
         emptyGmoCount = @0;
         noQuestCount = @0;
         noItemsCount = @0;
-        //eggStart = [NSDate dateWithTimeInterval:-1860 sinceDate:[NSDate date]];
         eggStart = [NSDate date];
-        //lastDeployTime = [NSDate dateWithTimeInterval:-1860 sinceDate:[NSDate date]];
-        lastDeployTime = nil;//[NSDate date];
     }
     
     return self;
@@ -39,7 +35,6 @@
     [lastQuestLocation release];
     [firstWarningDate release];
     [eggStart release];
-    [lastDeployTime release];
     [lastUpdate release];
     [pokemonEncounterId release];
     [targetFortId release];
@@ -83,11 +78,9 @@
 @synthesize noItemsCount;
 @synthesize spinCount;
 @synthesize emptyGmoCount;
-@synthesize luckyEggsCount;
 
 @synthesize firstWarningDate;
 @synthesize eggStart;
-@synthesize lastDeployTime;
 @synthesize lastUpdate;
 
 @synthesize lastAction;
@@ -116,6 +109,11 @@
 
 +(void)logout
 {
+    [self logout:false];
+}
+
++(void)logout:(BOOL)skipRestart
+{
     syslog(@"[INFO] Attempting to logout.");
     dispatch_semaphore_t sem = dispatch_semaphore_create(0);
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -134,6 +132,9 @@
         ];
         [[Device sharedInstance] setUsername:nil];
         [[Device sharedInstance] setPassword:nil];
+        [[Device sharedInstance] setLuckyEggsCount:@0];
+        [[Device sharedInstance] setLastEggDeployTime:nil];
+        [[Device sharedInstance] setIsLoggedIn:false];
         [NSThread sleepForTimeInterval:0.5];
         if ([[[Device sharedInstance] username] isNullOrEmpty] &&
             [[Settings sharedInstance] enableAccountManager]) {
@@ -218,9 +219,11 @@
     });
     
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
-    syslog(@"[DEBUG] Restarting...");
-    sleep(1);
-    [self restart];
+    if (!skipRestart) {
+        syslog(@"[DEBUG] Restarting...");
+        sleep(1);
+        [self restart];
+    }
 }
 
 +(void)checkWarning:(NSString *)timestamp

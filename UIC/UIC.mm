@@ -7,7 +7,7 @@
 
 #import "UIC.h"
 
-// TODO: 5S delays
+// TODO: Fix egg deploy for quests
 // TODO: Resize image if not SE/5S
 // TODO: Detect different tutorial stages for incomplete tuts
 // TODO: Handle invalid usernames
@@ -42,7 +42,7 @@ static BOOL _dataStarted = false;
         syslog(@"[DEBUG] %@ (%@) running %@ %@ with a delay of %@",
                [[Device sharedInstance] uuid], [[Device sharedInstance] model],
                [[Device sharedInstance] osName], [[Device sharedInstance] osVersion],
-               [[Device sharedInstance] multiplier]);
+               [[Settings sharedInstance] delayMultiplier]);
         
         syslog(@"[DEBUG] NSUserDefaults: %@", [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]);
         
@@ -50,6 +50,9 @@ static BOOL _dataStarted = false;
         
         // Print settings
         [[Settings sharedInstance] config];
+        
+        //NSDictionary *pixelConfig = [[Settings sharedInstance] fetchRemoteConfig:[[Settings sharedInstance] pixelConfigUrl]];
+        //syslog(@"[DEBUG] Pixel config: %@", pixelConfig);
         
         if ([DeviceConfig sharedInstance] == nil) {
             return nil;
@@ -224,8 +227,6 @@ static BOOL _dataStarted = false;
                                        betweenMin:[[ColorOffset alloc] init:0.02 green:0.78 blue:0.9]
                                            andMax:[[ColorOffset alloc] init:0.04 green:0.80 blue:1.0]];
         isStartup = [image rgbAtLocation:[[DeviceConfig sharedInstance] startup]
-                              //betweenMin:[[ColorOffset alloc] init:0.0 green:0.75 blue:0.55]
-                              //    andMax:[[ColorOffset alloc] init:1.0 green:0.90 blue: 0.70]];
                               betweenMin:[[ColorOffset alloc] init:0.55 green:0.75 blue:0.0]
                                   andMax:[[ColorOffset alloc] init:0.70 green:0.90 blue:1.0]];
         isPassengerWarning = [image rgbAtLocation:[[DeviceConfig sharedInstance] passenger]
@@ -300,7 +301,7 @@ static BOOL _dataStarted = false;
         dispatch_semaphore_signal(sem);
     });
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
-    //bool loop = true;
+    int delayMultiplier = [[[Settings sharedInstance] delayMultiplier] intValue];
     if (isAgeVerification) {
         syslog(@"[INFO] Age verification screen.");
         [UIC2 ageVerification];
@@ -313,25 +314,24 @@ static BOOL _dataStarted = false;
         if (![[Device sharedInstance] isLoggedIn]) {
             [[Device sharedInstance] setIsLoggedIn:true];
         }
-        sleep(2);
+        sleep(2 * delayMultiplier);
     } else if (isFailedLogin) {
         syslog(@"[INFO] Found failed to login screen or banned screen.");
         DeviceCoordinate *switchAccount = [[DeviceConfig sharedInstance] loginBannedSwitchAccount];
         [JarvisTestCase touch:[switchAccount tapX] withY:[switchAccount tapY]];
-        [[Device sharedInstance] setUsername:nil];
-        sleep(1);
-        [DeviceState logout]; // TODO: Don't restart
-        sleep(2);
+        //[[Device sharedInstance] setUsername:nil];
+        sleep(1 * delayMultiplier);
+        [DeviceState logout:true]; // TODO: Don't restart
+        sleep(2 * delayMultiplier);
     } else if (isStartupLogo) {
         syslog(@"[INFO] Startup logo found, waiting and trying again.");
-        sleep(2); // TODO: 2 * DelayMultiplier
+        sleep(2 * delayMultiplier);
     } else if (isUnableAuth) {
         syslog(@"[INFO] Found unable to authenticate button.");
         DeviceCoordinate *unableAuth = [[DeviceConfig sharedInstance] unableAuthButton];
         [JarvisTestCase touch:[unableAuth tapX] withY:[unableAuth tapY]];
     } else if (isInvalidCredentials) {
         syslog(@"[INFO] Invalid credentials for %@", [[Device sharedInstance] username]);
-        [[Device sharedInstance] setUsername:nil];
         NSMutableDictionary *invalidData = [[NSMutableDictionary alloc] init];
         invalidData[@"uuid"] = [[Device sharedInstance] uuid];
         invalidData[@"username"] = [[Device sharedInstance] username];
@@ -340,35 +340,36 @@ static BOOL _dataStarted = false;
                       dict:invalidData
                   blocking:true
                 completion:^(NSDictionary *result) {}];
-        sleep(2);
-        // TODO: Set is logged in
+        sleep(2 * delayMultiplier);
+        [[Device sharedInstance] setUsername:nil];
+        [[Device sharedInstance] setIsLoggedIn:false];
     } else if (isTos) {
         syslog(@"[INFO] Accepting Terms of Service prompt.")
         DeviceCoordinate *tos = [[DeviceConfig sharedInstance] loginTerms];
         [JarvisTestCase touch:[tos tapX] withY:[tos tapY]];
-        sleep(2); // TODO: 2 * DelayMultiplier
+        sleep(2 * delayMultiplier);
     } else if (isTosUpdate) {
         syslog(@"[INFO] Accepting updated Terms of Service prompt.");
         DeviceCoordinate *tos2 = [[DeviceConfig sharedInstance] loginTerms2];
         [JarvisTestCase touch:[tos2 tapX] withY:[tos2 tapY]];
-        sleep(2);
+        sleep(2 * delayMultiplier);
     } else if (isPrivacy) {
         syslog(@"[INFO] Accepting Privacy Policy prompt");
         DeviceCoordinate *privacy = [[DeviceConfig sharedInstance] loginPrivacy];
         [JarvisTestCase touch:[privacy tapX] withY:[privacy tapY]];
-        sleep(2);
+        sleep(2 * delayMultiplier);
     } else if (isPrivacyUpdate) {
         syslog(@"[INFO] Accepting updated Privacy Policy prompt.");
         DeviceCoordinate *privacyUpdate = [[DeviceConfig sharedInstance] loginPrivacyUpdate];
         [JarvisTestCase touch:[privacyUpdate tapX] withY:[privacyUpdate tapY]];
-        sleep(2);
+        sleep(2 * delayMultiplier);
     } else if ([UIC2 isStartupPrompt]) {
         syslog(@"[INFO] Found startup prompt.");
-        sleep(1);
+        sleep(1 * delayMultiplier);
         syslog(@"[INFO] Closing news.");
         DeviceCoordinate *closeNews = [[DeviceConfig sharedInstance] closeNews];
         [JarvisTestCase touch:[closeNews tapX] withY:[closeNews tapY]];
-        sleep(2);
+        sleep(2 * delayMultiplier);
         syslog(@"[INFO] Opening nearby tracker.");
         DeviceCoordinate *tracker = [[DeviceConfig sharedInstance] trackerMenu];
         [JarvisTestCase touch:[tracker tapX] withY:[tracker tapY]];
@@ -376,23 +377,23 @@ static BOOL _dataStarted = false;
             _dataStarted = true;
             [[JobController sharedInstance] getJobs];
         }
-        sleep(2);
+        sleep(2 * delayMultiplier);
     } else if (isPassengerWarning) {
         syslog(@"[INFO] Found passenger warning.");
         DeviceCoordinate *passenger = [[DeviceConfig sharedInstance] passenger];
         [JarvisTestCase touch:[passenger tapX] withY:[passenger tapY]];
-        sleep(2);
+        sleep(2 * delayMultiplier);
     } else if (isWeather) {
         syslog(@"[INFO] Found weather alert.");
         DeviceCoordinate *closeWeather1 = [[DeviceConfig sharedInstance] closeWeather1];
         [JarvisTestCase touch:[closeWeather1 tapX] withY:[closeWeather1 tapY]];
-        sleep(2);
+        sleep(2 * delayMultiplier);
         DeviceCoordinate *closeWeather2 = [[DeviceConfig sharedInstance] closeWeather2];
         [JarvisTestCase touch:[closeWeather2 tapX] withY:[closeWeather2 tapX]];
-        sleep(2);
+        sleep(2 * delayMultiplier);
     } else if ([UIC2 isMainScreen]) {
         //syslog(@"[INFO] Found main screen.");
-        sleep(2);
+        sleep(1 * delayMultiplier);
         if (!_dataStarted) {
             _dataStarted = true;
             [[JobController sharedInstance] getJobs];
@@ -402,7 +403,6 @@ static BOOL _dataStarted = false;
         [UIC2 doTutorialSelection];
     } else if ([UIC2 isBanned]) {
         syslog(@"[INFO] Found banned screen. Restarting...");
-        [[Device sharedInstance] setUsername:nil];
         NSMutableDictionary *bannedData = [[NSMutableDictionary alloc] init];
         bannedData[@"uuid"] = [[Device sharedInstance] uuid];
         bannedData[@"username"] = [[Device sharedInstance] username];
@@ -411,22 +411,21 @@ static BOOL _dataStarted = false;
                       dict:bannedData
                   blocking:true
                 completion:^(NSDictionary *result) {}];
-        sleep(2);
-        //loop = false;
+        sleep(2 * delayMultiplier);
+        [[Device sharedInstance] setUsername:nil];
         [DeviceState restart];
     } else if ([UIC2 isWarningScreen]) {
         syslog(@"[INFO] Found warning pop-up.");
         DeviceCoordinate *closeWarning = [[DeviceConfig sharedInstance] closeWarning];
         [JarvisTestCase touch:[closeWarning tapX] withY:[closeWarning tapY]];
-        sleep(2);
+        sleep(2 * delayMultiplier);
     } else if ([[Device sharedInstance] isLoggedIn] &&
                (isLevelUp || isPokestopOpen) &&
                ![UIC2 isTracker]) {
         syslog(@"[INFO] Found level up/Pokestop open/badge screen.");
-        // TODO: Check for white pixel in tracker to skip closing tracker window.
         DeviceCoordinate *closeMenu = [[DeviceConfig sharedInstance] closeMenu];
         [JarvisTestCase touch:[closeMenu tapX] withY:[closeMenu tapY]];
-        sleep(2);
+        sleep(2 * delayMultiplier);
     } else if (isAdventureSyncRewards) {
         syslog(@"[INFO] Found Adventure sync rewards pop-up.");
         DeviceCoordinate *advSyncButton = [[DeviceConfig sharedInstance] adventureSyncButton];
@@ -434,49 +433,46 @@ static BOOL _dataStarted = false;
                  betweenMin:[[ColorOffset alloc] init:0.40 green:0.80 blue:0.50]
                      andMax:[[ColorOffset alloc] init:0.50 green:0.90 blue:0.70]]) {
             [JarvisTestCase touch:[advSyncButton tapX] withY:[advSyncButton tapY]];
-            sleep(2);
+            sleep(2 * delayMultiplier);
             [JarvisTestCase touch:[advSyncButton tapX] withY:[advSyncButton tapY]];
         } else if ([UIC2 isAtPixel:advSyncButton
                         betweenMin:[[ColorOffset alloc] init:0.05 green:0.45 blue:0.50]
                             andMax:[[ColorOffset alloc] init:0.20 green:0.60 blue:0.65]]) {
             [JarvisTestCase touch:[advSyncButton tapX] withY:[advSyncButton tapY]];
         }
-        sleep(2);
+        sleep(2 * delayMultiplier);
     } else if (isPokemonEncounter) {
         syslog(@"[INFO] Oopsie, must have clicked a Pokemon, exiting encounter.");
         DeviceCoordinate *encounterRun = [[DeviceConfig sharedInstance] encounterPokemonRun];
         [JarvisTestCase touch:[encounterRun tapX] withY:[encounterRun tapY]];
-        sleep(2);
+        sleep(2 * delayMultiplier);
     } else if (isTeamSelect) {
         syslog(@"[INFO] Looks like we don't have a team and clicked a gym, starting team selection.");
         DeviceCoordinate *teamSelectNext = [[DeviceConfig sharedInstance] teamSelectNext];
         for (int i = 0; i < 6; i++) {
             [JarvisTestCase touch:[teamSelectNext tapX] withY:[teamSelectNext tapY]];
-            sleep(1);
+            sleep(1 * delayMultiplier);
         }
-        sleep(3);
+        sleep(3 * delayMultiplier);
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 5; j++) {
                 [JarvisTestCase touch:[teamSelectNext tapX] withY:[teamSelectNext tapY]];
-                sleep(1);
+                sleep(1 * delayMultiplier);
             }
-            sleep(4);
+            sleep(4 * delayMultiplier);
         }
         
-        double tapMultiplier = 1.0;
-        if (@available(iOS 13.0, *)) {
-            tapMultiplier = 0.5;
-        }
+        double tapMultiplier = [DeviceConfig tapMultiplier];
         int x = arc4random_uniform([UIScreen mainScreen].bounds.size.width);
         int teamSelectY = [[DeviceConfig sharedInstance] teamSelectY];
         [JarvisTestCase touch:x * tapMultiplier withY:teamSelectY * tapMultiplier];
-        sleep(3);
+        sleep(3 * delayMultiplier);
         [JarvisTestCase touch:[teamSelectNext tapX] withY:[teamSelectNext tapY]];
-        sleep(2);
+        sleep(2 * delayMultiplier);
         DeviceCoordinate *welcomeOk = [[DeviceConfig sharedInstance] teamSelectWelcomeOk];
         [JarvisTestCase touch:[welcomeOk tapX] withY:[welcomeOk tapY]];
         syslog(@"[INFO] Team selection finished.");
-        sleep(2);
+        sleep(2 * delayMultiplier);
     } else {
         //syslog(@"[WARN] Nothing found");
         sleep(5);
@@ -484,95 +480,96 @@ static BOOL _dataStarted = false;
     }
     
     //syslog(@"[VERBOSE] Pixel check loop took %f seconds", [[NSDate date] timeIntervalSinceDate:start]);
-
-    //if (loop) {
     [self startPixelCheckLoop];
-    //}
 }
 
 // TODO: Move to DeviceState
 +(void)ageVerification
 {
-    int sleepDelay = 1; // TODO: DelayMultiplier
+    int delayMultiplier = [[[Settings sharedInstance] delayMultiplier] intValue];
+    // Click Year selector
     syslog(@"[DEBUG] Is age verification, selecting year selector");
     DeviceCoordinate *ageVerificationYear = [[DeviceConfig sharedInstance] ageVerificationYear];
     [JarvisTestCase touch:[ageVerificationYear tapX]
                     withY:[ageVerificationYear tapY]];
-    sleep(sleepDelay);
+    sleep(1 * delayMultiplier);
+    // Click very last year which passes age verification, '2007'
     syslog(@"[DEBUG] Tapping year 2007");
     DeviceCoordinate *ageVerificationYear2007 = [[DeviceConfig sharedInstance] ageVerificationYear2007];
     [JarvisTestCase touch:[ageVerificationYear2007 tapX]
                     withY:[ageVerificationYear2007 tapY]];
-    sleep(sleepDelay);
+    sleep(1 * delayMultiplier);
+    // Confirm age verification
     syslog(@"[DEBUG] Tapping age verification confirmation button");
     DeviceCoordinate *ageVerification = [[DeviceConfig sharedInstance] ageVerification];
     [JarvisTestCase touch:[ageVerification tapX]
                     withY:[ageVerification tapY]];
-    sleep(sleepDelay);
+    sleep(1 * delayMultiplier);
 }
 
 +(void)loginAccount
 {
-    int sleepDelay = 1; // TODO: DelayMultiplier
-    sleep(sleepDelay);
+    int delayMultiplier = [[[Settings sharedInstance] delayMultiplier] intValue];
+    sleep(1 * delayMultiplier);
     
     // Click 'New Player' button
     DeviceCoordinate *loginNewPlayer = [[DeviceConfig sharedInstance] loginNewPlayer];
     syslog(@"[DEBUG Tapping new player button %@", loginNewPlayer);
     [JarvisTestCase touch:[loginNewPlayer tapX]
                     withY:[loginNewPlayer tapY]];
-    sleep(2);
+    sleep(2 * delayMultiplier);
     
     // Click Pokemon Trainer Club button
     DeviceCoordinate *loginPTC = [[DeviceConfig sharedInstance] loginPTC];
     syslog(@"[DEBUG] Tapping PTC button %@", loginPTC);
     [JarvisTestCase touch:[loginPTC tapX]
                     withY:[loginPTC tapY]];
-    sleep(2);
+    sleep(2 * delayMultiplier);
     
     // Click Username text field
     DeviceCoordinate *loginUsernameTextfield = [[DeviceConfig sharedInstance] loginUsernameTextfield];
     syslog(@"[DEBUG] Tapping username text field %@", loginUsernameTextfield);
     [JarvisTestCase touch:[loginUsernameTextfield tapX]
                     withY:[loginUsernameTextfield tapY]];
-    sleep(sleepDelay);
+    sleep(2 * delayMultiplier);
     
     // Type account username
     [Jarvis__ typeUsername];
-    sleep(sleepDelay);
+    sleep(2 * delayMultiplier);
     
     // Click Password text field
     DeviceCoordinate *loginPasswordTextfield = [[DeviceConfig sharedInstance] loginPasswordTextfield];
     syslog(@"[DEBUG] Tappng password text field %@", loginPasswordTextfield);
     [JarvisTestCase touch:[loginPasswordTextfield tapX]
                     withY:[loginPasswordTextfield tapY]];
-    sleep(sleepDelay);
+    sleep(2 * delayMultiplier);
     
     // Type account password
     [Jarvis__ typePassword];
-    sleep(sleepDelay);
+    sleep(2 * delayMultiplier);
     
     // Click Config login button
     DeviceCoordinate *loginConfirm = [[DeviceConfig sharedInstance] loginConfirm];
     syslog(@"[DEBUG] Tapping confirm login %@", loginConfirm);
     [JarvisTestCase touch:[loginConfirm tapX]
                     withY:[loginConfirm tapY]];
-    sleep(sleepDelay);
+    sleep(2 * delayMultiplier);
 }
 
 +(void)doTutorialSelection
 {
+    int delayMultiplier = [[[Settings sharedInstance] delayMultiplier] intValue];
     syslog(@"[INFO] [TUT] Tapping 9 times passed Professor Willow screen.");
     DeviceCoordinate *willowPrompt = [[DeviceConfig sharedInstance] tutorialWillowPrompt];
     for (int i = 0; i < 9; i++) {
         [JarvisTestCase touch:[willowPrompt tapX] withY:[willowPrompt tapY]];
-        sleep(2);
+        sleep(2 * delayMultiplier);
     }
-    sleep(1);
+    sleep(2 * delayMultiplier);
     syslog(@"[INFO] [TUT] Selecting female gender.");
     DeviceCoordinate *genderFemale = [[DeviceConfig sharedInstance] tutorialGenderFemale];
     [JarvisTestCase touch:[genderFemale tapX] withY:[genderFemale tapY]];
-    sleep(1);
+    sleep(1 * delayMultiplier);
     syslog(@"[INFO] [TUT] Tapping next button 3 times.");
     DeviceCoordinate *tutorialStyleConfirm = [[DeviceConfig sharedInstance] tutorialStyleConfirm];
     DeviceCoordinate *tutorialNext = [[DeviceConfig sharedInstance] tutorialNext];
@@ -581,20 +578,20 @@ static BOOL _dataStarted = false;
                  betweenMin:[[ColorOffset alloc] init:0.42 green:0.82 blue:0.60]
                      andMax:[[ColorOffset alloc] init:0.47 green:0.86 blue:0.63]]) {
         [JarvisTestCase touch:[tutorialNext tapX] withY:[tutorialNext tapY]];
-        sleep(2);
+        sleep(1 * delayMultiplier);
     }
-    sleep(2);
+    sleep(2 * delayMultiplier);
     syslog(@"[INFO] [TUT] Confirming style selection.");
     [JarvisTestCase touch:[tutorialStyleConfirm tapX] withY:[tutorialStyleConfirm tapY]];
-    sleep(2);
+    sleep(2 * delayMultiplier);
 
     // TODO: Block Until Clicked/pixel check method
     syslog(@"[INFO] [TUT] Willow prompt, tapping 2 times.");
     for (int i = 0; i < 3; i++) {
         [JarvisTestCase touch:[willowPrompt tapX] withY:[willowPrompt tapY]];
-        sleep(2);
+        sleep(2 * delayMultiplier);
     }
-    sleep(3); // TODO: If 5S/6, wait a little longer
+    sleep(3 * delayMultiplier); // TODO: If 5S/6, wait a little longer
     int failed = 0;
     int maxFails = 5;
     while (![self findAndClickPokemon]) {
@@ -602,7 +599,7 @@ static BOOL _dataStarted = false;
         DeviceCoordinate *ageStart = [[DeviceConfig sharedInstance] ageVerificationDragStart];
         DeviceCoordinate *ageEnd = [[DeviceConfig sharedInstance] ageVerificationDragEnd];
         [JarvisTestCase drag:ageStart toPoint:ageEnd];
-        sleep(5);
+        sleep(5 * delayMultiplier);
         failed++;
         if (failed >= maxFails) {
             break;
@@ -612,7 +609,7 @@ static BOOL _dataStarted = false;
         syslog(@"[ERROR] [TUT] Failed to find and click Pokemon to catch...");
         return;
     }
-    sleep(4);
+    sleep(4 * delayMultiplier);
     // Check for camera permissions prompt.
     // TODO: Check for actual AR prompt (only shows when camera has permissions?)
     syslog(@"[DEBUG] [TUT] Checking for AR(+) camera permissions prompt...");
@@ -621,13 +618,13 @@ static BOOL _dataStarted = false;
         syslog(@"[INFO] [TUT] Found AR(+) prompt, clicking.");
         DeviceCoordinate *startupOldCoordinate = [[DeviceConfig sharedInstance] startupOldOkButton];
         [JarvisTestCase touch:[startupOldCoordinate tapX] withY:[startupOldCoordinate tapY]];
-        sleep(2);
+        sleep(2 * delayMultiplier);
     }
     // TODO: Verify isArPlusModePrompt works.
     if (![self isArPlusModePrompt]) {
         syslog(@"[INFO] No AR(+) enabled.");
     }
-    sleep(3);
+    sleep(3 * delayMultiplier);
     // If we haven't hit the post capture prompt yet, keep attempting to throw pokeballs.
     //0.611765 0.839216 0.466667 1
     //0.611765 0.839216 0.462745 1
@@ -645,7 +642,7 @@ static BOOL _dataStarted = false;
         sleep(10);
     }
     syslog(@"[INFO] [TUT] Pokemon caught!");
-    sleep(2);
+    sleep(2 * delayMultiplier);
     //310x755 - 0.611765 0.839216 0.466667
     syslog(@"[INFO] [TUT] Tapping OK after Pokemon caught button and waiting 10 seconds.");
     DeviceCoordinate *catchConfirm = [[DeviceConfig sharedInstance] tutorialCatchConfirm];
@@ -655,17 +652,17 @@ static BOOL _dataStarted = false;
     // TODO: Pixel check close button
     DeviceCoordinate *closeButton = [[DeviceConfig sharedInstance] closeMenu];
     [JarvisTestCase touch:[closeButton tapX] withY:[closeButton tapY]];
-    sleep(3);
+    sleep(3 * delayMultiplier);
     syslog(@"[INFO] [TUT] Willow prompt, tapping 2 times.");
     [JarvisTestCase touch:[willowPrompt tapX] withY:[willowPrompt tapY]];
-    sleep(3);
+    sleep(3 * delayMultiplier);
     [JarvisTestCase touch:[willowPrompt tapX] withY:[willowPrompt tapY]];
-    sleep(5);
+    sleep(5 * delayMultiplier);
     NSString *username = [[Device sharedInstance] username];
     NSString *usernameReturn = [NSString stringWithFormat:@"%@\n", username];
     syslog(@"[INFO] [TUT] Typing in nickname %@", username)
     [JarvisTestCase type:usernameReturn];
-    sleep(1);
+    sleep(1 * delayMultiplier);
     // TODO: While not confirm button keep trying to enter random username and click OK button on fail.
     // Click OK button.
     if ([self isPassengerWarning]) {
@@ -673,12 +670,12 @@ static BOOL _dataStarted = false;
         DeviceCoordinate *passenger = [[DeviceConfig sharedInstance] passenger];
         [JarvisTestCase touch:[passenger tapX] withY:[passenger tapY]];
     }
-    sleep(2);
+    sleep(2 * delayMultiplier);
     // Confirm username.
     syslog(@"[INFO] [TUT] Confirming username.");
     DeviceCoordinate *confirm = [[DeviceConfig sharedInstance] tutorialStyleConfirm];
     [JarvisTestCase touch:[confirm tapX] withY:[confirm tapY]];
-    sleep(2);
+    sleep(2 * delayMultiplier);
     // x 327-765 0.615686 0.835294 0.439216 1
     syslog(@"[INFO] [TUT] Clicking away Professor Willow screens.");
     DeviceCoordinate *pokestopConfirm = [[DeviceConfig sharedInstance] tutorialPokestopConfirm];
@@ -686,13 +683,13 @@ static BOOL _dataStarted = false;
                  betweenMin:[[ColorOffset alloc] init:0.42 green:0.82 blue:0.60]
                      andMax:[[ColorOffset alloc] init:0.46 green:0.85 blue:0.63]]) {
         [JarvisTestCase touch:[pokestopConfirm tapX] withY:[pokestopConfirm tapY]];
-        sleep(2);
+        sleep(2 * delayMultiplier);
     }
-    sleep(3);
+    sleep(3 * delayMultiplier);
     // Click Pokestop button.
     syslog(@"[INFO] [TUT] Clicking away spin Pokestop prompt.");
     [JarvisTestCase touch:[pokestopConfirm tapX] withY:[pokestopConfirm tapY]];
-    sleep(2);
+    sleep(2 * delayMultiplier);
     syslog(@"[INFO] [TUT] Tutorial done!");
     NSMutableDictionary *tutData = [[NSMutableDictionary alloc] init];
     tutData[@"uuid"] = [[Device sharedInstance] uuid];
@@ -922,10 +919,7 @@ static BOOL _dataStarted = false;
         CGFloat blue = 0;
         CGFloat alpha = 0;
         [feetColor getRed:&red green:&green blue:&blue alpha:&alpha];
-        double tapMultiplier = 1.0;
-        if (@available(iOS 13.0, *)) {
-            tapMultiplier = 0.5;
-        }
+        double tapMultiplier = [DeviceConfig tapMultiplier];
         syslog(@"[DEBUG] [TUT] Checking if Pokemon at feet.");
         if (red > 0.9 &&
             green > 0.6 && green < 0.8 && //0.7
@@ -943,14 +937,13 @@ static BOOL _dataStarted = false;
             for (int y = 40; y < height / 10; y++) {
                 int realX = x * 10;
                 int realY = y * 10;
-                //NSLog(@"[Jarvis] [DEBUG] [TUT] findAndClickPokemon: Comparing at %d, %d", realX, realY);
                 UIColor *color = [image getPixelColor:realX withY:realY];
                 CGFloat red = 0;
                 CGFloat green = 0;
                 CGFloat blue = 0;
                 CGFloat alpha = 0;
                 [color getRed:&red green:&green blue:&blue alpha:&alpha];
-                //NSLog(@"[Jarvis] [DEBUG] [TUT] Pixel: red=%f green=%f blue=%f alpha=%f", red, green, blue, alpha);
+                //NSLog(@"[Jarvis] [DEBUG] [TUT] Pixel: [x=%d y=%d] red=%f green=%f blue=%f alpha=%f", realX, realY, red, green, blue, alpha);
                 if (red > 0.9 &&
                     green > 0.6 && green < 0.8 && //0.7
                     blue > 0.3 && blue < 0.5) { //0.4
@@ -1000,13 +993,6 @@ static BOOL _dataStarted = false;
         return result;
     }
     
-    //[[DeviceState sharedInstance] setLastDeployTime:[NSDate date]];
-    //if ([[NSDate date] timeIntervalSinceDate:[[DeviceState sharedInstance] lastDeployTime]] < 900) {
-    //    syslog(@"[DEBUG] Egg already deployed");
-    //    return false;
-    //}
-    
-    // TODO: Check if has egg, if not closeMenu
     DeviceCoordinate *closeMenu = [[DeviceConfig sharedInstance] closeMenu];
     // Check if not the main screen, tracker menu likely open, close it.
     //while (![self isMainScreen]) {
@@ -1025,7 +1011,7 @@ static BOOL _dataStarted = false;
     [JarvisTestCase touch:[openItems tapX] withY:[openItems tapY]];
     sleep(1);
     
-    // Check if egg is in 1st item slot
+    // If egg wasn't found in 1st, 2nd, or 3rd item slot we either don't have any or one active.
     NSNumber *hasEgg = [self hasEgg];
     if ([hasEgg intValue] == 0) {
         [JarvisTestCase touch:[closeMenu tapX] withY:[closeMenu tapY]];
@@ -1033,7 +1019,7 @@ static BOOL _dataStarted = false;
         return result;
     }
 
-    // Click egg menu item
+    // Check which item slot it was found at.
     DeviceCoordinate *eggMenuItem;
     switch ([hasEgg intValue]) {
         case 1:
@@ -1046,6 +1032,7 @@ static BOOL _dataStarted = false;
             eggMenuItem = [[DeviceConfig sharedInstance] itemEgg3];
             break;
     }
+    // Click egg menu item
     [JarvisTestCase touch:[eggMenuItem tapX] withY:[eggMenuItem tapY]];
     sleep(2);
     // Touch egg to deploy

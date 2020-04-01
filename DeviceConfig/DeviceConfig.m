@@ -9,17 +9,28 @@
 
 @implementation DeviceConfig
 
++(double)tapMultiplier
+{
+    double width = [UIScreen mainScreen].bounds.size.width;
+    double tapMultiplier = 1.0; // iOS 12 and below
+    if (@available(iOS 13.0, *)) {
+        if (width == 414) { // Plus devices
+            tapMultiplier = 1 / 3;
+        } else {
+            tapMultiplier = 0.5; // iOS 13
+        }
+    }
+    return tapMultiplier;
+}
+
 +(id<DeviceConfigProtocol>)sharedInstance
 {
     static id<DeviceConfigProtocol> sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        double tapMultiplier = 1.0; // iOS 12 and below
-        if (@available(iOS 13.0, *)) {
-            tapMultiplier = 0.5; // iOS 13
-        }
         double width = [UIScreen mainScreen].bounds.size.width;
         double height = [UIScreen mainScreen].bounds.size.height;
+        double tapMultiplier = [self tapMultiplier];
         int ratio = (height / width) * 1000;
         if (ratio >= 1770 && ratio <= 1780) { // iPhones
             switch ((int)width) {

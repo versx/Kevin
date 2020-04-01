@@ -15,7 +15,6 @@
 @synthesize model;
 @synthesize osName;
 @synthesize osVersion;
-@synthesize multiplier;
 
 
 -(NSString *)username
@@ -88,6 +87,44 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
+-(NSNumber *)luckyEggsCount
+{
+    @try {
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:@"lucky_eggs"] == nil) {
+            return @0;
+        }
+        return [[NSUserDefaults standardUserDefaults] objectForKey:@"lucky_eggs"] ?: @0;
+    }
+    @catch (NSException *exception) {
+        syslog(@"[ERROR] luckyEggCount: %@", exception);
+        return @0;
+    }
+}
+-(void)setLuckyEggsCount:(NSNumber *)value
+{
+    [[NSUserDefaults standardUserDefaults] setValue:value forKey:@"lucky_eggs"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+-(NSDate *)lastEggDeployTime
+{
+    @try {
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:@"last_egg_deploy"] == nil) {
+            return nil;
+        }
+        return [[NSUserDefaults standardUserDefaults] objectForKey:@"last_egg_deploy"] ?: nil;
+    }
+    @catch (NSException *exception) {
+        syslog(@"[ERROR] lastEggDeployTime: %@", exception);
+        return nil;
+    }
+}
+-(void)setLastEggDeployTime:(NSDate *)date
+{
+    [[NSUserDefaults standardUserDefaults] setValue:date forKey:@"last_egg_deploy"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 
 @synthesize ptcToken;
 @synthesize level;
@@ -100,7 +137,6 @@
     NSLog(@"[INFO] init");
     if ((self = [super init]))
     {
-        multiplier = @5;
         ptcToken = [[NSUserDefaults standardUserDefaults] valueForKey:TOKEN_USER_DEFAULT_KEY] ?: @"";
         level = @0;
     }
@@ -119,6 +155,7 @@
         [sharedInstance setModel:modelName];
         [sharedInstance setOsName:[[UIDevice currentDevice] systemName]];
         [sharedInstance setOsVersion:[[UIDevice currentDevice] systemVersion]];
+        /*
         if ([modelName isEqualToString:@"iPhone 5s"] ||
             [modelName isEqualToString:@"iPhone 6"] ||
             [modelName isEqualToString:@"iPhone 6 Plus"]) {
@@ -126,6 +163,7 @@
         } else {
             [sharedInstance setMultiplier:@5];
         }
+        */
     });
     return sharedInstance;
 }

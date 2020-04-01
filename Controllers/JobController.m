@@ -720,26 +720,27 @@ static dispatch_queue_t _getJobQueue;
         
         if (success) {
             syslog(@"[INFO] Spinning Pokestop");
-            NSDate *lastDeployTime = [[DeviceState sharedInstance] lastDeployTime];
-            NSNumber *luckyEggsCount = [[DeviceState sharedInstance] luckyEggsCount];
+            NSDate *lastDeployTime = [[Device sharedInstance] lastEggDeployTime];
+            NSNumber *luckyEggsCount = [[Device sharedInstance] luckyEggsCount];
             //NSNumber *spinCount = [[DeviceState sharedInstance] spinCount];
             NSNumber *level = [[Device sharedInstance] level];
             NSTimeInterval eggTimeIntervalSince = [[NSDate date] timeIntervalSinceDate:lastDeployTime];
             syslog(@"[INFO] Lucky Eggs Count: %@ EggTimeSince: %f Level: %@ LastDeploy: %@",
             luckyEggsCount, eggTimeIntervalSince, level, lastDeployTime);
-            NSNumber *eggInterval = @300; // 5 mins
-            if ([level intValue] >= 9 && [level intValue] < 30 &&
+            NSNumber *eggInterval = @1801; // 30 mins 1 second
+            if ([luckyEggsCount intValue] > 0 &&
+                [level intValue] >= 9 && [level intValue] < 30 &&
                 (lastDeployTime == nil ||
                 eggTimeIntervalSince == NAN ||
                 eggTimeIntervalSince >= [eggInterval intValue])) {
             //if ([luckyEggsCount intValue] >= 1 &&
                 syslog(@"[INFO] Deploying lucky egg.");
                 if ([UIC2 eggDeploy]) {
-                    [[DeviceState sharedInstance] setLastDeployTime:[NSDate date]];
-                    [[DeviceState sharedInstance] setLuckyEggsCount:[Utils decrementInt:luckyEggsCount]];
+                    [[Device sharedInstance] setLastEggDeployTime:[NSDate date]];
+                    [[Device sharedInstance] setLuckyEggsCount:[Utils decrementInt:luckyEggsCount]];
                 } else {
                     //syslog(@"[ERROR] Failed to deploy lucky egg.");
-                    // TODO: [[DeviceState sharedInstance] setLuckyEggsCount:@0];
+                    // TODO: [[Device sharedInstance] setLuckyEggsCount:@0];
                 }
                 // TODO: [[DeviceState sharedInstance] setSpinCount:@0];
                 [[DeviceState sharedInstance] setUltraQuestSpin:true];

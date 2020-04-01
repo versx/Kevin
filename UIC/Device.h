@@ -36,4 +36,10 @@
 -(NSNumber *)maxLevel;
 -(void)setMaxLevel:(NSNumber *)value;
 
+-(NSNumber *)luckyEggsCount;
+-(void)setLuckyEggsCount:(NSNumber *)value;
+
+-(NSDate *)lastEggDeployTime;
+-(void)setLastEggDeployTime:(NSDate *)date;
+
 @end

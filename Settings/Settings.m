@@ -14,7 +14,9 @@ static BOOL _enableAccountManager;
 static NSString *_backendControllerUrl;
 static NSString *_backendRawUrl;
 static NSString *_token;
+static NSString *_pixelConfigUrl;
 static NSNumber *_port;
+static NSNumber *_delayMultiplier;
 static NSNumber *_targetMaxDistance;
 static NSNumber *_pokemonMaxTime;
 static NSNumber *_raidMaxTime;
@@ -50,11 +52,17 @@ static NSString *plistFileName = @"config.plist";
 -(NSString *)backendRawUrl {
     return _backendRawUrl;
 }
+-(NSString *)pixelConfigUrl {
+    return _pixelConfigUrl;
+}
 -(NSString *)token {
     return _token;
 }
 -(NSNumber *)port {
     return _port;
+}
+-(NSNumber *)delayMultiplier {
+    return _delayMultiplier;
 }
 -(NSNumber *)targetMaxDistance {
     return _targetMaxDistance;
@@ -123,8 +131,10 @@ static NSString *plistFileName = @"config.plist";
         _enableAccountManager = [_config[@"enableAccountManager"] boolValue] ?: DEFAULT_ENABLE_ACCOUNT_MANAGER;
         _backendControllerUrl = _config[@"backendControllerURL"];
         _backendRawUrl = _config[@"backendRawURL"];
+        _pixelConfigUrl = _config[@"pixelConfigUrl"];
         _token = _config[@"token"] ?: @"";
         _port = _config[@"port"] ?: DEFAULT_PORT;
+        _delayMultiplier = _config[@"delayMultiplier"] ?: DEFAULT_DELAY_MULTIPLIER;
         _targetMaxDistance = _config[@"targetMaxDistance"] ?: DEFAULT_TARGET_MAX_DISTANCE;
         _pokemonMaxTime = _config[@"pokemonMaxTime"] ?: DEFAULT_POKEMON_MAX_TIME;
         _raidMaxTime = _config[@"raidMaxTime"] ?: DEFAULT_RAID_MAX_TIME;

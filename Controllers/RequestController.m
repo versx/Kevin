@@ -150,7 +150,6 @@ static int _jitterCorner;
     data[@"uuid_control"] = [[Device sharedInstance] uuid];
     data[@"ptcToken"] = [[Device sharedInstance] ptcToken] ?: @"";
     
-    //dispatch_semaphore_t sem = dispatch_semaphore_create(0);
     [Utils postRequest:[[Settings sharedInstance] backendRawUrl]
                   dict:data
               blocking:false
@@ -176,8 +175,6 @@ static int _jitterCorner;
         bool onlyInvalidGmos = [data[@"only_invalid_gmos"] boolValue] ?: false;
         bool containsGmo = [data[@"contains_gmos"] boolValue] ?: true;
         NSNumber *luckyEggs = data[@"lucky_eggs"] ?: @0;
-
-        [[Device sharedInstance] setLevel:level];
         
         //self.lock.lock();
         NSNumber *diffLat = @(currentLoc.coordinate.latitude - [targetLat doubleValue]);
@@ -188,29 +185,39 @@ static int _jitterCorner;
         //NSNumber *spinFortLat = data[@"spin_fort_lat"] ?: @0.0;
         //NSNumber *spinFortLon = data[@"spin_fort_lon"] ?: @0.0;
         if ([level intValue] > 0) {
-            // TODO: Use luckyegg_count from lorgnette
             if ([[Device sharedInstance] level] != level) {
-                NSNumber *luckyEggsCount = [[DeviceState sharedInstance] luckyEggsCount];
-                switch ([level intValue]) {
-                    case 9:
-                        [[DeviceState sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount]];
-                        break;
-                    case 10:
-                        [[DeviceState sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount withAmount:@2]];
-                        break;
-                    case 15:
-                        [[DeviceState sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount withAmount:@3]];
-                        break;
-                    case 20:
-                        [[DeviceState sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount withAmount:@4]];
-                        break;
-                    case 25:
-                        [[DeviceState sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount withAmount:@5]];
-                        break;
+                NSNumber *oldLevel = [[Device sharedInstance] level];
+                syslog(@"[DEBUG] Level changed from %@ to %@", oldLevel, level);
+                NSNumber *luckyEggsCount = [[Device sharedInstance] luckyEggsCount];
+                if ([oldLevel intValue] > 0) {
+                    switch ([level intValue]) {
+                        case 9:
+                            syslog(@"[DEBUG] Hit level 9 adding 1 lucky egg");
+                            [[Device sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount]];
+                            break;
+                        case 10:
+                            syslog(@"[DEBUG] Hit level 10 adding 2 lucky eggs");
+                            [[Device sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount withAmount:@2]];
+                            break;
+                        case 15:
+                            syslog(@"[DEBUG] Hit level 15 adding 3 lucky eggs");
+                            [[Device sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount withAmount:@3]];
+                            break;
+                        case 20:
+                            syslog(@"[DEBUG] Hit level 20 adding 4 lucky eggs");
+                            [[Device sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount withAmount:@4]];
+                            break;
+                        case 25:
+                            syslog(@"[DEBUG] Hit level 25 adding 5 lucky eggs");
+                            [[Device sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount withAmount:@5]];
+                            break;
+                    }
                 }
             }
-            if (luckyEggs != nil) {
-                [[DeviceState sharedInstance] setLuckyEggsCount:luckyEggs];
+            // If we're provided a `luckyegg_count` from backend, use it.
+            if ([luckyEggs intValue] > 0) {
+                syslog(@"[DEBUG] Setting lucky egg value from backend: %@", luckyEggs);
+                [[Device sharedInstance] setLuckyEggsCount:luckyEggs];
             }
             [[Device sharedInstance] setLevel:level];
         }
@@ -289,9 +296,7 @@ static int _jitterCorner;
         }
         
         syslog(@"[DEBUG] [GMO] %@", msg);
-        //dispatch_semaphore_signal(sem);
     }];
-    //dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
     NSString *response = [Utils toJsonString:data withPrettyPrint:false];
     return response;
 }
@@ -371,6 +376,8 @@ static int _jitterCorner;
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TOKEN_USER_DEFAULT_KEY];
     [[Device sharedInstance] setUsername:nil];
     [[Device sharedInstance] setPassword:nil];
+    [[Device sharedInstance] setLuckyEggsCount:@0];
+    [[Device sharedInstance] setLastEggDeployTime:nil];
     [DeviceState restart];
     return JSON_OK;
 }
