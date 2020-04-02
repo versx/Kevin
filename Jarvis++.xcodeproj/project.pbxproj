@@ -48,6 +48,8 @@
 		C03E44F424342D5100B467BB /* DeviceIPhoneNormal.m in Sources */ = {isa = PBXBuildFile; fileRef = C03E44F324342D5100B467BB /* DeviceIPhoneNormal.m */; };
 		C03E44F624342F9E00B467BB /* DeviceIPhonePlus.h in Headers */ = {isa = PBXBuildFile; fileRef = C03E44F524342F9E00B467BB /* DeviceIPhonePlus.h */; };
 		C03E44F824342FAC00B467BB /* DeviceIPhonePlus.m in Sources */ = {isa = PBXBuildFile; fileRef = C03E44F724342FAC00B467BB /* DeviceIPhonePlus.m */; };
+		C04D0A742435EDA2006DE57D /* DeviceCoordinate+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = C04D0A732435EDA2006DE57D /* DeviceCoordinate+Extensions.h */; };
+		C04D0A762435EDBD006DE57D /* DeviceCoordinate+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C04D0A752435EDBD006DE57D /* DeviceCoordinate+Extensions.m */; };
 		C065AE40242ECD2A007114C8 /* DeviceRatio1775.h in Headers */ = {isa = PBXBuildFile; fileRef = C065AE3F242ECD2A007114C8 /* DeviceRatio1775.h */; };
 		C065AE42242ECD3B007114C8 /* DeviceRatio1775.m in Sources */ = {isa = PBXBuildFile; fileRef = C065AE41242ECD3B007114C8 /* DeviceRatio1775.m */; };
 		C065AE44242EFCCA007114C8 /* NSString+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = C065AE43242EFCCA007114C8 /* NSString+Extensions.h */; };
@@ -129,6 +131,8 @@
 		C03E44F324342D5100B467BB /* DeviceIPhoneNormal.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceIPhoneNormal.m; sourceTree = "<group>"; };
 		C03E44F524342F9E00B467BB /* DeviceIPhonePlus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceIPhonePlus.h; sourceTree = "<group>"; };
 		C03E44F724342FAC00B467BB /* DeviceIPhonePlus.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceIPhonePlus.m; sourceTree = "<group>"; };
+		C04D0A732435EDA2006DE57D /* DeviceCoordinate+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DeviceCoordinate+Extensions.h"; sourceTree = "<group>"; };
+		C04D0A752435EDBD006DE57D /* DeviceCoordinate+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "DeviceCoordinate+Extensions.m"; sourceTree = "<group>"; };
 		C065AE3F242ECD2A007114C8 /* DeviceRatio1775.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceRatio1775.h; sourceTree = "<group>"; };
 		C065AE41242ECD3B007114C8 /* DeviceRatio1775.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceRatio1775.m; sourceTree = "<group>"; };
 		C065AE43242EFCCA007114C8 /* NSString+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+Extensions.h"; sourceTree = "<group>"; };
@@ -225,6 +229,8 @@
 		C0025ABC241483A2007813F7 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				C04D0A732435EDA2006DE57D /* DeviceCoordinate+Extensions.h */,
+				C04D0A752435EDBD006DE57D /* DeviceCoordinate+Extensions.m */,
 				C065AE43242EFCCA007114C8 /* NSString+Extensions.h */,
 				C065AE45242EFCD8007114C8 /* NSString+Extensions.m */,
 				C0025ABD241483B7007813F7 /* UIImage+Pixels.h */,
@@ -361,8 +367,8 @@
 		C0339C842427E8F30046D0AD /* DeviceCoordinate */ = {
 			isa = PBXGroup;
 			children = (
-				C0339C872427E9220046D0AD /* DeviceCoordinate.m */,
 				C0339C852427E9140046D0AD /* DeviceCoordinate.h */,
+				C0339C872427E9220046D0AD /* DeviceCoordinate.m */,
 				C0339C892427E9300046D0AD /* DeviceCoordinateScalar.h */,
 				C0339C8B2427E93C0046D0AD /* DeviceCoordinateScalar.m */,
 			);
@@ -450,6 +456,7 @@
 			files = (
 				C067ACEC241EAFF7007E3055 /* IOHIDEvent+KIF.h in Headers */,
 				C067ACF2241EAFF7007E3055 /* UIWindow-KIFAdditions.h in Headers */,
+				C04D0A742435EDA2006DE57D /* DeviceCoordinate+Extensions.h in Headers */,
 				C01B4980240ACF9400633B45 /* UIC.h in Headers */,
 				C0AC1CF8240BB97A008F4DFB /* Settings.h in Headers */,
 				C0B68E022414C33E009B5970 /* Consts.h in Headers */,
@@ -610,6 +617,7 @@
 				C0B68E042414C632009B5970 /* Consts.m in Sources */,
 				C0339C882427E9220046D0AD /* DeviceCoordinate.m in Sources */,
 				C065AE42242ECD3B007114C8 /* DeviceRatio1775.m in Sources */,
+				C04D0A762435EDBD006DE57D /* DeviceCoordinate+Extensions.m in Sources */,
 				C0339C8C2427E93C0046D0AD /* DeviceCoordinateScalar.m in Sources */,
 				C067ACF6241EAFF7007E3055 /* UIView-KIFAdditions.m in Sources */,
 				C0339C912427EE5B0046D0AD /* DeviceConfig.m in Sources */,
@@ -696,6 +704,7 @@
 				GCC_NO_COMMON_BLOCKS = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Jarvis++.pch";
+				GENERATE_MASTER_OBJECT_FILE = NO;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INSTALL_PATH = "@rpath/";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
@@ -768,6 +777,7 @@
 				GCC_NO_COMMON_BLOCKS = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Jarvis++.pch";
+				GENERATE_MASTER_OBJECT_FILE = NO;
 				HEADER_SEARCH_PATHS = "$(inherited)";
 				INSTALL_PATH = "@rpath/";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;

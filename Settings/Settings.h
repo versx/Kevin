@@ -24,7 +24,6 @@
 -(NSNumber *)targetMaxDistance;
 -(NSNumber *)pokemonMaxTime;
 -(NSNumber *)raidMaxTime;
--(NSNumber *)encounterDelay;
 -(NSNumber *)jitterValue;
 -(NSNumber *)maxEmptyGMO;
 -(NSNumber *)maxFailedCount;
@@ -33,6 +32,7 @@
 -(NSNumber *)minDelayLogout;
 -(BOOL)ultraQuests;
 -(BOOL)deployEggs;
+-(BOOL)nearbyTracker;
 
 -(NSString *)loggingUrl;
 -(NSNumber *)loggingPort;

@@ -7,7 +7,7 @@
 
 #import "UIC.h"
 
-// TODO: Fix egg deploy for quests
+// TODO: Fix crash after 10 minutes issue
 // TODO: Resize image if not SE/5S
 // TODO: Detect different tutorial stages for incomplete tuts
 // TODO: Handle invalid usernames
@@ -34,12 +34,12 @@ static BOOL _dataStarted = false;
 
 -(id)init
 {
-    syslog(@"[Jarvis] [UIC] init");
+    syslog(@"[INFO] init");
     if ((self = [super init])) {
         _heartbeatQueue = dispatch_queue_create("heartbeat_queue", NULL);
         _pixelCheckQueue = dispatch_queue_create("pixelcheck_queue", NULL);
         
-        syslog(@"[DEBUG] %@ (%@) running %@ %@ with a delay of %@",
+        syslog(@"[INFO] %@ (%@) running %@ %@ with a delay of %@",
                [[Device sharedInstance] uuid], [[Device sharedInstance] model],
                [[Device sharedInstance] osName], [[Device sharedInstance] osVersion],
                [[Settings sharedInstance] delayMultiplier]);
@@ -51,12 +51,15 @@ static BOOL _dataStarted = false;
         // Print settings
         [[Settings sharedInstance] config];
         
+        syslog(@"[DEBUG] ageVerification: %@ OldCornerTest: %@", [[DeviceConfig sharedInstance] loginNewPlayer], [[DeviceConfig sharedInstance] startupOldCornerTest]);
+        
         //NSDictionary *pixelConfig = [[Settings sharedInstance] fetchRemoteConfig:[[Settings sharedInstance] pixelConfigUrl]];
         //syslog(@"[DEBUG] Pixel config: %@", pixelConfig);
         
         if ([DeviceConfig sharedInstance] == nil) {
             return nil;
         }
+        syslog(@"[DEBUG] DeviceConfig: %@", [DeviceConfig sharedInstance]);
         
         //JarvisTestCase *jarvis = [[JarvisTestCase alloc] init];
         //[jarvis runTest];
@@ -110,11 +113,8 @@ static BOOL _dataStarted = false;
         data[@"uuid"] = [[Device sharedInstance] uuid];
         data[@"username"] = [[Device sharedInstance] username];
         data[@"min_level"] = [[Device sharedInstance] minLevel];
-        syslog(@"[DEBUG] setting MaxLevel");
-        syslog(@"[DEBUG] MaxLevel: %@", [[Device sharedInstance] maxLevel]);
-        //data[@"max_level"] = [[Device sharedInstance] maxLevel];
-        [data setObject:[[Device sharedInstance] maxLevel] forKey:@"max_level"];
-        syslog(@"[DEBUG] setting Type");
+        data[@"max_level"] = [[Device sharedInstance] maxLevel];
+        //[data setObject:[[Device sharedInstance] maxLevel] forKey:@"max_level"];
         data[@"type"] = @"get_account";
         syslog(@"[DEBUG] Sending get_account request: %@", data);
         [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
@@ -221,17 +221,17 @@ static BOOL _dataStarted = false;
                                       betweenMin:[[ColorOffset alloc] init:0.15 green:0.33 blue:0.17]
                                           andMax:[[ColorOffset alloc] init:0.25 green:0.43 blue:0.27]];
         isStartupLoggedOut = [image rgbAtLocation:[[DeviceConfig sharedInstance] startupLoggedOut] //0.0313726 0.796078 1 1
-                                       betweenMin:[[ColorOffset alloc] init:0.95 green:0.75 blue:0.0]
-                                           andMax:[[ColorOffset alloc] init:1.00 green:0.85 blue:0.1]] ||
+                                       betweenMin:[[ColorOffset alloc] init:0.95 green:0.75 blue:0.00]
+                                           andMax:[[ColorOffset alloc] init:1.00 green:0.85 blue:0.10]] ||
                              [image rgbAtLocation:[[DeviceConfig sharedInstance] startupLoggedOut]
-                                       betweenMin:[[ColorOffset alloc] init:0.02 green:0.78 blue:0.9]
-                                           andMax:[[ColorOffset alloc] init:0.04 green:0.80 blue:1.0]];
+                                       betweenMin:[[ColorOffset alloc] init:0.02 green:0.78 blue:0.90]
+                                           andMax:[[ColorOffset alloc] init:0.04 green:0.80 blue:1.00]];
         isStartup = [image rgbAtLocation:[[DeviceConfig sharedInstance] startup]
-                              betweenMin:[[ColorOffset alloc] init:0.55 green:0.75 blue:0.0]
-                                  andMax:[[ColorOffset alloc] init:0.70 green:0.90 blue:1.0]];
+                              betweenMin:[[ColorOffset alloc] init:0.55 green:0.75 blue:0.00]
+                                  andMax:[[ColorOffset alloc] init:0.70 green:0.90 blue:1.00]];
         isPassengerWarning = [image rgbAtLocation:[[DeviceConfig sharedInstance] passenger]
-                                       betweenMin:[[ColorOffset alloc] init:0.0 green:0.75 blue:0.55]
-                                           andMax:[[ColorOffset alloc] init:1.0 green:0.90 blue:0.70]];
+                                       betweenMin:[[ColorOffset alloc] init:0.00 green:0.75 blue:0.55]
+                                           andMax:[[ColorOffset alloc] init:1.00 green:0.90 blue:0.70]];
         isWeather = [image rgbAtLocation:[[DeviceConfig sharedInstance] weather]
                               betweenMin:[[ColorOffset alloc] init:0.23 green:0.35 blue:0.50]
                                   andMax:[[ColorOffset alloc] init:0.36 green:0.47 blue:0.65]];
@@ -277,12 +277,12 @@ static BOOL _dataStarted = false;
                           [image rgbAtLocation:[[DeviceConfig sharedInstance] loginPrivacyUpdateText]
                                     betweenMin:[[ColorOffset alloc] init:0.22 green:0.36 blue:0.37]
                                         andMax:[[ColorOffset alloc] init:0.32 green:0.46 blue:0.47]];
-        isLevelUp = [image rgbAtLocation:[[DeviceConfig sharedInstance] closeMenu] // close: 0.588235 0.52549 0.113725 1
-                              betweenMin:[[ColorOffset alloc] init:0.10 green:0.51 blue:0.57]
-                                  andMax:[[ColorOffset alloc] init:0.13 green:0.54 blue:0.60]];
-        isPokestopOpen = [image rgbAtLocation:[[DeviceConfig sharedInstance] closeMenu] //close: 0.94902 0.984314 0.882353 1 | 0.941176 0.945098 0.917647 1 | 0.909804 0.909804 0.890196 1
-                                   betweenMin:[[ColorOffset alloc] init:0.87 green:0.89 blue:0.89]
-                                       andMax:[[ColorOffset alloc] init:0.92 green:0.99 blue:0.96]];
+        isLevelUp = [image rgbAtLocation:[[DeviceConfig sharedInstance] closeMenu] // close: 0.588235 0.52549 0.113725 1 - fixed
+                              betweenMin:[[ColorOffset alloc] init:0.10 green:0.52 blue:0.58]
+                                  andMax:[[ColorOffset alloc] init:0.12 green:0.53 blue:0.60]];
+        isPokestopOpen = [image rgbAtLocation:[[DeviceConfig sharedInstance] closeMenu] //close: 0.94902 0.984314 0.882353 1 | 0.941176 0.945098 0.917647 1 | 0.909804 0.909804 0.890196 1   0.94902 0.968627 0.886275 1
+                                   betweenMin:[[ColorOffset alloc] init:0.88 green:0.89 blue:0.87] //0.898039 0.901961 0.862745 1
+                                       andMax:[[ColorOffset alloc] init:0.96 green:0.99 blue:0.96]];
         isAdventureSyncRewards = [image rgbAtLocation:[[DeviceConfig sharedInstance] adventureSyncRewards]
                                            betweenMin:[[ColorOffset alloc] init:0.98 green:0.30 blue:0.45]
                                                andMax:[[ColorOffset alloc] init:1.00 green:0.50 blue:0.60]];
@@ -316,12 +316,11 @@ static BOOL _dataStarted = false;
         }
         sleep(2 * delayMultiplier);
     } else if (isFailedLogin) {
-        syslog(@"[INFO] Found failed to login screen or banned screen.");
+        syslog(@"[INFO] Found failed to login screen.");
         DeviceCoordinate *switchAccount = [[DeviceConfig sharedInstance] loginBannedSwitchAccount];
         [JarvisTestCase touch:[switchAccount tapX] withY:[switchAccount tapY]];
-        //[[Device sharedInstance] setUsername:nil];
         sleep(1 * delayMultiplier);
-        [DeviceState logout:true]; // TODO: Don't restart
+        [DeviceState logout:true];
         sleep(2 * delayMultiplier);
     } else if (isStartupLogo) {
         syslog(@"[INFO] Startup logo found, waiting and trying again.");
@@ -343,6 +342,11 @@ static BOOL _dataStarted = false;
         sleep(2 * delayMultiplier);
         [[Device sharedInstance] setUsername:nil];
         [[Device sharedInstance] setIsLoggedIn:false];
+    } else if ([UIC2 isArPlusPrompt]) {
+        syslog(@"[INFO] Found camera permissions prompt.");
+        DeviceCoordinate *startupOldOk = [[DeviceConfig sharedInstance] startupOldOkButton];
+        [JarvisTestCase touch:[startupOldOk tapX] withY:[startupOldOk tapY]];
+        sleep(2 * delayMultiplier);
     } else if (isTos) {
         syslog(@"[INFO] Accepting Terms of Service prompt.")
         DeviceCoordinate *tos = [[DeviceConfig sharedInstance] loginTerms];
@@ -370,9 +374,7 @@ static BOOL _dataStarted = false;
         DeviceCoordinate *closeNews = [[DeviceConfig sharedInstance] closeNews];
         [JarvisTestCase touch:[closeNews tapX] withY:[closeNews tapY]];
         sleep(2 * delayMultiplier);
-        syslog(@"[INFO] Opening nearby tracker.");
-        DeviceCoordinate *tracker = [[DeviceConfig sharedInstance] trackerMenu];
-        [JarvisTestCase touch:[tracker tapX] withY:[tracker tapY]];
+        [UIC2 openNearbyTracker];
         if (!_dataStarted) {
             _dataStarted = true;
             [[JobController sharedInstance] getJobs];
@@ -383,6 +385,7 @@ static BOOL _dataStarted = false;
         DeviceCoordinate *passenger = [[DeviceConfig sharedInstance] passenger];
         [JarvisTestCase touch:[passenger tapX] withY:[passenger tapY]];
         sleep(2 * delayMultiplier);
+        [UIC2 openNearbyTracker];
     } else if (isWeather) {
         syslog(@"[INFO] Found weather alert.");
         DeviceCoordinate *closeWeather1 = [[DeviceConfig sharedInstance] closeWeather1];
@@ -421,7 +424,7 @@ static BOOL _dataStarted = false;
         sleep(2 * delayMultiplier);
     } else if ([[Device sharedInstance] isLoggedIn] &&
                (isLevelUp || isPokestopOpen) &&
-               ![UIC2 isTracker]) {
+               ([[Settings sharedInstance] nearbyTracker] && ![UIC2 isTracker])) {
         syslog(@"[INFO] Found level up/Pokestop open/badge screen.");
         DeviceCoordinate *closeMenu = [[DeviceConfig sharedInstance] closeMenu];
         [JarvisTestCase touch:[closeMenu tapX] withY:[closeMenu tapY]];
@@ -827,11 +830,11 @@ static BOOL _dataStarted = false;
     dispatch_semaphore_t sem = dispatch_semaphore_create(0);
     dispatch_async(dispatch_get_main_queue(), ^{
         UIImage *image = [Utils takeScreenshot];
-        result = [image rgbAtLocation:[[DeviceConfig sharedInstance] startupOldOkButton]
-                           betweenMin:[[ColorOffset alloc] init:0.42 green:0.82 blue:0.60]
+        result = [image rgbAtLocation:[[DeviceConfig sharedInstance] startupOldOkButton] // Camera pop-up is same as 3 line startup
+                           betweenMin:[[ColorOffset alloc] init:0.42 green:0.82 blue:0.60] // 0.615686 0.839216 0.447059 1
                                andMax:[[ColorOffset alloc] init:0.47 green:0.86 blue:0.63]] &&
                  [image rgbAtLocation:[[DeviceConfig sharedInstance] startupOldCornerTest]
-                           betweenMin:[[ColorOffset alloc] init:0.99 green:0.99 blue:0.99]
+                           betweenMin:[[ColorOffset alloc] init:0.99 green:0.99 blue:0.99] // 1 1 1 1
                                andMax:[[ColorOffset alloc] init:1.01 green:1.01 blue:1.01]];
         dispatch_semaphore_signal(sem);
     });
@@ -843,8 +846,8 @@ static BOOL _dataStarted = false;
 {
     //syslog(@"[DEBUG] Checking for AR(+) mode prompt.");
     bool result = [self isAtPixel:[[DeviceConfig sharedInstance] checkArPeristence]
-                       betweenMin:[[ColorOffset alloc] init:0.42 green:0.82 blue:0.60]
-                           andMax:[[ColorOffset alloc] init:0.42 green:0.82 blue:0.60]];
+                       betweenMin:[[ColorOffset alloc] init:0.94 green:0.94 blue:0.94]
+                           andMax:[[ColorOffset alloc] init:1.00 green:1.00 blue:1.00]];
     if (!result) {
         // AR mode enabled, disable
         syslog(@"[INFO] AR mode prompts detected, closing and disabling.");
@@ -892,7 +895,7 @@ static BOOL _dataStarted = false;
 
 +(BOOL)isTracker
 {
-    return [self isAtPixel:[[DeviceConfig sharedInstance] trackerTopCenter] //0.980392 1 0.984314
+    return [self isAtPixel:[[DeviceConfig sharedInstance] trackerTopCenter] //0.980392 1 0.984314 1
                 betweenMin:[[ColorOffset alloc] init:0.97 green:0.97 blue:0.97]
                     andMax:[[ColorOffset alloc] init:1.00 green:1.00 blue:1.00]] &&
            [self isAtPixel:[[DeviceConfig sharedInstance] trackerBottomCenter] //0.933333 1 0.941176 1
@@ -970,13 +973,18 @@ static BOOL _dataStarted = false;
     dispatch_semaphore_t sem = dispatch_semaphore_create(0);
     dispatch_async(dispatch_get_main_queue(), ^{
         UIImage *image = [Utils takeScreenshot];
-        ColorOffset *min = [[ColorOffset alloc] init:0.45 green:0.60 blue:0.65];
-        ColorOffset *max = [[ColorOffset alloc] init:0.60 green:0.70 blue:0.75];
-        if ([image rgbAtLocation:[[DeviceConfig sharedInstance] itemEgg] betweenMin:min andMax:max]) {
+        ColorOffset *eggMin = [[ColorOffset alloc] init:0.45 green:0.60 blue:0.65];
+        ColorOffset *eggMax = [[ColorOffset alloc] init:0.60 green:0.70 blue:0.75];
+        ColorOffset *giftMin = [[ColorOffset alloc] init:0.60 green:0.05 blue:0.50];
+        ColorOffset *giftMax = [[ColorOffset alloc] init:0.70 green:0.15 blue:0.75];
+        if ([image rgbAtLocation:[[DeviceConfig sharedInstance] itemEgg] betweenMin:eggMin andMax:eggMax] &&
+            ![image rgbAtLocation:[[DeviceConfig sharedInstance] itemEgg] betweenMin:giftMin andMax:giftMax]) {
             result = @1;
-        } else if ([image rgbAtLocation:[[DeviceConfig sharedInstance] itemEgg2] betweenMin:min andMax:max]) {
+        } else if ([image rgbAtLocation:[[DeviceConfig sharedInstance] itemEgg2] betweenMin:eggMin andMax:eggMax] &&
+                   ![image rgbAtLocation:[[DeviceConfig sharedInstance] itemEgg2] betweenMin:giftMin andMax:giftMax]) {
             result = @2;
-        } else if ([image rgbAtLocation:[[DeviceConfig sharedInstance] itemEgg3] betweenMin:min andMax:max]) {
+        } else if ([image rgbAtLocation:[[DeviceConfig sharedInstance] itemEgg3] betweenMin:eggMin andMax:eggMax] &&
+                   ![image rgbAtLocation:[[DeviceConfig sharedInstance] itemEgg3] betweenMin:giftMin andMax:giftMax]) {
             result = @3;
         }
         dispatch_semaphore_signal(sem);
@@ -1014,24 +1022,30 @@ static BOOL _dataStarted = false;
     // If egg wasn't found in 1st, 2nd, or 3rd item slot we either don't have any or one active.
     NSNumber *hasEgg = [self hasEgg];
     if ([hasEgg intValue] == 0) {
+        syslog(@"[WARN] No lucky egg detected at the first 3 item slots.");
         [JarvisTestCase touch:[closeMenu tapX] withY:[closeMenu tapY]];
         sleep(1);
         return result;
     }
+    sleep(1);
 
     // Check which item slot it was found at.
     DeviceCoordinate *eggMenuItem;
     switch ([hasEgg intValue]) {
         case 1:
             eggMenuItem = [[DeviceConfig sharedInstance] itemEgg];
+            syslog(@"[DEBUG] Egg found in slot 1");
             break;
         case 2:
             eggMenuItem = [[DeviceConfig sharedInstance] itemEgg2];
+            syslog(@"[DEBUG] Egg found in slot 2");
             break;
         case 3:
             eggMenuItem = [[DeviceConfig sharedInstance] itemEgg3];
+            syslog(@"[DEBUG] Egg found in slot 3");
             break;
     }
+    syslog(@"[DEBUG] Clicking lucky egg item at %@", eggMenuItem);
     // Click egg menu item
     [JarvisTestCase touch:[eggMenuItem tapX] withY:[eggMenuItem tapY]];
     sleep(2);
@@ -1042,6 +1056,16 @@ static BOOL _dataStarted = false;
     result = true;
     syslog(@"[INFO] Deployed egg");
     return result;
+}
+
++(void)openNearbyTracker
+{
+    if ([[Settings sharedInstance] nearbyTracker] && ![self isTracker]) {
+        syslog(@"[INFO] Opening nearby tracker.");
+        DeviceCoordinate *tracker = [[DeviceConfig sharedInstance] trackerMenu];
+        [JarvisTestCase touch:[tracker tapX] withY:[tracker tapY]];
+        sleep(1 * [[[Settings sharedInstance] delayMultiplier] intValue]);
+    }
 }
 
 @end

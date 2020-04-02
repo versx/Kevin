@@ -52,3 +52,6 @@ Payload/
 
 # No dumb directory files
 __MACOSX/
+
+# No test configs
+uic2.plist

@@ -39,11 +39,9 @@ static int _jitterCorner;
 -(NSString *)handleLocationRequest
 {
     NSMutableDictionary *responseData = [[NSMutableDictionary alloc] init];
-    //self.lock.lock();
     CLLocation *currentLoc = [[DeviceState sharedInstance] currentLocation];
     if (currentLoc != nil) {
         if ([[DeviceState sharedInstance] waitRequiresPokemon]) {
-            //self.lock.unlock();
             double jitterValue = [[[Settings sharedInstance] jitterValue] doubleValue];
             double jitterLat = 0.0;
             double jitterLon = 0.0;
@@ -85,7 +83,6 @@ static int _jitterCorner;
             }
         } else {
             // raids, quests
-            //self.lock.unlock();
             NSNumber *currentLat = [NSNumber numberWithDouble:currentLoc.coordinate.latitude];
             NSNumber *currentLon = [NSNumber numberWithDouble:currentLoc.coordinate.longitude];
             responseData[@"latitude"] = currentLat;
@@ -176,7 +173,6 @@ static int _jitterCorner;
         bool containsGmo = [data[@"contains_gmos"] boolValue] ?: true;
         NSNumber *luckyEggs = data[@"lucky_eggs"] ?: @0;
         
-        //self.lock.lock();
         NSNumber *diffLat = @(currentLoc.coordinate.latitude - [targetLat doubleValue]);
         NSNumber *diffLon = @(currentLoc.coordinate.longitude - [targetLon doubleValue]);
         
@@ -408,6 +404,7 @@ static int _jitterCorner;
         //[allowButton tap];
     //});
     */
+    //DeviceCoordinate *ageVerify = [[DeviceConfig sharedInstance] ageVerification];
     
     return JSON_OK;
 }

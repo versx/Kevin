@@ -14,8 +14,19 @@
 
 +(JobController *)sharedInstance;
 
+/**
+* Send an `init` request to backend and initialize
+*/
 -(void)initialize;
+
+/**
+* Send a `get_account` request to backend and grab an account
+*/
 -(void)getAccount;
+
+/**
+* Start sending `get_job` requests to backend to grab jobs
+*/
 -(void)getJobs;
 
 @end

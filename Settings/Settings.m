@@ -20,7 +20,6 @@ static NSNumber *_delayMultiplier;
 static NSNumber *_targetMaxDistance;
 static NSNumber *_pokemonMaxTime;
 static NSNumber *_raidMaxTime;
-static NSNumber *_encounterDelay;
 static NSNumber *_jitterValue;
 static NSNumber *_maxEmptyGMO;
 static NSNumber *_maxFailedCount;
@@ -29,6 +28,7 @@ static NSNumber *_maxWarningTimeRaid;
 static NSNumber *_minDelayLogout;
 static BOOL _ultraQuests;
 static BOOL _deployEggs;
+static BOOL _nearbyTracker;
 
 static NSString *_loggingUrl;
 static NSNumber *_loggingPort;
@@ -73,9 +73,6 @@ static NSString *plistFileName = @"config.plist";
 -(NSNumber *)raidMaxTime {
     return _raidMaxTime;
 }
--(NSNumber *)encounterDelay {
-    return _encounterDelay;
-}
 -(NSNumber *)jitterValue {
     return _jitterValue;
 }
@@ -99,6 +96,9 @@ static NSString *plistFileName = @"config.plist";
 }
 -(BOOL)deployEggs {
     return _deployEggs;
+}
+-(BOOL)nearbyTracker {
+    return _nearbyTracker;
 }
 
 -(NSString *)loggingUrl {
@@ -131,14 +131,13 @@ static NSString *plistFileName = @"config.plist";
         _enableAccountManager = [_config[@"enableAccountManager"] boolValue] ?: DEFAULT_ENABLE_ACCOUNT_MANAGER;
         _backendControllerUrl = _config[@"backendControllerURL"];
         _backendRawUrl = _config[@"backendRawURL"];
-        _pixelConfigUrl = _config[@"pixelConfigUrl"];
+        //_pixelConfigUrl = _config[@"pixelConfigURL"];
         _token = _config[@"token"] ?: @"";
         _port = _config[@"port"] ?: DEFAULT_PORT;
         _delayMultiplier = _config[@"delayMultiplier"] ?: DEFAULT_DELAY_MULTIPLIER;
         _targetMaxDistance = _config[@"targetMaxDistance"] ?: DEFAULT_TARGET_MAX_DISTANCE;
         _pokemonMaxTime = _config[@"pokemonMaxTime"] ?: DEFAULT_POKEMON_MAX_TIME;
         _raidMaxTime = _config[@"raidMaxTime"] ?: DEFAULT_RAID_MAX_TIME;
-        _encounterDelay = _config[@"encounterDelay"] ?: DEFAULT_ENCOUNTER_DELAY;
         _jitterValue = _config[@"jitterValue"] ?: @(5.0e-05); // 5.0e-05 0.000005 // ?: DEFAULT_JITTER_VALUE;
         _maxEmptyGMO = _config[@"maxEmptyGMO"] ?: DEFAULT_MAX_EMPTY_GMO;
         _maxFailedCount = _config[@"maxFailedCount"] ?: DEFAULT_MAX_FAILED_COUNT;
@@ -147,11 +146,12 @@ static NSString *plistFileName = @"config.plist";
         _minDelayLogout = _config[@"minDelayLogout"] ?: DEFAULT_MIN_DELAY_LOGOUT;
         _ultraQuests = [_config[@"ultraQuests"] boolValue] ?: DEFAULT_ULTRA_QUESTS;
         _deployEggs = [_config[@"deployEggs"] boolValue] ?: DEFAULT_DEPLOY_EGGS;
+        _nearbyTracker = [_config[@"nearbyTracker"] boolValue] ?: DEFAULT_NEARBY_TRACKER;
         
-        _loggingUrl = _config[@"LoggingURL"] ?: @""; // TODO: Rename to loggingUrl
-        _loggingPort = _config[@"LoggingPort"] ?: @9999; // TODO: Rename to loggingPort
-        _loggingTls = [_config[@"LoggingUseTLS"] boolValue] ?: true; // TODO: Rename to loggingTls
-        _loggingTcp = [_config[@"loggingTcp"] boolValue] ?: true;
+        _loggingUrl = _config[@"loggingURL"] ?: @"";
+        _loggingPort = _config[@"loggingPort"] ?: @9999;
+        _loggingTls = [_config[@"loggingTLS"] boolValue] ?: false;
+        _loggingTcp = [_config[@"loggingTCP"] boolValue] ?: true;
     });
     return sharedInstance;
 }

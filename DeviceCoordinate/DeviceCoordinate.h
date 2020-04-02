@@ -19,6 +19,6 @@
 -(id)init:(int)x withY:(int)y andTapScalar:(double)scalar;
 -(id)init:(int)x withY:(int)y andDeviceCoordinateScalar:(DeviceCoordinateScalar *)scalar;
 
--(XCUICoordinate *)toXCUICoordinate:(XCUIApplication *)app;
+//-(XCUICoordinate *)toXCUICoordinate:(XCUIApplication *)app;
 
 @end

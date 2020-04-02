@@ -6,9 +6,7 @@
 //
 
 #import "../DeviceConfig.h"
-#import "../DeviceConfigProtocol.h"
-#import "../../DeviceCoordinate/DeviceCoordinateScalar.h"
 
-@interface DeviceIPhonePlus : NSObject<DeviceConfigProtocol>
+@interface DeviceIPhonePlus : DeviceRatio1775
 
 @end

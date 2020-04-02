@@ -102,7 +102,7 @@
     //NSLog(@"[DEBUG] Alpha: %f", CGColorGetAlpha(color));
     bool passed = red   >= [min red]   && red   <= [max red]   && // Red
                   green >= [min green] && green <= [max green] && // Green
-                  blue  >= [min blue]  && blue  <= [max blue]; // Blue
+                  blue  >= [min blue]  && blue  <= [max blue];    // Blue
     return passed;
 }
 

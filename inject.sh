@@ -5,8 +5,9 @@
 appDir="/Users/helpdesk/Desktop/Projects/Jarvis/app.zip" # Path to app.zip
 payloadDir="/Users/helpdesk/Desktop/Projects/Jarvis/Payload/" # Path to Payload/ directory of unzipped app.zip
 #DEVELOPER="iPhone Developer: ()" # This can be found by running `security find-identity -p codesigning`
-MOBILEPROV="/Users/helpdesk/Desktop/deployer-redux/profile/DevProfile.mobileprovision" # path to provisioning profile
+#MOBILEPROV="/Users/helpdesk/Desktop/deployer-redux/profile/DevProfile.mobileprovision" # path to provisioning profile
 
+# Remove previous Payload/ folder
 rm -rf "$payloadDir"
 
 # Unzip ipa
@@ -15,18 +16,8 @@ unzip app.zip
 # Remove stupid directory settings file
 rm -rf __MACOSX
 
-#echo "Copying ${CONFIGURATION_BUILD_DIR}/CocoaAsyncSocket/libCocoaAsyncSocket.a to $payloadDir/pokemongo.app/Frameworks"
-#cp "${CONFIGURATION_BUILD_DIR}/CocoaAsyncSocket/libCocoaAsyncSocket.a" "$payloadDir/pokemongo.app/Frameworks/libCocoaAsyncSocket.a"
 
-#echo "Copying CocoaHTTPServer to $payloadDir/pokemongo.app/Frameworks"
-#cp "${CONFIGURATION_BUILD_DIR}/CocoaHTTPServer/libCocoaHTTPServer.a" "$payloadDir/pokemongo.app/Frameworks/libCocoaHTTPServer.a"
-
-#echo "Copying CocoaLumberjack to $payloadDir/pokemongo.app/Frameworks"
-#cp "${CONFIGURATION_BUILD_DIR}/CocoaLumberjack/libCocoaLumberjack.a" "$payloadDir/pokemongo.app/Frameworks/libCocoaLumberjack.a"
-
-#echo "Copying PaperTrailLumberjack to $payloadDir/pokemongo.app/Frameworks"
-#cp "${CONFIGURATION_BUILD_DIR}/PaperTrailLumberjack/libPaperTrailLumberjack.a" "$payloadDir/pokemongo.app/Frameworks/libPaperTrailLumberjack.a"
-
+# Copy configs, frameworks, and dynamic libraries
 echo "Copying KIF to $payloadDir/pokemongo.app/Frameworks"
 cp -R "${CONFIGURATION_BUILD_DIR}/KIF.framework" "$payloadDir/pokemongo.app/Frameworks/"
 
@@ -39,21 +30,8 @@ cp -R "XCTAutomationSupport.framework" "$payloadDir/pokemongo.app/Frameworks/"
 echo "Copying libJarvis++.dylib to ${payloadDir}"
 cp "${CONFIGURATION_BUILD_DIR}/libJarvis++.dylib" "$payloadDir/pokemongo.app/libJarvis++.dylib"
 
-#echo "Copying config.plist to ${payloadDir}/pokemongo.app/"
-#cp config.plist "$payloadDir/pokemongo.app/"
 
-#echo "Installing CocoaAsyncSocket to ${payloadDir}/pokemongo.app/pokemongo..."
-#optool install -c load -p "${CONFIGURATION_BUILD_DIR}/CocoaAsyncSocket/libCocoaAsyncSocket.a" -t ${payload}/pokemongo.app/pokemongo
-
-#echo "Installing CocoaHTTPServer to ${payloadDir}/pokemongo.app/pokemongo..."
-#optool install -c load -p "${CONFIGURATION_BUILD_DIR}/CocoaHTTPServer/libCocoaHTTPServer.a" -t ${payload}/pokemongo.app/pokemongo
-
-#echo "Installing CocoaLumberjack to ${payloadDir}/pokemongo.app/pokemongo..."
-#optool install -c load -p "${CONFIGURATION_BUILD_DIR}/CocoaLumberjack/libCocoaLumberjack.a" -t ${payload}/pokemongo.app/pokemongo
-
-#echo "Installing PaperTrailLumberjack to ${payloadDir}/pokemongo.app/pokemongo..."
-#optool install -c load -p "${CONFIGURATION_BUILD_DIR}/PaperTrailLumberjack/libPaperTrailLumberjack.a" -t ${payload}/pokemongo.app/pokemongo
-
+ Install load commands
 echo "Installing KIF to ${payloadDir}/pokemongo.app/pokemongo..."
 optool install -c load -p "${CONFIGURATION_BUILD_DIR}/KIF/KIF.framework/KIF" -t ${payload}/pokemongo.app/pokemongo
 

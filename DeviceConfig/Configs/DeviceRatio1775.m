@@ -10,6 +10,10 @@
 @implementation DeviceRatio1775
 
 static DeviceCoordinateScalar *scalar;
+static double _tapScalar;
+-(double)tapScalar {
+    return _tapScalar;
+}
 
 -(id)init:(int)width height:(int)height multiplier:(double)multiplier tapMultiplier:(double)tapMultiplier
 {
@@ -21,6 +25,7 @@ static DeviceCoordinateScalar *scalar;
                                            multiplier:multiplier
                                         tapMultiplier:tapMultiplier
         ];
+        _tapScalar = tapMultiplier;
     }
     return self;
 }

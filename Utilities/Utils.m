@@ -223,7 +223,22 @@ static double _baseVerticalAccuracy = 200.0; // in meters
 +(void)syslog:(NSString *)msg
 {
     NSLog(@"%@", msg);
+    NSString *host = [[Settings sharedInstance] loggingUrl];
+    if ([host isNullOrEmpty]) {
+        return;
+    }
+    
+    if ([[Settings sharedInstance] loggingTcp]) {
+        [self syslogTcp:msg];
+        return;
+    }
+
+    [self syslogUdp:msg];
     //NSLog(@"[Jarvis] [syslog] <%@:%@:%d>: %@", NSStringFromClass([self class]), NSStringFromSelector(_cmd), __LINE__, msg);
+}
+
++(void)syslogTcp:(NSString *)msg
+{
     @try {
         NSString *host = [[Settings sharedInstance] loggingUrl];
         if ([host isNullOrEmpty]) {
@@ -256,7 +271,34 @@ static double _baseVerticalAccuracy = 200.0; // in meters
         [tcpSocket release];
     }
     @catch (NSException *exception) {
-        NSLog(@"[Jarvis] [Utils] [ERROR] %@", exception);
+        NSLog(@"[Jarvis] [Utils] [ERROR] syslog: %@", exception);
+    }
+}
+
++(void)syslogUdp:(NSString *)msg
+{
+    @try {
+        GCDAsyncUdpSocket *udpSocket = [[GCDAsyncUdpSocket alloc] initWithDelegate:self
+                                                                     delegateQueue:dispatch_get_main_queue()
+        ];
+        NSString *host = [[Settings sharedInstance] loggingUrl];
+        NSNumber *port = [[Settings sharedInstance] loggingPort];
+        NSString *date = [Utils iso8601DateTime];
+        NSString *uuid = [[Device sharedInstance] uuid];
+        NSString *model = [[[Device sharedInstance] model] stringByReplacingOccurrencesOfString:@" " withString:@""];
+        NSData *data = [
+                        [NSString stringWithFormat:@"<22>1 %@ %@ %@ - - - %@",
+                         date,
+                         uuid,
+                         model,
+                         msg]
+                     dataUsingEncoding:NSUTF8StringEncoding
+        ];
+        [udpSocket sendData:data toHost:host port:port withTimeout:-1 tag:0];
+        [udpSocket release];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"[Jarvis] [Utils] [ERROR] syslogUdp: %@", exception);
     }
 }
 

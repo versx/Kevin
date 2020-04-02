@@ -6,6 +6,8 @@
 //
 
 #import "DeviceConfig.h"
+#import "DeviceIPhonePlus.h"
+#import "DeviceIPhoneNormal.h"
 
 @implementation DeviceConfig
 

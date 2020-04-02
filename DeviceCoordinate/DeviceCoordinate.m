@@ -35,16 +35,18 @@
     self = [super init];
     if (self) {
         self.x = [scalar scaleX:x];
-        self.y = [scalar scaleX:y];
+        self.y = [scalar scaleY:y];
         self.tapX = [scalar tapScaleX:x];
         self.tapY = [scalar tapScaleY:y];
     }
     return self;
 }
 
+/*
 -(XCUICoordinate *)toXCUICoordinate:(XCUIApplication *)app
 {
     return [app coordinateWithNormalizedOffset:CGVectorMake([self tapX], [self tapY])];
 }
+*/
 
 @end

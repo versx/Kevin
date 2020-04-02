@@ -85,7 +85,6 @@
 
 @synthesize lastAction;
 @synthesize pokemonEncounterId;
-//@synthesize ptcToken;
 @synthesize targetFortId;
 
 
@@ -134,7 +133,7 @@
         [[Device sharedInstance] setPassword:nil];
         [[Device sharedInstance] setLuckyEggsCount:@0];
         [[Device sharedInstance] setLastEggDeployTime:nil];
-        [[Device sharedInstance] setIsLoggedIn:false];
+        [[NSUserDefaults standardUserDefaults] synchronize];
         [NSThread sleepForTimeInterval:0.5];
         if ([[[Device sharedInstance] username] isNullOrEmpty] &&
             [[Settings sharedInstance] enableAccountManager]) {
@@ -152,7 +151,6 @@
                 syslog(@"[DEBUG] get_account request: %@", result);
                 NSDictionary *data = [result objectForKey:@"data"];
                 if (data != nil) {
-                    syslog(@"[DEBUG] data dictionary: %@", data);
                     NSString *username = data[@"username"];
                     NSString *password = data[@"password"];
                     NSNumber *level = data[@"level"];
@@ -186,7 +184,7 @@
                         [[Device sharedInstance] setPassword:password];
                         [[Device sharedInstance] setPtcToken:ptcToken];
                         [[Device sharedInstance] setLevel:level];
-                        [[Device sharedInstance] setIsLoggedIn:true];
+                        // TODO: [[Device sharedInstance] setIsLoggedIn:true];
                         if (![ptcToken isNullOrEmpty]) {
                             [[NSUserDefaults standardUserDefaults] setValue:ptcToken forKey:TOKEN_USER_DEFAULT_KEY];
                             [[NSUserDefaults standardUserDefaults] synchronize];

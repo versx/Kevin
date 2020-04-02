@@ -11,4 +11,6 @@
 
 @interface DeviceRatio1775 : NSObject<DeviceConfigProtocol>
 
+-(double)tapScalar;
+
 @end

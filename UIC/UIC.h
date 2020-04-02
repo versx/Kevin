@@ -8,6 +8,7 @@
 #import "Consts.h"
 #import "Device.h"
 #import "../Controllers/JobController.h"
+#import "../DeviceConfig/ColorOffset.h"
 #import "../DeviceConfig/DeviceConfig.h"
 #import "../DeviceConfig/DeviceConfigProtocol.h"
 #import "../Jarvis++/Jarvis__.h"
@@ -27,6 +28,7 @@
 -(void)startPixelCheckLoop;
 -(void)startHeartbeatLoop;
 
++(BOOL)isAtPixel:(DeviceCoordinate *)coordinate betweenMin:(ColorOffset *)min andMax:(ColorOffset *)max;
 +(BOOL)eggDeploy;
 
 @end
