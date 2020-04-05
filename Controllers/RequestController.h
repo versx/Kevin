@@ -82,6 +82,8 @@
 */
 -(NSString *)handleRestartRequest;
 
+-(NSString *)handleAccountRequest;
+
 /**
 * Handles test development requests from the `/test` endpoint
 *

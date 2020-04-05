@@ -11,12 +11,13 @@
 
 /* Unused, make sure of them.
 // HTTP endpoints
-NSString * VALID_GET_ENDPOINTS[5] = {
+NSString * VALID_GET_ENDPOINTS[6] = {
     @"/loc",
     @"/config",
     @"/restart",
     @"/reboot",
-    @"/clear"
+    @"/clear",
+    @"/account"
 };
 NSString * VALID_POST_ENDPOINTS[7] = {
     @"/loc",
@@ -51,7 +52,8 @@ NSString * VALID_POST_ENDPOINTS[7] = {
             [path isEqualToString:@"/config"] ||
             [path isEqualToString:@"/restart"] ||
             [path isEqualToString:@"/reboot"] ||
-            [path isEqualToString:@"/clear"]) {
+            [path isEqualToString:@"/clear"] ||
+            [path isEqualToString:@"/account"]) {
             return YES;
         }
     }
@@ -63,7 +65,6 @@ NSString * VALID_POST_ENDPOINTS[7] = {
 {
     [response setHeaderField:@"Accept" value:@"application/json"];
     [response setHeaderField:@"Content-Type" value:@"application/json"];
-    // TODO: Add token
     return [response messageData];
 }
 
@@ -120,6 +121,8 @@ NSString * VALID_POST_ENDPOINTS[7] = {
             response = [[RequestController sharedInstance] handleRestartRequest];
         } else if ([path isEqualToString:@"/clear"]) {
             response = [[RequestController sharedInstance] handleClearRequest];
+        } else if ([path isEqualToString:@"/account"]) {
+            response = [[RequestController sharedInstance] handleAccountRequest];
         }
         NSData *responseData = [response dataUsingEncoding:NSUTF8StringEncoding];
         return [[HTTPDataResponse alloc] initWithData:responseData];

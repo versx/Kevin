@@ -11,8 +11,9 @@
 
 -(id)init
 {
-    syslog(@"[DEBUG] init");
     if ((self = [super init])) {
+        [self setContinueAfterFailure:true];
+        [self setStopTestsOnFirstBigFailure:false];
         [self registerUIInterruptionHandler:@"System Dialog"];
     }
     return self;
@@ -62,7 +63,30 @@
         }
     }
     @catch (NSException *exception) {
-        syslog(@"[DEBUG] type: %@", exception);
+        syslog(@"[ERROR] type: %@", exception);
+    }
+}
+
++(void)clearAndType:(NSString *)text
+{
+    @try {
+        if ([NSThread isMainThread]) {
+            //[tester clearTextFromFirstResponder];
+            //sleep(1);
+            [tester enterTextIntoCurrentFirstResponder:text
+                                          fallbackView:nil];
+        } else {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                //[tester clearTextFromAndThenEnterTextIntoCurrentFirstResponder:text];
+                //[tester clearTextFromFirstResponder];
+                //sleep(1);
+                [tester enterTextIntoCurrentFirstResponder:text
+                                              fallbackView:nil];
+            });
+        }
+    }
+    @catch (NSException *exception) {
+        syslog(@"[DEBUG] clearAndType: %@", exception);
     }
 }
 
@@ -80,7 +104,7 @@
         });
     }
     @catch (NSException *exception) {
-        syslog(@"[DEBUG] swipe: %@", exception);
+        syslog(@"[ERROR] swipe: %@", exception);
     }
 }
 +(void)drag/*FromPoint*/:(DeviceCoordinate *)start toPoint:(DeviceCoordinate *)end
@@ -95,13 +119,19 @@
         });
     }
     @catch (NSException *exception) {
-        syslog(@"[DEBUG] swipe: %@", exception);
+        syslog(@"[ERROR] swipe: %@", exception);
     }
 }
 
 +(void)touch:(int)x withY:(int)y
 {
-    //syslog(@"[DEBUG] touch %d %d", x, y);
+    double width = [UIScreen mainScreen].bounds.size.width;
+    double height = [UIScreen mainScreen].bounds.size.height;
+    if (x > width || y > height) {
+        syslog(@"[WARN] Touch coordinates %dx%d are greater than screen size %fx%f", x, y, width, height);
+        return;
+    }
+    syslog(@"[DEBUG] touch %d %d", x, y);
     @try {
         if ([NSThread isMainThread]) {
             [viewTester tapScreenAtPoint:CGPointMake(x, y)];
@@ -112,7 +142,7 @@
         }
     }
     @catch (NSException *exception) {
-        syslog(@"[DEBUG] touch: %@", exception);
+        syslog(@"[ERROR] touch: %@", exception);
     }
 }
 
@@ -125,7 +155,7 @@
         });
     }
     @catch (NSException *exception) {
-        syslog(@"[DEBUG] clearText: %@", exception);
+        syslog(@"[ERROR] clearText: %@", exception);
     }
 }
 
@@ -139,8 +169,14 @@
         //[viewTester tap];
     }
     @catch (NSException *exception) {
-        syslog(@"[DEBUG] drag: %@", exception);
+        syslog(@"[ERROR] drag: %@", exception);
     }
+}
+
++(void)test
+{
+    BOOL result = [UIAutomationHelper acknowledgeSystemAlert];
+    syslog(@"[DEBUG] Test result: %@", result ? @"Yes" : @"No");
 }
 
 @end

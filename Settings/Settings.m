@@ -61,9 +61,6 @@ static NSString *plistFileName = @"config.plist";
 -(NSNumber *)port {
     return _port;
 }
--(NSNumber *)delayMultiplier {
-    return _delayMultiplier;
-}
 -(NSNumber *)targetMaxDistance {
     return _targetMaxDistance;
 }
@@ -131,7 +128,7 @@ static NSString *plistFileName = @"config.plist";
         _enableAccountManager = [_config[@"enableAccountManager"] boolValue] ?: DEFAULT_ENABLE_ACCOUNT_MANAGER;
         _backendControllerUrl = _config[@"backendControllerURL"];
         _backendRawUrl = _config[@"backendRawURL"];
-        //_pixelConfigUrl = _config[@"pixelConfigURL"];
+        _pixelConfigUrl = _config[@"pixelConfigURL"];
         _token = _config[@"token"] ?: @"";
         _port = _config[@"port"] ?: DEFAULT_PORT;
         _delayMultiplier = _config[@"delayMultiplier"] ?: DEFAULT_DELAY_MULTIPLIER;

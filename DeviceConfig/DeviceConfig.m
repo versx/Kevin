@@ -22,6 +22,13 @@
             tapMultiplier = 0.5; // iOS 13
         }
     }
+    // For whatever reason 5S with iOS support uses 0.5?
+    NSString *model = [[Device sharedInstance] model];
+    if ([model isEqualToString:@"iPhone SE"] || [model isEqualToString:@"iPhone 5s"]) {
+        tapMultiplier = 0.5;
+    } else {
+        tapMultiplier = 1.0;
+    }
     return tapMultiplier;
 }
 
@@ -41,8 +48,8 @@
                            width, height, ratio);
                     sharedInstance = [[DeviceIPhoneNormal alloc] init:width
                                                                height:height
-                                                           multiplier:1.0
-                                                        tapMultiplier:tapMultiplier];
+                                                           multiplier:0.75//1.17 0.853 //1.0
+                                                        tapMultiplier:tapMultiplier];//1.17 0.47976] //tapMultiplier];
                     break;
                 case 414: // iPhone Large (6+, 6S+, 7+, 8+)
                     syslog(@"[INFO] Large Phone size detected (Width: %f, Height: %f, Ratio: %d)",
@@ -61,7 +68,7 @@
                                                      tapMultiplier:tapMultiplier];
                     break;
             }
-        } else if (ratio >= 1330 && ratio <= 1340) { //iPads
+        } else if (ratio >= 1330 && ratio <= 1340) { // iPads
             syslog(@"[FATAL] iPad size detected (Width: %f, Height: %f, Ratio: %d)",
                    width, height, ratio);
             sharedInstance = [[DeviceRatio1333 alloc] init:width

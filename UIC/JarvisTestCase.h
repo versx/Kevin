@@ -7,6 +7,7 @@
 
 #import <CoreLocation/CoreLocation.h>
 #import <KIF/KIFUIViewTestActor.h>
+#import <KIF/UIAutomationHelper.h>
 #import <KIF/XCTestCase-KIFAdditions.h>
 #import <UIKit/UIDevice.h>
 #import <UIKit/UIKit.h>
@@ -21,8 +22,11 @@
 -(void)registerUIInterruptionHandler:(NSString *)description;
 
 +(void)type:(NSString *)text;
++(void)clearAndType:(NSString *)text;
 +(void)touch:(int)x withY:(int)y;
 +(void)drag:(DeviceCoordinate *)start toPoint:(DeviceCoordinate *)end;
 +(void)swipe;
+
++(void)test;
 
 @end

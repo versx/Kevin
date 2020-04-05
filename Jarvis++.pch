@@ -5,7 +5,7 @@
 //  Created by versx on 3/10/20.
 //
 
-#define JARVIS_VERSION @"0.6.93"
+#define JARVIS_VERSION @"0.7.9"
 
 #import <Foundation/Foundation.h>
 #import "Utilities/Utils.h"

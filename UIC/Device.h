@@ -20,7 +20,7 @@
 @property (nonatomic, assign) NSString *model;
 @property (nonatomic, assign) NSString *osName;
 @property (nonatomic, assign) NSString *osVersion;
-@property (nonatomic, assign) NSNumber *multiplier;
+@property (nonatomic, assign) NSNumber *delayMultiplier;
 
 @property (nonatomic, readwrite, assign) NSString *ptcToken;
 @property (nonatomic, readwrite, assign) NSNumber *level;

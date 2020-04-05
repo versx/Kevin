@@ -15,7 +15,7 @@
 @synthesize model;
 @synthesize osName;
 @synthesize osVersion;
-
+@synthesize delayMultiplier;
 
 -(NSString *)username
 {
@@ -135,10 +135,10 @@
 -(id)init
 {
     NSLog(@"[INFO] init");
-    if ((self = [super init]))
-    {
+    if ((self = [super init])) {
         ptcToken = [[NSUserDefaults standardUserDefaults] valueForKey:TOKEN_USER_DEFAULT_KEY] ?: @"";
         level = @0;
+        delayMultiplier = @1;
     }
     return self;
 }
@@ -155,15 +155,13 @@
         [sharedInstance setModel:modelName];
         [sharedInstance setOsName:[[UIDevice currentDevice] systemName]];
         [sharedInstance setOsVersion:[[UIDevice currentDevice] systemVersion]];
-        /*
         if ([modelName isEqualToString:@"iPhone 5s"] ||
             [modelName isEqualToString:@"iPhone 6"] ||
             [modelName isEqualToString:@"iPhone 6 Plus"]) {
-            [sharedInstance setMultiplier:@45];
+            [sharedInstance setDelayMultiplier:@2];
         } else {
-            [sharedInstance setMultiplier:@5];
+            [sharedInstance setDelayMultiplier:@1];
         }
-        */
     });
     return sharedInstance;
 }

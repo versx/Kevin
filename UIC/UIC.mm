@@ -7,11 +7,10 @@
 
 #import "UIC.h"
 
-// TODO: Fix crash after 10 minutes issue
-// TODO: Resize image if not SE/5S
+// TODO: Fix crash after 10 minutes during leveling issue
+// TODO: Fix 6/6+/6s/7/7+/iPad support
 // TODO: Detect different tutorial stages for incomplete tuts
 // TODO: Handle invalid usernames
-// TODO: Benchmark/Performance/Profile monitor
 // TODO: Move constants to consts class
 // TODO: Remove PTFakeTouch
 // TODO: Pixel offsets in remote config
@@ -34,32 +33,25 @@ static BOOL _dataStarted = false;
 
 -(id)init
 {
-    syslog(@"[INFO] init");
     if ((self = [super init])) {
         _heartbeatQueue = dispatch_queue_create("heartbeat_queue", NULL);
         _pixelCheckQueue = dispatch_queue_create("pixelcheck_queue", NULL);
         
-        syslog(@"[INFO] %@ (%@) running %@ %@ with a delay of %@",
+        syslog(@"[INFO] %@ (%@) running %@ %@ with a delay of %@ and a tap multiplier of %f",
                [[Device sharedInstance] uuid], [[Device sharedInstance] model],
                [[Device sharedInstance] osName], [[Device sharedInstance] osVersion],
-               [[Settings sharedInstance] delayMultiplier]);
-        
-        syslog(@"[DEBUG] NSUserDefaults: %@", [[NSUserDefaults standardUserDefaults] dictionaryRepresentation]);
-        
-        //[self setDefaultBirthDate];
-        
+               [[Device sharedInstance] delayMultiplier],
+               [DeviceConfig tapMultiplier]);
+
         // Print settings
         [[Settings sharedInstance] config];
-        
-        syslog(@"[DEBUG] ageVerification: %@ OldCornerTest: %@", [[DeviceConfig sharedInstance] loginNewPlayer], [[DeviceConfig sharedInstance] startupOldCornerTest]);
-        
-        //NSDictionary *pixelConfig = [[Settings sharedInstance] fetchRemoteConfig:[[Settings sharedInstance] pixelConfigUrl]];
-        //syslog(@"[DEBUG] Pixel config: %@", pixelConfig);
         
         if ([DeviceConfig sharedInstance] == nil) {
             return nil;
         }
         syslog(@"[DEBUG] DeviceConfig: %@", [DeviceConfig sharedInstance]);
+        
+        syslog(@"[DEBUG] startupOldOkButton: %@", [[DeviceConfig sharedInstance] startupOldOkButton]);
         
         //JarvisTestCase *jarvis = [[JarvisTestCase alloc] init];
         //[jarvis runTest];
@@ -80,8 +72,18 @@ static BOOL _dataStarted = false;
             syslog(@"[ERROR] Error starting HTTP Server: %@", error);
         }
         
-        [self login];
-        [self startHeartbeatLoop]; // TODO: Start heartbeat first time after receiving data.
+        NSNumber *delay = @5;
+        NSString *model = [[Device sharedInstance] model];
+        if ([model isEqualToString:@"iPhone 5s"]) {
+            delay = @30;
+        }
+        
+        // Delay execution of my block for 10 seconds.
+        dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, [delay intValue] * NSEC_PER_SEC);
+        dispatch_after(time, dispatch_get_main_queue(), ^{
+            [self login];
+            [self startHeartbeatLoop]; // TODO: Start heartbeat first time after receiving data.
+        });
     }
     
     return self;
@@ -173,13 +175,14 @@ static BOOL _dataStarted = false;
               blocking:false
             completion:^(NSDictionary *result) {}
     ];
+    NSNumber *delayMultiplier = [[Device sharedInstance] delayMultiplier];
     dispatch_async(_heartbeatQueue, ^{
         while (heartbeatRunning) {
             // Check if time since last check-in was within 2 minutes, if not reboot device.
             sleep(15);
             NSDate *lastUpdate = [[DeviceState sharedInstance] lastUpdate];
             NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:lastUpdate];
-            if (timeIntervalSince >= 120) { // TODO: Make constant in Consts class
+            if (timeIntervalSince >= 120 * [delayMultiplier intValue]) { // TODO: Make constant in Consts class
                 syslog(@"[ERROR] HTTP SERVER DIED. Restarting...");
                 [DeviceState restart];
             } else {
@@ -301,7 +304,7 @@ static BOOL _dataStarted = false;
         dispatch_semaphore_signal(sem);
     });
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
-    int delayMultiplier = [[[Settings sharedInstance] delayMultiplier] intValue];
+    int delayMultiplier = [[[Device sharedInstance] delayMultiplier] intValue];
     if (isAgeVerification) {
         syslog(@"[INFO] Age verification screen.");
         [UIC2 ageVerification];
@@ -340,8 +343,9 @@ static BOOL _dataStarted = false;
                   blocking:true
                 completion:^(NSDictionary *result) {}];
         sleep(2 * delayMultiplier);
-        [[Device sharedInstance] setUsername:nil];
-        [[Device sharedInstance] setIsLoggedIn:false];
+        //[[Device sharedInstance] setUsername:nil];
+        //[[Device sharedInstance] setIsLoggedIn:false];
+        [DeviceState logout];
     } else if ([UIC2 isArPlusPrompt]) {
         syslog(@"[INFO] Found camera permissions prompt.");
         DeviceCoordinate *startupOldOk = [[DeviceConfig sharedInstance] startupOldOkButton];
@@ -489,7 +493,7 @@ static BOOL _dataStarted = false;
 // TODO: Move to DeviceState
 +(void)ageVerification
 {
-    int delayMultiplier = [[[Settings sharedInstance] delayMultiplier] intValue];
+    int delayMultiplier = [[[Device sharedInstance] delayMultiplier] intValue];
     // Click Year selector
     syslog(@"[DEBUG] Is age verification, selecting year selector");
     DeviceCoordinate *ageVerificationYear = [[DeviceConfig sharedInstance] ageVerificationYear];
@@ -512,7 +516,7 @@ static BOOL _dataStarted = false;
 
 +(void)loginAccount
 {
-    int delayMultiplier = [[[Settings sharedInstance] delayMultiplier] intValue];
+    int delayMultiplier = [[[Device sharedInstance] delayMultiplier] intValue];
     sleep(1 * delayMultiplier);
     
     // Click 'New Player' button
@@ -561,7 +565,9 @@ static BOOL _dataStarted = false;
 
 +(void)doTutorialSelection
 {
-    int delayMultiplier = [[[Settings sharedInstance] delayMultiplier] intValue];
+    syslog(@"[INFO] [TUT] Starting tutorial for account %@", [[Device sharedInstance] username]);
+
+    int delayMultiplier = [[[Device sharedInstance] delayMultiplier] intValue];
     syslog(@"[INFO] [TUT] Tapping 9 times passed Professor Willow screen.");
     DeviceCoordinate *willowPrompt = [[DeviceConfig sharedInstance] tutorialWillowPrompt];
     for (int i = 0; i < 9; i++) {
@@ -666,7 +672,7 @@ static BOOL _dataStarted = false;
     syslog(@"[INFO] [TUT] Typing in nickname %@", username)
     [JarvisTestCase type:usernameReturn];
     sleep(1 * delayMultiplier);
-    // TODO: While not confirm button keep trying to enter random username and click OK button on fail.
+    // TODO: While not tutorialStyleConfirm button keep trying to enter random username and click OK button on fail.
     // Click OK button.
     if ([self isPassengerWarning]) {
         syslog(@"[INFO] [TUT] Clicking OK username button.");
@@ -815,8 +821,8 @@ static BOOL _dataStarted = false;
     dispatch_async(dispatch_get_main_queue(), ^{
         UIImage *image = [Utils takeScreenshot];
         result = [image rgbAtLocation:[[DeviceConfig sharedInstance] passenger]
-                           betweenMin:[[ColorOffset alloc] init:0.0 green:0.75 blue:0.55]
-                               andMax:[[ColorOffset alloc] init:1.0 green:0.90 blue:0.70]];
+                           betweenMin:[[ColorOffset alloc] init:0.00 green:0.75 blue:0.55]
+                               andMax:[[ColorOffset alloc] init:1.00 green:0.90 blue:0.70]];
         dispatch_semaphore_signal(sem);
     });
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
@@ -1010,6 +1016,16 @@ static BOOL _dataStarted = false;
         sleep(1);
     }
     
+    if ([self isAtPixel:[[DeviceConfig sharedInstance] activeEgg] //0.94902 1 0.956863 1
+             betweenMin:[[ColorOffset alloc] init:0.7 green:0.8 blue:0.9]
+                 andMax:[[ColorOffset alloc] init:0.8 green:0.9 blue:1.0]] ||
+        [self isAtPixel:[[DeviceConfig sharedInstance] activeEgg]
+             betweenMin:[[ColorOffset alloc] init:0.94 green:0.90 blue:0.94]
+                 andMax:[[ColorOffset alloc] init:0.96 green:1.01 blue:0.96]]) {
+        syslog(@"[INFO] Lucky egg already active, skipping deployment.");
+        return result;
+    }
+    
     // Open main menu
     [JarvisTestCase touch:[closeMenu tapX] withY:[closeMenu tapY]];
     sleep(1);
@@ -1022,7 +1038,7 @@ static BOOL _dataStarted = false;
     // If egg wasn't found in 1st, 2nd, or 3rd item slot we either don't have any or one active.
     NSNumber *hasEgg = [self hasEgg];
     if ([hasEgg intValue] == 0) {
-        syslog(@"[WARN] No lucky egg detected at the first 3 item slots.");
+        syslog(@"[WARN] No lucky egg detected at the first 3 item slots, might already be active.");
         [JarvisTestCase touch:[closeMenu tapX] withY:[closeMenu tapY]];
         sleep(1);
         return result;
@@ -1055,6 +1071,10 @@ static BOOL _dataStarted = false;
     sleep(2);
     result = true;
     syslog(@"[INFO] Deployed egg");
+    
+    [[Device sharedInstance] setLastEggDeployTime:[NSDate date]];
+    NSNumber *luckyEggsCount = [[Device sharedInstance] luckyEggsCount];
+    [[Device sharedInstance] setLuckyEggsCount:[Utils decrementInt:luckyEggsCount]];
     return result;
 }
 
@@ -1064,7 +1084,7 @@ static BOOL _dataStarted = false;
         syslog(@"[INFO] Opening nearby tracker.");
         DeviceCoordinate *tracker = [[DeviceConfig sharedInstance] trackerMenu];
         [JarvisTestCase touch:[tracker tapX] withY:[tracker tapY]];
-        sleep(1 * [[[Settings sharedInstance] delayMultiplier] intValue]);
+        sleep(1 * [[[Device sharedInstance] delayMultiplier] intValue]);
     }
 }
 

@@ -23,7 +23,6 @@ static int _jitterCorner;
 
 -(id)init
 {
-    syslog(@"[INFO] init");
     if ((self = [super init])) {
         _jitterCorner = 0;
     }
@@ -93,6 +92,7 @@ static int _jitterCorner;
             bool ultraQuests = [[Settings sharedInstance] ultraQuests];
             bool delayQuest = [[DeviceState sharedInstance] delayQuest];
             NSString *action = [[DeviceState sharedInstance] lastAction];
+            NSNumber *luckyEggsCount = [[Device sharedInstance] luckyEggsCount];
             if (ultraQuests && [action isEqualToString:@"scan_quest"] && delayQuest) {
                 // Auto-spinning should only happen when ultraQuests is
                 // set and the instance is scan_quest type
@@ -110,7 +110,11 @@ static int _jitterCorner;
                     responseData[@"actions"] = @[@""];
                 }
             } else if ([action isEqualToString:@"leveling"]) {
-                responseData[@"actions"] = @[@"pokestop"];
+                if ([luckyEggsCount intValue] > 0) {
+                    responseData[@"actions"] = @[@"pokestop", @"luckyegg"];
+                } else {
+                    responseData[@"actions"] = @[@"pokestop"];
+                }
             } else if ([action isEqualToString:@"scan_raid"]) {
                 // Raid instances do not need IV encounters, Use scan_pokemon
                 // type if you want to encounter while scanning raids.
@@ -120,7 +124,6 @@ static int _jitterCorner;
     }
 
     NSString *response = [Utils toJsonString:responseData withPrettyPrint:false];
-    //syslog(@"[DEBUG] [LOC] %@", response);
     return response;
 }
 
@@ -192,20 +195,20 @@ static int _jitterCorner;
                             [[Device sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount]];
                             break;
                         case 10:
-                            syslog(@"[DEBUG] Hit level 10 adding 2 lucky eggs");
-                            [[Device sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount withAmount:@2]];
+                            syslog(@"[DEBUG] Hit level 10 adding 1 lucky egg");
+                            [[Device sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount]];
                             break;
                         case 15:
-                            syslog(@"[DEBUG] Hit level 15 adding 3 lucky eggs");
-                            [[Device sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount withAmount:@3]];
+                            syslog(@"[DEBUG] Hit level 15 adding 1 lucky egg");
+                            [[Device sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount]];
                             break;
                         case 20:
-                            syslog(@"[DEBUG] Hit level 20 adding 4 lucky eggs");
-                            [[Device sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount withAmount:@4]];
+                            syslog(@"[DEBUG] Hit level 20 adding 2 lucky eggs");
+                            [[Device sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount withAmount:@2]];
                             break;
                         case 25:
-                            syslog(@"[DEBUG] Hit level 25 adding 5 lucky eggs");
-                            [[Device sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount withAmount:@5]];
+                            syslog(@"[DEBUG] Hit level 25 adding 1 lucky egg");
+                            [[Device sharedInstance] setLuckyEggsCount:[Utils incrementInt:luckyEggsCount]];
                             break;
                     }
                 }
@@ -286,6 +289,11 @@ static int _jitterCorner;
             [[DeviceState sharedInstance] setGotQuest:true];
             [[DeviceState sharedInstance] setGotQuestEarly:true];
         }
+        
+        //if (![[DeviceState sharedInstance] gotItems] && items > 0 && itemDistance < 30.0) {
+        //    [[DeviceState sharedInstance] setGotItems:true];
+        //    syslog(@"[DEBUG] Got items.");
+        //}
         
         if (![[DeviceState sharedInstance] gotIV] && encounters > 0) {
             [[DeviceState sharedInstance] setGotIV:true];
@@ -378,6 +386,9 @@ static int _jitterCorner;
     return JSON_OK;
 }
 
+/**
+ * Send restart application request.
+ */
 -(NSString *)handleRestartRequest
 {
     syslog(@"[INFO] Restarting per user request");
@@ -385,12 +396,45 @@ static int _jitterCorner;
     return JSON_OK;
 }
 
+-(NSString *)handleAccountRequest
+{
+    syslog(@"[INFO] Received account request from client.");
+    NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
+    data[@"username"] = [[Device sharedInstance] username];
+    data[@"password"] = [[Device sharedInstance] password];
+    NSString *response = [Utils toJsonString:data withPrettyPrint:true];
+    syslog(@"[INFO] Pretty print account response: %@", response);
+    return response;
+}
+
+-(void)showMessage:(NSString*)message withTitle:(NSString *)title
+{
+    UIAlertController * alert = [UIAlertController alertControllerWithTitle:title
+                                                                    message:message
+                                                             preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK"
+                                                       style:UIAlertActionStyleDefault
+                                                     handler:^(UIAlertAction *action) {
+        //do something when click button
+    }];
+    [alert addAction:okAction];
+    UIApplication *app = [UIApplication sharedApplication];
+    UIWindow *window = [[app delegate] window];
+    UIViewController *controller = [window rootViewController];
+    [controller presentViewController:alert
+                             animated:YES
+                           completion:nil];
+}
+
 /**
- Handle `/test` web requests.
+ Handle `/test` web requests. Development purposes.
  */
 -(NSString *)handleTestRequest:(NSDictionary *)params
 {
     syslog(@"[DEBUG] handleTestRequest: %@", params);
+    
+    //[self showMessage:@"This is a test message" withTitle:@"Test title"];
+    [JarvisTestCase test];
     /*
     //dispatch_async(dispatch_get_main_queue(), ^{
         //[Utils showAlert:self withMessage:@"This is a test alert"];

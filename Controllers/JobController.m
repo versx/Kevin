@@ -10,7 +10,8 @@
 @implementation JobController
 
 static dispatch_queue_t _getJobQueue;
-static int _eggInterval = 1801; // 30 mins 1 second
+static int _eggInterval = 901;//1801; // 30 mins 1 second
+static NSTimer *_timer = nil;
 
 +(JobController *)sharedInstance
 {
@@ -25,7 +26,6 @@ static int _eggInterval = 1801; // 30 mins 1 second
 
 -(id)init
 {
-    syslog(@"[INFO] init");
     if ((self = [super init])) {
         _getJobQueue = dispatch_queue_create("getjob_queue", NULL);
     }
@@ -187,11 +187,15 @@ static int _eggInterval = 1801; // 30 mins 1 second
                     NSNumber *failedGetJobCount = [[DeviceState sharedInstance] failedGetJobCount];
                     if ([failedGetJobCount intValue] == 10) {
                         syslog(@"[ERROR] Failed to get job 10 times in a row. Exiting...");
-                        //[[Device sharedInstance] setShouldExit:true];
+                        [[Device sharedInstance] setShouldExit:true];
                         dispatch_semaphore_signal(sem);
                         return;
                     } else {
                         syslog(@"[ERROR] Failed to get a job.");
+                        NSNumber *failedToGetJobCount = [[DeviceState sharedInstance] failedGetJobCount];
+                        [[DeviceState sharedInstance] setFailedGetJobCount:[Utils incrementInt:failedToGetJobCount]];
+                        sleep(5 * [[[Settings sharedInstance] delayMultiplier] intValue]);
+                        [[Device sharedInstance] setShouldExit:true];
                         dispatch_semaphore_signal(sem);
                         return;
                     }
@@ -216,6 +220,8 @@ static int _eggInterval = 1801; // 30 mins 1 second
                         }
                     }
                 }
+                
+                // TODO: Check for warning
                 
                 [[DeviceState sharedInstance] setFailedGetJobCount:@0];
                 if (data == nil) {
@@ -250,7 +256,7 @@ static int _eggInterval = 1801; // 30 mins 1 second
                     syslog(@"[DEBUG] [STATUS] Token");
                     [self handleGatherToken:action withData:data hasWarning:hasWarning];
                 } else {
-                    syslog(@"[WARN] Unknown action received: %@", action);
+                    //syslog(@"[WARN] Unknown action received: %@", action);
                 }
                 
                 dispatch_semaphore_signal(sem);
@@ -275,6 +281,23 @@ static int _eggInterval = 1801; // 30 mins 1 second
             sleep(1);
         }
     });
+}
+
+-(void)startEggTimer
+{
+    if (_timer != nil) {
+        return;
+    }
+    _timer = [NSTimer scheduledTimerWithTimeInterval:_eggInterval
+                                              target:[UIC2 class]
+                                            selector:@selector(eggDeploy)
+                                            userInfo:nil
+                                             repeats:YES];
+    syslog(@"[INFO] Deploying lucky egg from scheduled timer.");
+    if (![UIC2 eggDeploy]) {
+       syslog(@"[ERROR] Failed to deploy lucky egg.");
+       // TODO: [[Device sharedInstance] setLuckyEggsCount:@0];
+    }
 }
 
 
@@ -594,13 +617,15 @@ static int _eggInterval = 1801; // 30 mins 1 second
         }
         [[DeviceState sharedInstance] setGotItems:false];
         
+        // TODO: check failedSpinCount >= 20
+        
         NSNumber *noItemsCount = [[DeviceState sharedInstance] noItemsCount];
-        if ([noItemsCount intValue] >= 200) {
+        if (noItemsCount >= [[Settings sharedInstance] maxNoQuestCount]) {
             [[DeviceState sharedInstance] setIsQuestInit:false];
             [[DeviceState sharedInstance] setNoItemsCount:@0];
+            [[Device sharedInstance] setShouldExit:true];
             syslog(@"[WARN] Stuck somewhere. Restarting accounts...");
             [DeviceState restart];
-            [[Device sharedInstance] setShouldExit:true];
             return;
         }
         
@@ -659,15 +684,18 @@ static int _eggInterval = 1801; // 30 mins 1 second
         
         NSDate *start = [NSDate date];
         NSNumber *delayTemp = delay;
+        if ([[Settings sharedInstance] ultraQuests]) {
+            delayTemp = @0;
+        }
         bool success = false;
         bool locked = true;
         while (locked) {
-            sleep(1);
+            usleep(100000 * [[[Settings sharedInstance] delayMultiplier] intValue]);
             NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:start];
             if (timeIntervalSince <= [delayTemp intValue]) {
                 NSNumber *left = @([delayTemp intValue] - timeIntervalSince);
                 syslog(@"[DEBUG] Delaying by %@", left);
-                sleep(MIN(10, [left intValue]));
+                usleep(MIN(10, [left intValue]) * 1000000.0);
                 //usleep(MIN(10.0, left) * 1000000));
                 continue;
             }
@@ -696,7 +724,7 @@ static int _eggInterval = 1801; // 30 mins 1 second
                     [[DeviceState sharedInstance] setDelayQuest:true];
                     [[DeviceState sharedInstance] setFailedCount:@0];
                     syslog(@"[INFO] Pokestop loaded after %f", [[NSDate date] timeIntervalSinceDate:start]);
-                    sleep(1);
+                    //sleep(1);
                 }
             }
         }
@@ -711,6 +739,12 @@ static int _eggInterval = 1801; // 30 mins 1 second
             syslog(@"[INFO] Lucky Eggs Count: %@ EggTimeSince: %f Level: %@ LastDeploy: %@",
                    luckyEggsCount, eggTimeIntervalSince, level, lastDeployTime);
             if (([luckyEggsCount intValue] > 0 &&
+                [level intValue] >= 9 && [level intValue] < 30) ||
+                eggTimeIntervalSince >= _eggInterval) {
+                [self startEggTimer];
+            }
+            /*
+            if (([luckyEggsCount intValue] > 0 &&
                 [level intValue] >= 9 && [level intValue] < 30) &&
                 (lastDeployTime == nil ||
                 eggTimeIntervalSince == NAN ||
@@ -723,30 +757,31 @@ static int _eggInterval = 1801; // 30 mins 1 second
                     //syslog(@"[ERROR] Failed to deploy lucky egg.");
                     // TODO: [[Device sharedInstance] setLuckyEggsCount:@0];
                 }
-                // TODO: [[DeviceState sharedInstance] setSpinCount:@0];
-                [[DeviceState sharedInstance] setUltraQuestSpin:true];
-                sleep(1);
-                int attempts = 0;
-                while ([[NSDate date] timeIntervalSinceDate:start] < 15.0 + [delay intValue]) {
-                    if (![[DeviceState sharedInstance] gotItems]) {
-                        if (attempts % 5 == 0) {
-                            syslog(@"[DEBUG] Waiting to spin...");
-                        }
-                        sleep(1);
-                    } else {
-                        syslog(@"[INFO] Successfully spun Pokestop");
-                        [[DeviceState sharedInstance] setUltraQuestSpin:false];
-                        NSNumber *spins = [[DeviceState sharedInstance] spinCount];
-                        [[DeviceState sharedInstance] setSpinCount:[Utils incrementInt:spins]];
-                        //sleep(3 * [[[Settings sharedInstance] delayMultiplier] intValue]);
-                        break;
-                    }
-                    attempts++;
-                }
-                [[DeviceState sharedInstance] setUltraQuestSpin:false];
+            }
+            */
+            [[DeviceState sharedInstance] setSpinCount:@0];
+            [[DeviceState sharedInstance] setUltraQuestSpin:true];
+            sleep(1);
+            int attempts = 0;
+            while ([[NSDate date] timeIntervalSinceDate:start] < 15.0 + [delay intValue]) {
                 if (![[DeviceState sharedInstance] gotItems]) {
-                    syslog(@"[ERROR] Failed to spin Pokestop");
+                    if (attempts % 5 == 0) {
+                        syslog(@"[DEBUG] Waiting to spin...");
+                    }
+                    sleep(1);
+                } else {
+                    syslog(@"[INFO] Successfully spun Pokestop");
+                    [[DeviceState sharedInstance] setUltraQuestSpin:false];
+                    NSNumber *spins = [[DeviceState sharedInstance] spinCount];
+                    [[DeviceState sharedInstance] setSpinCount:[Utils incrementInt:spins]];
+                    //sleep(3 * [[[Settings sharedInstance] delayMultiplier] intValue]);
+                    break;
                 }
+                attempts++;
+            }
+            [[DeviceState sharedInstance] setUltraQuestSpin:false];
+            if (![[DeviceState sharedInstance] gotItems]) {
+                syslog(@"[ERROR] Failed to spin Pokestop");
             }
         }
         

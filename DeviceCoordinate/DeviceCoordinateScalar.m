@@ -22,8 +22,7 @@
 
 -(id)init:(int)widthNow heightNow:(int)heightNow widthTarget:(int)widthTarget heightTarget:(int)heightTarget multiplier:(double)multiplier tapMultiplier:(double)tapMultiplier
 {
-    self = [super init];
-    if (self) {
+    if ((self = [super init])) {
         self.widthNow = widthNow;
         self.heightNow = heightNow;
         self.widthTarget = widthTarget;

@@ -254,6 +254,9 @@ static DeviceCoordinateScalar *scalar;
 -(DeviceCoordinate *)itemEgg3 {
     return [[DeviceCoordinate alloc] init:325 withY:1900 andDeviceCoordinateScalar:scalar];
 }
+-(DeviceCoordinate *)activeEgg {
+    return [[DeviceCoordinate alloc] init:0 withY:0 andDeviceCoordinateScalar:scalar];
+}
 
 
 #pragma mark Account

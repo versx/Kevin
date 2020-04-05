@@ -11,6 +11,7 @@
 
 static DeviceCoordinateScalar *scalar;
 static double _tapScalar;
+
 -(double)tapScalar {
     return _tapScalar;
 }
@@ -37,7 +38,7 @@ static double _tapScalar;
     return [[DeviceCoordinate alloc] init:320 withY:785 andDeviceCoordinateScalar:scalar];
 }
 -(DeviceCoordinate *)loginPTC {
-    return [[DeviceCoordinate alloc] init:320 withY:800/*0.171.1 = 725*/ andDeviceCoordinateScalar:scalar];
+    return [[DeviceCoordinate alloc] init:320 withY:725/*was:800*/ andDeviceCoordinateScalar:scalar];
 }
 -(DeviceCoordinate *)loginUsernameTextfield {
     return [[DeviceCoordinate alloc] init:320 withY:500 andDeviceCoordinateScalar:scalar];
@@ -256,6 +257,9 @@ static double _tapScalar;
 }
 -(DeviceCoordinate *)itemEgg3 {
     return [[DeviceCoordinate alloc] init:148 withY:670 andDeviceCoordinateScalar:scalar];
+}
+-(DeviceCoordinate *)activeEgg {
+    return [[DeviceCoordinate alloc] init:592 withY:276 andDeviceCoordinateScalar:scalar];
 }
 
 

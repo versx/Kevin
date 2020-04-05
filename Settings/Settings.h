@@ -20,7 +20,6 @@
 -(NSString *)pixelConfigUrl;
 -(NSString *)token;
 -(NSNumber *)port;
--(NSNumber *)delayMultiplier;
 -(NSNumber *)targetMaxDistance;
 -(NSNumber *)pokemonMaxTime;
 -(NSNumber *)raidMaxTime;

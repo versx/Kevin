@@ -5,6 +5,8 @@
 //  Created by versx on 3/22/20.
 //
 
+#import <UIKit/UIDevice.h>
+
 #import "DeviceConfigProtocol.h"
 //#import "Configs/DeviceIPhoneNormal.h"
 //#import "Configs/DeviceIPhonePlus.h"

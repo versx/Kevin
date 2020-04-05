@@ -11,7 +11,6 @@
 
 -(id)init
 {
-    syslog(@"[INFO] init");
     if ((self = [super init]))
     {
         lastAction = @"";

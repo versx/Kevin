@@ -9,4 +9,14 @@
 
 @implementation PixelSettings
 
++(PixelSettings *)sharedInstance
+{
+    static PixelSettings *sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [[PixelSettings alloc] init];
+    });
+    return sharedInstance;
+}
+
 @end

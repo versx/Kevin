@@ -170,6 +170,8 @@
 -(DeviceCoordinate *)itemEgg2;
 /** Blue pixel in egg at 3rd slot. */
 -(DeviceCoordinate *)itemEgg3;
+/**  */
+-(DeviceCoordinate *)activeEgg;
 
 #pragma mark Accounts Coordinates
 

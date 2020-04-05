@@ -46,6 +46,7 @@ void onUncaughtException(NSException* exception)
     NSString *username = [[Device sharedInstance] username];
     syslog(@"[DEBUG] typeUsername: %@", username);
     [JarvisTestCase type:username];
+    //[JarvisTestCase clearAndType:username];
 }
 
 +(void)typePassword
@@ -53,6 +54,7 @@ void onUncaughtException(NSException* exception)
     NSString *password = [[Device sharedInstance] password];
     syslog(@"[DEBUG] typePassword: %@", password);
     [JarvisTestCase type:password];
+    //[JarvisTestCase clearAndType:password];
 }
 
 @end
