@@ -27,6 +27,8 @@
 @property (nonatomic, readwrite, assign) BOOL isLoggedIn;
 @property (nonatomic, readwrite, assign) BOOL shouldExit;
 
+-(BOOL)isOneGbDevice;
+
 -(NSString *)username;
 -(void)setUsername:(NSString *)value;
 -(NSString *)password;

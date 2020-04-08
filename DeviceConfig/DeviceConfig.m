@@ -24,7 +24,7 @@
     }
     // For whatever reason 5S with iOS support uses 0.5?
     NSString *model = [[Device sharedInstance] model];
-    if ([model isEqualToString:@"iPhone SE"] || [model isEqualToString:@"iPhone 5s"]) {
+    if ([model isEqualToString:@"iPhone SE"] || [model isEqualToString:@"iPhone 5s"] || [model isEqualToString:@"iPhone 6"]) {
         tapMultiplier = 0.5;
     } else {
         tapMultiplier = 1.0;
@@ -46,9 +46,9 @@
                 case 375: // iPhone Normal (6, 6S, 7)
                     syslog(@"[INFO] Normal Phone size detected (Width: %f, Height: %f, Ratio: %d)",
                            width, height, ratio);
-                    sharedInstance = [[DeviceIPhoneNormal alloc] init:width
+                    sharedInstance = [[DeviceRatio1775 alloc] init:width
                                                                height:height
-                                                           multiplier:0.75//1.17 0.853 //1.0
+                                                           multiplier:0.9//0.65//1.17 0.853 //1.0
                                                         tapMultiplier:tapMultiplier];//1.17 0.47976] //tapMultiplier];
                     break;
                 case 414: // iPhone Large (6+, 6S+, 7+, 8+)

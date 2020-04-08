@@ -166,6 +166,16 @@
     return sharedInstance;
 }
 
+-(BOOL)isOneGbDevice
+{
+    if ([[self model] isEqualToString:@"iPhone 5s"] ||
+        [[self model] isEqualToString:@"iPhone 6"] ||
+        [[self model] isEqualToString:@"iPhone 6 Plus"]) {
+        return true;
+    }
+    return false;
+}
+
 static NSString* getModelIdentifier() {
     struct utsname systemInfo;
     uname(&systemInfo);

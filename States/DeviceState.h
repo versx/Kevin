@@ -30,7 +30,6 @@
 @property (nonatomic, readwrite, assign) BOOL delayQuest;
 @property (nonatomic, readwrite, assign) BOOL skipSpin;
 @property (nonatomic, readwrite, assign) BOOL isQuestInit;
-@property (nonatomic, readwrite, assign) BOOL ultraQuestSpin;
 @property (nonatomic, readwrite, assign) BOOL newCreated;
 @property (nonatomic, readwrite, assign) BOOL needsLogout;
 @property (nonatomic, readwrite, assign) BOOL isStartup;

@@ -118,7 +118,17 @@ static NSTimer *_timer = nil;
                 } else {
                     syslog(@"[ERROR] Failed to get account and not logged in.");
                     [[Device sharedInstance] setShouldExit:true];
+                    [DeviceState restart];
+                    return;
                 }
+                
+                if (![username isEqualToString:[[Device sharedInstance] username]]) {
+                    syslog(@"[DEBUG] Logged into different account (%@) than returned from backend (%@). Logging out!",
+                           [[Device sharedInstance] username], username);
+                    [DeviceState logout];
+                    return;
+                }
+                
                 [[Device sharedInstance] setUsername:username];
                 [[Device sharedInstance] setPassword:password];
                 [[Device sharedInstance] setLevel:level];
@@ -158,6 +168,7 @@ static NSTimer *_timer = nil;
         [[DeviceState sharedInstance] setFailedGetJobCount:@0];
         [[DeviceState sharedInstance] setFailedCount:@0];
         [[DeviceState sharedInstance] setEmptyGmoCount:@0];
+        [[DeviceState sharedInstance] setNoItemsCount:@0];
         [[DeviceState sharedInstance] setNoQuestCount:@0];
 
         // Grab an account from the backend controller.
@@ -194,7 +205,7 @@ static NSTimer *_timer = nil;
                         syslog(@"[ERROR] Failed to get a job.");
                         NSNumber *failedToGetJobCount = [[DeviceState sharedInstance] failedGetJobCount];
                         [[DeviceState sharedInstance] setFailedGetJobCount:[Utils incrementInt:failedToGetJobCount]];
-                        sleep(5 * [[[Settings sharedInstance] delayMultiplier] intValue]);
+                        sleep(5 * [[[Device sharedInstance] delayMultiplier] intValue]);
                         [[Device sharedInstance] setShouldExit:true];
                         dispatch_semaphore_signal(sem);
                         return;
@@ -216,12 +227,11 @@ static NSTimer *_timer = nil;
                                 CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
                                 [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
                                 [DeviceState logout];
+                                return;
                             }
                         }
                     }
                 }
-                
-                // TODO: Check for warning
                 
                 [[DeviceState sharedInstance] setFailedGetJobCount:@0];
                 if (data == nil) {
@@ -248,15 +258,15 @@ static NSTimer *_timer = nil;
                     [self handleSwitchAccount:action withData:data hasWarning:hasWarning];
                 } else if ([action isEqualToString:@"leveling"]) {
                     syslog(@"[DEBUG] [STATUS] Leveling");
-                    [self handleLeveling:action withData:data hasWarning:hasWarning];
+                    [self handleLevelingJob:action withData:data hasWarning:hasWarning];
                 } else if ([action isEqualToString:@"scan_iv"]) {
                     syslog(@"[DEBUG] [STATUS] IV");
                     [self handleIVJob:action withData:data hasWarning:hasWarning];
                 } else if ([action isEqualToString:@"gather_token"]) {
                     syslog(@"[DEBUG] [STATUS] Token");
                     [self handleGatherToken:action withData:data hasWarning:hasWarning];
-                } else {
-                    //syslog(@"[WARN] Unknown action received: %@", action);
+                //} else {
+                //    syslog(@"[WARN] Unknown action received: %@", action);
                 }
                 
                 dispatch_semaphore_signal(sem);
@@ -274,7 +284,8 @@ static NSTimer *_timer = nil;
                     syslog(@"[ERROR] Failed %@ times in a row. Restarting...", failedCount);
                     [DeviceState restart];
                 }
-                sleep(2);
+                
+                sleep(1);
             }];
             
             dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
@@ -296,7 +307,6 @@ static NSTimer *_timer = nil;
     syslog(@"[INFO] Deploying lucky egg from scheduled timer.");
     if (![UIC2 eggDeploy]) {
        syslog(@"[ERROR] Failed to deploy lucky egg.");
-       // TODO: [[Device sharedInstance] setLuckyEggsCount:@0];
     }
 }
 
@@ -325,10 +335,12 @@ static NSTimer *_timer = nil;
     syslog(@"[INFO] Scanning prepared");
     
     BOOL locked = true;
+    NSNumber *pokemonMaxTime = [[Settings sharedInstance] pokemonMaxTime];
     while (locked) {
         sleep(1);
         NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:start];
-        if (timeIntervalSince >= 30) { // TODO: Make constant
+        
+        if (timeIntervalSince >= [pokemonMaxTime intValue]) {
             locked = false;
             [[DeviceState sharedInstance] setWaitForData:false];
             NSNumber *failedCount = [[DeviceState sharedInstance] failedCount];
@@ -407,7 +419,7 @@ static NSTimer *_timer = nil;
         } else {
             locked = [[DeviceState sharedInstance] waitForData];
             if (!locked) {
-                [[DeviceState sharedInstance] setFailedCount:0];
+                [[DeviceState sharedInstance] setFailedCount:@0];
                 syslog(@"[INFO] Raids loaded after %f", timeIntervalSince);
             }
         }
@@ -507,7 +519,7 @@ static NSTimer *_timer = nil;
     BOOL locked = true;
     BOOL found = false;
     while (locked) {
-        sleep(2); // TODO: DelayMultiplier
+        sleep(1 * [[[Device sharedInstance] delayMultiplier] intValue]);
         NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:start];
         if (timeIntervalSince <= 5) {
             continue;
@@ -551,7 +563,7 @@ static NSTimer *_timer = nil;
             if (!locked) {
                 [[DeviceState sharedInstance] setDelayQuest:true];
                 success = true;
-                [[DeviceState sharedInstance] setFailedCount:0];
+                [[DeviceState sharedInstance] setFailedCount:@0];
                 syslog(@"[INFO] Pokestop loaded after %f", timeIntervalSince);
             }
         }
@@ -559,14 +571,16 @@ static NSTimer *_timer = nil;
 
     if ([action isEqualToString:@"scan_quest"]) { // TODO: Probably can remove this check
         if ([[DeviceState sharedInstance] gotQuest]) {
-            [[DeviceState sharedInstance] setNoQuestCount:0];
+            [[DeviceState sharedInstance] setNoQuestCount:@0];
         } else {
             NSNumber *noQuestCount = [[DeviceState sharedInstance] noQuestCount];
             [[DeviceState sharedInstance] setNoQuestCount:[Utils incrementInt:noQuestCount]];
         }
         [[DeviceState sharedInstance] setGotQuest:false];
-
-        if ([[DeviceState sharedInstance] noQuestCount] >= [[Settings sharedInstance] maxNoQuestCount]) {
+        
+        NSNumber *noQuestCount = [[DeviceState sharedInstance] noQuestCount];
+        NSNumber *maxNoQuestCount = [[Settings sharedInstance] maxNoQuestCount];
+        if ([noQuestCount intValue] >= [maxNoQuestCount intValue]) {
             syslog(@"[WARN] Stuck somewhere. Restarting...");
             [DeviceState logout];
         }
@@ -588,7 +602,7 @@ static NSTimer *_timer = nil;
     }
 }
 
--(void)handleLeveling:(NSString *)action withData:(NSDictionary *)data hasWarning:(BOOL)hasWarning
+-(void)handleLevelingJob:(NSString *)action withData:(NSDictionary *)data hasWarning:(BOOL)hasWarning
 {
     [[DeviceState sharedInstance] setDelayQuest:false];
     //degreePerMeter = 83267.0991559005
@@ -610,24 +624,28 @@ static NSTimer *_timer = nil;
         
         // Check if previous spin had quest data
         if ([[DeviceState sharedInstance] gotItems]) {
-            [[DeviceState sharedInstance] setNoItemsCount:0];
+            [[DeviceState sharedInstance] setNoItemsCount:@0];
         } else {
             NSNumber *noItemsCount = [[DeviceState sharedInstance] noItemsCount];
             [[DeviceState sharedInstance] setNoItemsCount:[Utils incrementInt:noItemsCount]];
         }
         [[DeviceState sharedInstance] setGotItems:false];
         
-        // TODO: check failedSpinCount >= 20
-        
         NSNumber *noItemsCount = [[DeviceState sharedInstance] noItemsCount];
-        if (noItemsCount >= [[Settings sharedInstance] maxNoQuestCount]) {
+        NSNumber *maxNoQuestCount = [[Settings sharedInstance] maxNoQuestCount];
+        syslog(@"[DEBUG] NoItemsCount: %@/%@", noItemsCount, maxNoQuestCount);
+        /*
+        if ([noItemsCount intValue] >= [maxNoQuestCount intValue]) {
             [[DeviceState sharedInstance] setIsQuestInit:false];
             [[DeviceState sharedInstance] setNoItemsCount:@0];
             [[Device sharedInstance] setShouldExit:true];
-            syslog(@"[WARN] Stuck somewhere. Restarting accounts...");
+            syslog(@"[WARN] Stuck somewhere %@/%@ no items. Restarting accounts...",
+                   noItemsCount,
+                   [[Settings sharedInstance] maxNoQuestCount]);
             [DeviceState restart];
             return;
         }
+        */
         
         [[DeviceState sharedInstance] setSkipSpin:false];
         syslog(@"[DEBUG] Quest Distance: %@", questDistance);
@@ -679,7 +697,7 @@ static NSTimer *_timer = nil;
         [[DeviceState sharedInstance] setWaitRequiresPokemon:false];
         [[DeviceState sharedInstance] setPokemonEncounterId:nil];
         //_targetMaxDistance = [[Settings sharedInstance] targetMaxDistance] ?: @250.0;
-        [[DeviceState sharedInstance] setWaitForData:false];
+        [[DeviceState sharedInstance] setWaitForData:true];
         syslog(@"[INFO] Scanning prepared");
         
         NSDate *start = [NSDate date];
@@ -690,7 +708,7 @@ static NSTimer *_timer = nil;
         bool success = false;
         bool locked = true;
         while (locked) {
-            usleep(100000 * [[[Settings sharedInstance] delayMultiplier] intValue]);
+            usleep(100000 * [[[Device sharedInstance] delayMultiplier] intValue]);
             NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:start];
             if (timeIntervalSince <= [delayTemp intValue]) {
                 NSNumber *left = @([delayTemp intValue] - timeIntervalSince);
@@ -719,6 +737,8 @@ static NSTimer *_timer = nil;
                 ];
             } else {
                 locked = [[DeviceState sharedInstance] waitForData];
+                // mizu has locked = false too for some reason?
+                //locked = false;
                 if (!locked) {
                     success = true;
                     [[DeviceState sharedInstance] setDelayQuest:true];
@@ -755,13 +775,12 @@ static NSTimer *_timer = nil;
                     [[Device sharedInstance] setLuckyEggsCount:[Utils decrementInt:luckyEggsCount]];
                 } else {
                     //syslog(@"[ERROR] Failed to deploy lucky egg.");
-                    // TODO: [[Device sharedInstance] setLuckyEggsCount:@0];
                 }
             }
             */
+            /*
             [[DeviceState sharedInstance] setSpinCount:@0];
-            [[DeviceState sharedInstance] setUltraQuestSpin:true];
-            sleep(1);
+            sleep(1 * [[[Device sharedInstance] delayMultiplier] intValue]);
             int attempts = 0;
             while ([[NSDate date] timeIntervalSinceDate:start] < 15.0 + [delay intValue]) {
                 if (![[DeviceState sharedInstance] gotItems]) {
@@ -770,21 +789,21 @@ static NSTimer *_timer = nil;
                     }
                     sleep(1);
                 } else {
+            */
                     syslog(@"[INFO] Successfully spun Pokestop");
-                    [[DeviceState sharedInstance] setUltraQuestSpin:false];
                     NSNumber *spins = [[DeviceState sharedInstance] spinCount];
                     [[DeviceState sharedInstance] setSpinCount:[Utils incrementInt:spins]];
-                    //sleep(3 * [[[Settings sharedInstance] delayMultiplier] intValue]);
+                    //sleep(1 * [[[Device sharedInstance] delayMultiplier] intValue]);
+            /*
                     break;
                 }
                 attempts++;
             }
-            [[DeviceState sharedInstance] setUltraQuestSpin:false];
             if (![[DeviceState sharedInstance] gotItems]) {
                 syslog(@"[ERROR] Failed to spin Pokestop");
             }
+            */
         }
-        
     } else {
         syslog(@"[DEBUG] Sleep 3 seconds before skipping...");
         sleep(3);
@@ -842,7 +861,7 @@ static NSTimer *_timer = nil;
         } else {
             locked = [[DeviceState sharedInstance] waitForData];;
             if (!locked) {
-                [[DeviceState sharedInstance] setFailedCount:0];
+                [[DeviceState sharedInstance] setFailedCount:@0];
                 syslog(@"[INFO] Pokemon loaded after %f", timeIntervalSince);
             }
         }

@@ -16,6 +16,7 @@
 // TODO: Pixel offsets in remote config
 // TODO: Fix https://developer.apple.com/documentation/xctest/xctestcase/1496273-adduiinterruptionmonitorwithdesc
 // TODO: Use https://github.com/mattstevens/RoutingHTTPServer for routes
+// TODO: Toggle WiFi https://stackoverflow.com/questions/14653058/disable-wifi-on-iphone-using-objective-c
 // REFERENCE: Find pixel location from screenshot - http://nicodjimenez.github.io/boxLabel/annotate.html
 
 @implementation UIC2
@@ -42,17 +43,32 @@ static BOOL _dataStarted = false;
                [[Device sharedInstance] osName], [[Device sharedInstance] osVersion],
                [[Device sharedInstance] delayMultiplier],
                [DeviceConfig tapMultiplier]);
+        
+        syslog(@"[INFO] CPU Usage: %@%%, Count: %lu, Uptime: %@, Thermal State: %@",
+               [[SystemInfo sharedInstance] cpuUsage],
+               (unsigned long)[[SystemInfo sharedInstance] processorCount],
+               [SystemInfo formatTimeInterval:[[SystemInfo sharedInstance] systemUptime]],
+               [SystemInfo formatThermalState:[[SystemInfo sharedInstance] thermalState]]);
+        
+        syslog(@"[INFO] Total Memory: %@, Used Memory: %@, Free Memory: %@",
+               [SystemInfo formatBytes:[[[SystemInfo sharedInstance] totalMemory] longValue]],
+               [SystemInfo formatBytes:[[[SystemInfo sharedInstance] usedMemory] longValue]],
+               [SystemInfo formatBytes:[[[SystemInfo sharedInstance] freeMemory] longValue]]);
+        
+        syslog(@"[INFO] Total Space: %@, Used Space: %@, Free Space: %@",
+               [SystemInfo formatBytes:[[[SystemInfo sharedInstance] totalSpace] longValue]],
+               [SystemInfo formatBytes:[[[SystemInfo sharedInstance] usedSpace] longValue]],
+               [SystemInfo formatBytes:[[[SystemInfo sharedInstance] freeSpace] longValue]]);
 
         // Print settings
         [[Settings sharedInstance] config];
-        
+
         if ([DeviceConfig sharedInstance] == nil) {
             return nil;
         }
         syslog(@"[DEBUG] DeviceConfig: %@", [DeviceConfig sharedInstance]);
-        
         syslog(@"[DEBUG] startupOldOkButton: %@", [[DeviceConfig sharedInstance] startupOldOkButton]);
-        
+
         //JarvisTestCase *jarvis = [[JarvisTestCase alloc] init];
         //[jarvis runTest];
         //[jarvis registerUIInterruptionHandler:@"System Dialog"];
@@ -71,19 +87,8 @@ static BOOL _dataStarted = false;
         if (![_httpServer start:&error]) {
             syslog(@"[ERROR] Error starting HTTP Server: %@", error);
         }
-        
-        NSNumber *delay = @5;
-        NSString *model = [[Device sharedInstance] model];
-        if ([model isEqualToString:@"iPhone 5s"]) {
-            delay = @30;
-        }
-        
-        // Delay execution of my block for 10 seconds.
-        dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, [delay intValue] * NSEC_PER_SEC);
-        dispatch_after(time, dispatch_get_main_queue(), ^{
-            [self login];
-            [self startHeartbeatLoop]; // TODO: Start heartbeat first time after receiving data.
-        });
+
+        [self login];
     }
     
     return self;
@@ -116,7 +121,6 @@ static BOOL _dataStarted = false;
         data[@"username"] = [[Device sharedInstance] username];
         data[@"min_level"] = [[Device sharedInstance] minLevel];
         data[@"max_level"] = [[Device sharedInstance] maxLevel];
-        //[data setObject:[[Device sharedInstance] maxLevel] forKey:@"max_level"];
         data[@"type"] = @"get_account";
         syslog(@"[DEBUG] Sending get_account request: %@", data);
         [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
@@ -124,12 +128,10 @@ static BOOL _dataStarted = false;
                   blocking:true
                 completion:^(NSDictionary *result) {
             syslog(@"[DEBUG] get_account postRequest sent, response %@", result);
-            /* TODO: Parse error response.
-             {
-                 error = "404 Not Found";
-                 status = error;
-             }
-             */
+            if ([[result objectForKey:@"status"] isEqualToString:@"error"]) {
+                syslog(@"[ERROR] Failed to get account from backend: %@", result[@"error"]);
+                return;
+            }
             NSDictionary *data = [result objectForKey:@"data"];
             NSString *user = data[@"username"];
             NSString *pass = data[@"password"];
@@ -155,10 +157,16 @@ static BOOL _dataStarted = false;
     // Wait until we get a response from the backend for `get_account` request.
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
     
-    // Start login sequence and detection after we connect to backend.
-    dispatch_async(_pixelCheckQueue, ^{
-        sleep(5);
-        [self startPixelCheckLoop];
+    // Delay execution of my block for 5/30 seconds depending on device model.
+    NSNumber *delay = [[Device sharedInstance] isOneGbDevice] ? @30 : @5; // SE
+    dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, [delay intValue] * NSEC_PER_SEC);
+    dispatch_after(time, dispatch_get_main_queue(), ^{
+        [self startHeartbeatLoop]; // TODO: Start heartbeat first time after receiving data.
+        // Start login sequence and detection after we connect to backend.
+        dispatch_async(_pixelCheckQueue, ^{
+            sleep(5);
+            [self startPixelCheckLoop];
+        });
     });
 }
 
@@ -182,7 +190,7 @@ static BOOL _dataStarted = false;
             sleep(15);
             NSDate *lastUpdate = [[DeviceState sharedInstance] lastUpdate];
             NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:lastUpdate];
-            if (timeIntervalSince >= 120 * [delayMultiplier intValue]) { // TODO: Make constant in Consts class
+            if (timeIntervalSince >= 120 * [delayMultiplier intValue]) { // TODO: heartbeatMaxTime config option
                 syslog(@"[ERROR] HTTP SERVER DIED. Restarting...");
                 [DeviceState restart];
             } else {
@@ -305,11 +313,12 @@ static BOOL _dataStarted = false;
     });
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
     int delayMultiplier = [[[Device sharedInstance] delayMultiplier] intValue];
-    if (isAgeVerification) {
+    bool autoLogin = [[Settings sharedInstance] autoLogin];
+    if (!autoLogin && isAgeVerification) {
         syslog(@"[INFO] Age verification screen.");
         [UIC2 ageVerification];
         [UIC2 loginAccount];
-    } else if (isStartupLoggedOut) {
+    } else if (!autoLogin && isStartupLoggedOut) {
         syslog(@"[INFO] App started in login screen.");
         [UIC2 loginAccount];
     } else if (isStartup) {
@@ -323,7 +332,8 @@ static BOOL _dataStarted = false;
         DeviceCoordinate *switchAccount = [[DeviceConfig sharedInstance] loginBannedSwitchAccount];
         [JarvisTestCase touch:[switchAccount tapX] withY:[switchAccount tapY]];
         sleep(1 * delayMultiplier);
-        [DeviceState logout:true];
+        //[DeviceState logout:true];
+        [DeviceState logout];
         sleep(2 * delayMultiplier);
     } else if (isStartupLogo) {
         syslog(@"[INFO] Startup logo found, waiting and trying again.");
@@ -343,8 +353,6 @@ static BOOL _dataStarted = false;
                   blocking:true
                 completion:^(NSDictionary *result) {}];
         sleep(2 * delayMultiplier);
-        //[[Device sharedInstance] setUsername:nil];
-        //[[Device sharedInstance] setIsLoggedIn:false];
         [DeviceState logout];
     } else if ([UIC2 isArPlusPrompt]) {
         syslog(@"[INFO] Found camera permissions prompt.");
@@ -428,7 +436,7 @@ static BOOL _dataStarted = false;
         sleep(2 * delayMultiplier);
     } else if ([[Device sharedInstance] isLoggedIn] &&
                (isLevelUp || isPokestopOpen) &&
-               ([[Settings sharedInstance] nearbyTracker] && ![UIC2 isTracker])) {
+               (([[Settings sharedInstance] nearbyTracker] && ![UIC2 isTracker]) || ![[Settings sharedInstance] nearbyTracker])) {
         syslog(@"[INFO] Found level up/Pokestop open/badge screen.");
         DeviceCoordinate *closeMenu = [[DeviceConfig sharedInstance] closeMenu];
         [JarvisTestCase touch:[closeMenu tapX] withY:[closeMenu tapY]];
@@ -490,7 +498,6 @@ static BOOL _dataStarted = false;
     [self startPixelCheckLoop];
 }
 
-// TODO: Move to DeviceState
 +(void)ageVerification
 {
     int delayMultiplier = [[[Device sharedInstance] delayMultiplier] intValue];
@@ -600,7 +607,7 @@ static BOOL _dataStarted = false;
         [JarvisTestCase touch:[willowPrompt tapX] withY:[willowPrompt tapY]];
         sleep(2 * delayMultiplier);
     }
-    sleep(3 * delayMultiplier); // TODO: If 5S/6, wait a little longer
+    sleep(3 * delayMultiplier);
     int failed = 0;
     int maxFails = 5;
     while (![self findAndClickPokemon]) {
@@ -620,7 +627,6 @@ static BOOL _dataStarted = false;
     }
     sleep(4 * delayMultiplier);
     // Check for camera permissions prompt.
-    // TODO: Check for actual AR prompt (only shows when camera has permissions?)
     syslog(@"[DEBUG] [TUT] Checking for AR(+) camera permissions prompt...");
     bool isArPrompt = [self isArPlusPrompt];
     if (isArPrompt) {
@@ -1086,6 +1092,11 @@ static BOOL _dataStarted = false;
         [JarvisTestCase touch:[tracker tapX] withY:[tracker tapY]];
         sleep(1 * [[[Device sharedInstance] delayMultiplier] intValue]);
     }
+}
+
++(void)freeScreen
+{
+    
 }
 
 @end

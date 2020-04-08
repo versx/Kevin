@@ -13,7 +13,7 @@
 
 @interface RequestController : NSObject
 
-+(RequestController *)sharedInstance;
++(instancetype)sharedInstance;
 
 /**
 * Handle data requests from the `/data` endpoint

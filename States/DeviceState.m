@@ -11,8 +11,7 @@
 
 -(id)init
 {
-    if ((self = [super init]))
-    {
+    if ((self = [super init])) {
         lastAction = @"";
         spinCount = @0;
         failedCount = @0;
@@ -21,8 +20,7 @@
         noQuestCount = @0;
         noItemsCount = @0;
         eggStart = [NSDate date];
-    }
-    
+    }    
     return self;
 }
 
@@ -66,7 +64,6 @@
 @synthesize delayQuest;
 @synthesize skipSpin;
 @synthesize isQuestInit;
-@synthesize ultraQuestSpin;
 @synthesize newCreated;
 @synthesize needsLogout;
 @synthesize isStartup;
@@ -92,14 +89,10 @@
     syslog(@"[INFO] Restarting...");
     dispatch_async(dispatch_get_main_queue(), ^{
         while (true) { // REVIEW: Uhh this doesn't look safe. ;-|
-            // TODO: UIControl().sendAction(#selector(NSXPCConnection.invalidate) to:UIApplication.shared for:nil);
-            UIControl *control = [[UIControl alloc] init];
-            UIApplication *app = [UIApplication sharedApplication];
-            NSXPCConnection *conn = [NSXPCConnection currentConnection];
-            SEL selector = [conn respondsToSelector:@selector(invalidate)];
-            [control sendAction:selector
-                             to:app
-                       forEvent:nil
+            SEL selector = [[NSXPCConnection currentConnection] respondsToSelector:@selector(invalidate)];
+            [[[UIControl alloc] init] sendAction:selector
+                                              to:[UIApplication sharedApplication]
+                                        forEvent:nil
             ];
         }
     });
@@ -114,13 +107,20 @@
 {
     syslog(@"[INFO] Attempting to logout.");
     dispatch_semaphore_t sem = dispatch_semaphore_create(0);
-    dispatch_async(dispatch_get_main_queue(), ^{
-        NSString *backendControllerUrl = [[Settings sharedInstance] backendControllerUrl];
+    //dispatch_async(dispatch_get_main_queue(), ^{
+        NSString *oldUsername = [[Device sharedInstance] username];
         [[Device sharedInstance] setIsLoggedIn:false];
+        [[Device sharedInstance] setUsername:nil];
+        [[Device sharedInstance] setPassword:nil];
+        [[Device sharedInstance] setLuckyEggsCount:@0];
+        [[Device sharedInstance] setLastEggDeployTime:nil];
         [[DeviceState sharedInstance] setDelayQuest:false];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+        
+        NSString *backendControllerUrl = [[Settings sharedInstance] backendControllerUrl];
         NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
         dict[@"uuid"] = [[Device sharedInstance] uuid];
-        dict[@"username"] = [[Device sharedInstance] username];
+        dict[@"username"] = oldUsername;
         dict[@"level"] = [[Device sharedInstance] level];
         dict[@"type"] = @"logged_out";
         [Utils postRequest:backendControllerUrl
@@ -128,12 +128,8 @@
                   blocking:true
                 completion:^(NSDictionary *result) {}
         ];
-        [[Device sharedInstance] setUsername:nil];
-        [[Device sharedInstance] setPassword:nil];
-        [[Device sharedInstance] setLuckyEggsCount:@0];
-        [[Device sharedInstance] setLastEggDeployTime:nil];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        [NSThread sleepForTimeInterval:0.5];
+        sleep(1);
+        /*
         if ([[[Device sharedInstance] username] isNullOrEmpty] &&
             [[Settings sharedInstance] enableAccountManager]) {
             NSMutableDictionary *payload = [[NSMutableDictionary alloc] init];
@@ -158,7 +154,7 @@
                     NSNumber *startLon = job[@"lon"];
                     NSNumber *lastLat = data[@"last_encounter_lat"];
                     NSNumber *lastLon = data[@"last_encounter_lon"];
-                    NSString *ptcToken = data[@"ptcToken"]; // TODO: Change from camel casing.
+                    NSString *ptcToken = data[@"ptcToken"]; // TODO: Change to ptc_token
                     CLLocation *startupLocation;
                     if (![startLat isEqualToNumber:@0.0] && ![startLon isEqualToNumber:@0.0]) {
                         startupLocation = [Utils createCoordinate:[startLat doubleValue] lon:[startLon doubleValue]];
@@ -183,7 +179,7 @@
                         [[Device sharedInstance] setPassword:password];
                         [[Device sharedInstance] setPtcToken:ptcToken];
                         [[Device sharedInstance] setLevel:level];
-                        // TODO: [[Device sharedInstance] setIsLoggedIn:true];
+                        [[Device sharedInstance] setIsLoggedIn:true];
                         if (![ptcToken isNullOrEmpty]) {
                             [[NSUserDefaults standardUserDefaults] setValue:ptcToken forKey:TOKEN_USER_DEFAULT_KEY];
                             [[NSUserDefaults standardUserDefaults] synchronize];
@@ -212,8 +208,21 @@
                 }
             }];
         }
+        */
+        
+        [[Device sharedInstance] setIsLoggedIn:false];
+        [[Device sharedInstance] setUsername:nil];
+        [[Device sharedInstance] setPassword:nil];
+        [[Device sharedInstance] setLuckyEggsCount:@0];
+        [[Device sharedInstance] setLastEggDeployTime:nil];
+        [[DeviceState sharedInstance] setDelayQuest:false];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:LOGIN_USER_DEFAULT_KEY];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:TOKEN_USER_DEFAULT_KEY];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+        
         dispatch_semaphore_signal(sem);
-    });
+    //});
     
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
     if (!skipRestart) {

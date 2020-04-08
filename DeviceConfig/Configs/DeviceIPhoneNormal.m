@@ -9,6 +9,30 @@
 
 @implementation DeviceIPhoneNormal
 
+static DeviceCoordinateScalar *scalar;
+static double _tapScalar;
+
+-(double)tapScalar {
+    return _tapScalar;
+}
+
+-(id)init:(int)width height:(int)height multiplier:(double)multiplier tapMultiplier:(double)tapMultiplier
+{
+    if ((self = [super init])) {
+        syslog(@"[DEBUG] Device Scale: %dx%d multiplier: %f tapMultiplier: %f", width, height, multiplier, tapMultiplier);
+        scalar = [[DeviceCoordinateScalar alloc] init:width
+                                            heightNow:height
+                                          widthTarget:375
+                                         heightTarget:667
+                                           multiplier:0.9//multiplier
+                                        tapMultiplier:tapMultiplier
+        ];
+        _tapScalar = tapMultiplier;
+    }
+    return self;
+}
+
+
 #pragma mark Login Coordinates
 
 -(DeviceCoordinate *)loginNewPlayer {

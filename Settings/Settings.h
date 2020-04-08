@@ -32,6 +32,7 @@
 -(BOOL)ultraQuests;
 -(BOOL)deployEggs;
 -(BOOL)nearbyTracker;
+-(BOOL)autoLogin;
 
 -(NSString *)loggingUrl;
 -(NSNumber *)loggingPort;

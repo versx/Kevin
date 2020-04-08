@@ -131,7 +131,7 @@
         syslog(@"[WARN] Touch coordinates %dx%d are greater than screen size %fx%f", x, y, width, height);
         return;
     }
-    syslog(@"[DEBUG] touch %d %d", x, y);
+    //syslog(@"[DEBUG] touch %d %d", x, y);
     @try {
         if ([NSThread isMainThread]) {
             [viewTester tapScreenAtPoint:CGPointMake(x, y)];

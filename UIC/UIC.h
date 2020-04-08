@@ -14,6 +14,7 @@
 #import "../Jarvis++/Jarvis__.h"
 #import "../Net/HttpClientConnection.h"
 #import "../Settings/Settings.h"
+#import "../Utilities/SystemInfo.h"
 
 #import <CocoaHTTPServer/HTTPServer.h>
 #import <CoreLocation/CoreLocation.h>

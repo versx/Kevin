@@ -133,11 +133,9 @@ static int _jitterCorner;
 -(NSString *)handleDataRequest:(NSDictionary *)params
 {
     CLLocation *currentLocation = [[DeviceState sharedInstance] currentLocation];
-    //if (currentLocation == nil) {
-    //    return @"{\"status\": \"error\", \"message\": \"currentLocation is null\"}";
-    //}
     [[DeviceState sharedInstance] setLastUpdate:[NSDate date]];
-    CLLocation *currentLoc = [Utils createCoordinate:currentLocation.coordinate.latitude lon: currentLocation.coordinate.longitude];
+    CLLocation *currentLoc = [Utils createCoordinate:currentLocation.coordinate.latitude
+                                                 lon:currentLocation.coordinate.longitude];
     //NSNumber *targetMaxDistance = _targetMaxDistance;
     NSString *pokemonEncounterId = [[DeviceState sharedInstance] pokemonEncounterId];
     NSMutableDictionary *data = [params mutableCopy];
@@ -175,14 +173,15 @@ static int _jitterCorner;
         bool onlyInvalidGmos = [data[@"only_invalid_gmos"] boolValue] ?: false;
         bool containsGmo = [data[@"contains_gmos"] boolValue] ?: true;
         NSNumber *luckyEggs = data[@"lucky_eggs"] ?: @0;
+        NSNumber *items = data[@"items"] ?: @0;
         
         NSNumber *diffLat = @(currentLoc.coordinate.latitude - [targetLat doubleValue]);
         NSNumber *diffLon = @(currentLoc.coordinate.longitude - [targetLon doubleValue]);
         
         // MIZU tut stuff
-        //NSString *spinFortId = data[@"spin_fort_id"] ?: @"";
-        //NSNumber *spinFortLat = data[@"spin_fort_lat"] ?: @0.0;
-        //NSNumber *spinFortLon = data[@"spin_fort_lon"] ?: @0.0;
+        NSString *spinFortId = data[@"spin_fort_id"] ?: @"";
+        NSNumber *spinFortLat = data[@"spin_fort_lat"] ?: @0.0;
+        NSNumber *spinFortLon = data[@"spin_fort_lon"] ?: @0.0;
         if ([level intValue] > 0) {
             if ([[Device sharedInstance] level] != level) {
                 NSNumber *oldLevel = [[Device sharedInstance] level];
@@ -213,7 +212,7 @@ static int _jitterCorner;
                     }
                 }
             }
-            // If we're provided a `luckyegg_count` from backend, use it.
+            // If we're provided a `lucky_eggs` from backend, use it.
             if ([luckyEggs intValue] > 0) {
                 syslog(@"[DEBUG] Setting lucky egg value from backend: %@", luckyEggs);
                 [[Device sharedInstance] setLuckyEggsCount:luckyEggs];
@@ -224,8 +223,7 @@ static int _jitterCorner;
         //syslog(@"[DEBUG] [RES1] inArea: %s level: %@ nearby: %@ wild: %@ quests: %@ encounters: %@ plat: %@ plon: %@ encounterResponseId: %@ tarlat: %@ tarlon: %@ emptyGMO: %s invalidGMO: %s containsGMO: %s", (inArea ? "Yes" : "No"), level, nearby, wild, quests, encounters, pokemonLat, pokemonLon, pokemonEncounterIdResult, targetLat, targetLon, (onlyEmptyGmos ? "Yes" : "No"), (onlyInvalidGmos ? "Yes" : "No"), (containsGmo ? "Yes" : "No"));
         //syslog(@"[DEBUG] SpinFortLat: %@ SpinFortLon: %@", spinFortLat, spinFortLon);
 
-        //NSNumber *itemDistance = @10000.0;
-        /*
+        NSNumber *itemDistance = @10000.0;
         if (![spinFortId isMemberOfClass:[NSNull class]] && ![spinFortLat isMemberOfClass:[NSNull class]]) {
             if ([spinFortLat doubleValue] != 0.0) {
                 CLLocation *fortLocation = [Utils createCoordinate:[spinFortLat doubleValue] lon:[spinFortLon doubleValue]];
@@ -233,7 +231,6 @@ static int _jitterCorner;
                 syslog(@"[DEBUG] ItemDistance: %@", itemDistance);
             }
         }
-        */
         // End MIZU tut stuff
         
         NSString *msg;
@@ -250,7 +247,8 @@ static int _jitterCorner;
                         if (pokemonLat != 0 && pokemonLon != 0 && pokemonEncounterId == pokemonEncounterIdResult) {
                             [[DeviceState sharedInstance] setWaitRequiresPokemon:false];
                             //CLLocation *oldLocation = [[DeviceState sharedInstance] currentLocation];
-                            [[DeviceState sharedInstance] setCurrentLocation:[Utils createCoordinate:[pokemonLat doubleValue] lon:[pokemonLon doubleValue]]];
+                            [[DeviceState sharedInstance] setCurrentLocation:[Utils createCoordinate:[pokemonLat doubleValue]
+                                                                                                 lon:[pokemonLon doubleValue]]];
                             //CLLocation *newLocation = [[DeviceState sharedInstance] currentLocation];
                             //_encounterDistance = [NSNumber numberWithDouble:[newLocation distanceFromLocation:oldLocation]];
                             [[DeviceState sharedInstance] setPokemonEncounterId:nil];
@@ -285,18 +283,20 @@ static int _jitterCorner;
             msg = @"Got Data without GMO";
         }
 
-        if (![[DeviceState sharedInstance] gotQuest] && quests > 0) {
+        if (![[DeviceState sharedInstance] gotQuest] && [quests intValue] > 0) {
             [[DeviceState sharedInstance] setGotQuest:true];
             [[DeviceState sharedInstance] setGotQuestEarly:true];
+            syslog(@"[DEBUG] Got quest.");
         }
         
-        //if (![[DeviceState sharedInstance] gotItems] && items > 0 && itemDistance < 30.0) {
-        //    [[DeviceState sharedInstance] setGotItems:true];
-        //    syslog(@"[DEBUG] Got items.");
-        //}
+        if (![[DeviceState sharedInstance] gotItems] && [items intValue] > 0) {//} && [itemDistance doubleValue] < 30.0) {
+            [[DeviceState sharedInstance] setGotItems:true];
+            syslog(@"[DEBUG] Got items.");
+        }
         
-        if (![[DeviceState sharedInstance] gotIV] && encounters > 0) {
+        if (![[DeviceState sharedInstance] gotIV] && [encounters intValue] > 0) {
             [[DeviceState sharedInstance] setGotIV:true];
+            syslog(@"[DEBUG] Got IV.");
         }
         
         syslog(@"[DEBUG] [GMO] %@", msg);

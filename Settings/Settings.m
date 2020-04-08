@@ -29,6 +29,7 @@ static NSNumber *_minDelayLogout;
 static BOOL _ultraQuests;
 static BOOL _deployEggs;
 static BOOL _nearbyTracker;
+static BOOL _autoLogin;
 
 static NSString *_loggingUrl;
 static NSNumber *_loggingPort;
@@ -40,8 +41,6 @@ static NSString *plistFileName = @"config.plist";
 -(NSDictionary *)config {
     return _config;
 }
-
-// TODO: Convert to synthesized properties
 
 -(BOOL)enableAccountManager {
     return _enableAccountManager;
@@ -97,6 +96,9 @@ static NSString *plistFileName = @"config.plist";
 -(BOOL)nearbyTracker {
     return _nearbyTracker;
 }
+-(BOOL)autoLogin {
+    return _autoLogin;
+}
 
 -(NSString *)loggingUrl {
     return _loggingUrl;
@@ -144,6 +146,7 @@ static NSString *plistFileName = @"config.plist";
         _ultraQuests = [_config[@"ultraQuests"] boolValue] ?: DEFAULT_ULTRA_QUESTS;
         _deployEggs = [_config[@"deployEggs"] boolValue] ?: DEFAULT_DEPLOY_EGGS;
         _nearbyTracker = [_config[@"nearbyTracker"] boolValue] ?: DEFAULT_NEARBY_TRACKER;
+        _autoLogin = [_config[@"autoLogin"] boolValue] ?: DEFAULT_AUTO_LOGIN;
         
         _loggingUrl = _config[@"loggingURL"] ?: @"";
         _loggingPort = _config[@"loggingPort"] ?: @9999;

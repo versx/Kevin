@@ -12,7 +12,7 @@
 
 @interface JobController : NSObject
 
-+(JobController *)sharedInstance;
++(instancetype)sharedInstance;
 
 /**
 * Send an `init` request to backend and initialize

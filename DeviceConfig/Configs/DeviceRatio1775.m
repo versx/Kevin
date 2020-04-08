@@ -19,6 +19,7 @@ static double _tapScalar;
 -(id)init:(int)width height:(int)height multiplier:(double)multiplier tapMultiplier:(double)tapMultiplier
 {
     if ((self = [super init])) {
+        syslog(@"[DEBUG] Device Scale: %dx%d multiplier: %f tapMultiplier: %f", width, height, multiplier, tapMultiplier);
         scalar = [[DeviceCoordinateScalar alloc] init:width
                                             heightNow:height
                                           widthTarget:320
