@@ -20,7 +20,7 @@
         noQuestCount = @0;
         noItemsCount = @0;
         eggStart = [NSDate date];
-    }    
+    }
     return self;
 }
 
@@ -103,7 +103,7 @@
     [self logout:false];
 }
 
-+(void)logout:(BOOL)skipRestart
++(void)logout:(bool)skipRestart
 {
     syslog(@"[INFO] Attempting to logout.");
     dispatch_semaphore_t sem = dispatch_semaphore_create(0);
@@ -122,7 +122,7 @@
         dict[@"uuid"] = [[Device sharedInstance] uuid];
         dict[@"username"] = oldUsername;
         dict[@"level"] = [[Device sharedInstance] level];
-        dict[@"type"] = @"logged_out";
+        dict[@"type"] = TYPE_LOGGED_OUT;
         [Utils postRequest:backendControllerUrl
                       dict:dict
                   blocking:true

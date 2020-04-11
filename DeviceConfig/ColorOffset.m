@@ -19,8 +19,7 @@
 
 -(id)init:(double)red green:(double)green blue:(double)blue
 {
-    self = [super init];
-    if (self) {
+    if ((self = [super init])) {
         self.red = red;
         self.green = green;
         self.blue = blue;

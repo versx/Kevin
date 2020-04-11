@@ -59,36 +59,6 @@ static BOOL _dataStarted = false;
                [SystemInfo formatBytes:[[[SystemInfo sharedInstance] totalSpace] longValue]],
                [SystemInfo formatBytes:[[[SystemInfo sharedInstance] usedSpace] longValue]],
                [SystemInfo formatBytes:[[[SystemInfo sharedInstance] freeSpace] longValue]]);
-
-        // Print settings
-        [[Settings sharedInstance] config];
-
-        if ([DeviceConfig sharedInstance] == nil) {
-            return nil;
-        }
-        syslog(@"[DEBUG] DeviceConfig: %@", [DeviceConfig sharedInstance]);
-        syslog(@"[DEBUG] startupOldOkButton: %@", [[DeviceConfig sharedInstance] startupOldOkButton]);
-
-        //JarvisTestCase *jarvis = [[JarvisTestCase alloc] init];
-        //[jarvis runTest];
-        //[jarvis registerUIInterruptionHandler:@"System Dialog"];
-
-        // Initalize our http server
-        _httpServer = [[HTTPServer alloc] init];
-        //[_httpServer setType:@"_http._tcp."];
-        [_httpServer setPort:[[[Settings sharedInstance] port] intValue]];
-        
-        // We're going to extend the base HTTPConnection class with our HttpClientConnection class.
-        // This allows us to do all kinds of customizations.
-        [_httpServer setConnectionClass:[HttpClientConnection class]];
-
-        // TODO: Attempt to start HTTP server, if fails, reboot app or try again.
-        NSError *error = nil;
-        if (![_httpServer start:&error]) {
-            syslog(@"[ERROR] Error starting HTTP Server: %@", error);
-        }
-
-        [self login];
     }
     
     return self;
@@ -104,6 +74,46 @@ static BOOL _dataStarted = false;
 
 
 #pragma mark Login Handlers
+
+-(void)start
+{
+    /*
+    int imageCount = _dyld_image_count();
+    for (int i = 0; i < imageCount; i++) {
+        if (strcmp(_dyld_get_image_name(i), "") == 0) {
+            
+        }
+        NSLog(@"[Jarvis] [DYLD] %d - %s", i, _dyld_get_image_name(i));
+    }
+    */
+    
+    // Print config settings
+    [[Settings sharedInstance] config];
+    
+    if ([DeviceConfig sharedInstance] == nil) {
+        return;
+    }
+    syslog(@"[DEBUG] DeviceConfig: %@", [DeviceConfig sharedInstance]);
+    syslog(@"[DEBUG] startupOldOkButton: %@", [[DeviceConfig sharedInstance] startupOldOkButton]);
+    
+    //JarvisTestCase *jarvis = [[JarvisTestCase alloc] init];
+    //[jarvis runTest];
+    //[jarvis registerUIInterruptionHandler:@"System Dialog"];
+
+    // Initalize our http server
+    _httpServer = [[HTTPServer alloc] init];
+    [_httpServer setPort:[[[Settings sharedInstance] port] intValue]];
+    [_httpServer setConnectionClass:[HttpClientConnection class]];
+
+    // TODO: Attempt to start HTTP server, if fails, reboot app or try again.
+    NSError *error = nil;
+    if (![_httpServer start:&error]) {
+        syslog(@"[ERROR] Error starting HTTP Server: %@", error);
+        return;
+    }
+
+    [self login];
+}
 
 -(void)login
 {
@@ -121,7 +131,7 @@ static BOOL _dataStarted = false;
         data[@"username"] = [[Device sharedInstance] username];
         data[@"min_level"] = [[Device sharedInstance] minLevel];
         data[@"max_level"] = [[Device sharedInstance] maxLevel];
-        data[@"type"] = @"get_account";
+        data[@"type"] = TYPE_GET_ACCOUNT;
         syslog(@"[DEBUG] Sending get_account request: %@", data);
         [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
                       dict:data
@@ -158,7 +168,7 @@ static BOOL _dataStarted = false;
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
     
     // Delay execution of my block for 5/30 seconds depending on device model.
-    NSNumber *delay = [[Device sharedInstance] isOneGbDevice] ? @30 : @5; // SE
+    NSNumber *delay = [[Device sharedInstance] isOneGbDevice] ? @15 /*5S*/ : @5; /*SE*/
     dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, [delay intValue] * NSEC_PER_SEC);
     dispatch_after(time, dispatch_get_main_queue(), ^{
         [self startHeartbeatLoop]; // TODO: Start heartbeat first time after receiving data.
@@ -177,7 +187,7 @@ static BOOL _dataStarted = false;
     NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
     data[@"uuid"] = [[Device sharedInstance] uuid];
     data[@"username"] = [[Device sharedInstance] username];
-    data[@"type"] = @"heartbeat";
+    data[@"type"] = TYPE_HEARTBEAT;
     [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
                   dict:data
               blocking:false
@@ -185,12 +195,13 @@ static BOOL _dataStarted = false;
     ];
     NSNumber *delayMultiplier = [[Device sharedInstance] delayMultiplier];
     dispatch_async(_heartbeatQueue, ^{
+        NSNumber *heartbeatMaxTime = [[Settings sharedInstance] heartbeatMaxTime];
         while (heartbeatRunning) {
             // Check if time since last check-in was within 2 minutes, if not reboot device.
             sleep(15);
             NSDate *lastUpdate = [[DeviceState sharedInstance] lastUpdate];
             NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:lastUpdate];
-            if (timeIntervalSince >= 120 * [delayMultiplier intValue]) { // TODO: heartbeatMaxTime config option
+            if (timeIntervalSince >= [heartbeatMaxTime intValue] * [delayMultiplier intValue]) {
                 syslog(@"[ERROR] HTTP SERVER DIED. Restarting...");
                 [DeviceState restart];
             } else {
@@ -313,12 +324,11 @@ static BOOL _dataStarted = false;
     });
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
     int delayMultiplier = [[[Device sharedInstance] delayMultiplier] intValue];
-    bool autoLogin = [[Settings sharedInstance] autoLogin];
-    if (!autoLogin && isAgeVerification) {
+    if (isAgeVerification && ![[Settings sharedInstance] autoLogin]) {
         syslog(@"[INFO] Age verification screen.");
         [UIC2 ageVerification];
         [UIC2 loginAccount];
-    } else if (!autoLogin && isStartupLoggedOut) {
+    } else if (isStartupLoggedOut && ![[Settings sharedInstance] autoLogin]) {
         syslog(@"[INFO] App started in login screen.");
         [UIC2 loginAccount];
     } else if (isStartup) {
@@ -347,7 +357,7 @@ static BOOL _dataStarted = false;
         NSMutableDictionary *invalidData = [[NSMutableDictionary alloc] init];
         invalidData[@"uuid"] = [[Device sharedInstance] uuid];
         invalidData[@"username"] = [[Device sharedInstance] username];
-        invalidData[@"type"] = @"account_invalid_credentials";
+        invalidData[@"type"] = TYPE_ACCOUNT_INVALID_CREDENTIALS;
         [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
                       dict:invalidData
                   blocking:true
@@ -421,7 +431,7 @@ static BOOL _dataStarted = false;
         NSMutableDictionary *bannedData = [[NSMutableDictionary alloc] init];
         bannedData[@"uuid"] = [[Device sharedInstance] uuid];
         bannedData[@"username"] = [[Device sharedInstance] username];
-        bannedData[@"type"] = @"account_banned";
+        bannedData[@"type"] = TYPE_ACCOUNT_BANNED;
         [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
                       dict:bannedData
                   blocking:true
@@ -709,7 +719,7 @@ static BOOL _dataStarted = false;
     NSMutableDictionary *tutData = [[NSMutableDictionary alloc] init];
     tutData[@"uuid"] = [[Device sharedInstance] uuid];
     tutData[@"username"] = [[Device sharedInstance] username];
-    tutData[@"type"] = @"tutorial_done";
+    tutData[@"type"] = TYPE_TUTORIAL_DONE;
     [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
                   dict:tutData
               blocking:true

@@ -134,7 +134,6 @@
 
 -(id)init
 {
-    NSLog(@"[INFO] init");
     if ((self = [super init])) {
         ptcToken = [[NSUserDefaults standardUserDefaults] valueForKey:TOKEN_USER_DEFAULT_KEY] ?: @"";
         level = @0;

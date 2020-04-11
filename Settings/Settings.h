@@ -14,13 +14,14 @@
 
 -(NSDictionary *)config;
 
--(BOOL)enableAccountManager;
+-(bool)enableAccountManager;
 -(NSString *)backendControllerUrl;
 -(NSString *)backendRawUrl;
 -(NSString *)pixelConfigUrl;
 -(NSString *)token;
 -(NSNumber *)port;
 -(NSNumber *)targetMaxDistance;
+-(NSNumber *)heartbeatMaxTime;
 -(NSNumber *)pokemonMaxTime;
 -(NSNumber *)raidMaxTime;
 -(NSNumber *)jitterValue;
@@ -29,15 +30,16 @@
 -(NSNumber *)maxNoQuestCount;
 -(NSNumber *)maxWarningTimeRaid;
 -(NSNumber *)minDelayLogout;
--(BOOL)ultraQuests;
--(BOOL)deployEggs;
--(BOOL)nearbyTracker;
--(BOOL)autoLogin;
+-(bool)ultraIV;
+-(bool)ultraQuests;
+-(bool)deployEggs;
+-(bool)nearbyTracker;
+-(bool)autoLogin;
 
 -(NSString *)loggingUrl;
 -(NSNumber *)loggingPort;
--(BOOL)loggingTls;
--(BOOL)loggingTcp;
+-(bool)loggingTls;
+-(bool)loggingTcp;
 
 
 //-(NSDictionary *)loadSettings;

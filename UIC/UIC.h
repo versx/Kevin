@@ -22,9 +22,11 @@
 #include <string.h>
 #include <sys/utsname.h>
 #include <math.h>
+#import <mach-o/dyld.h>
 
 @interface UIC2 : NSObject
 
+-(void)start;
 -(void)login;
 -(void)startPixelCheckLoop;
 -(void)startHeartbeatLoop;

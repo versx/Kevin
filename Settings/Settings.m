@@ -10,7 +10,7 @@
 @implementation Settings
 
 static NSDictionary *_config;
-static BOOL _enableAccountManager;
+static bool _enableAccountManager;
 static NSString *_backendControllerUrl;
 static NSString *_backendRawUrl;
 static NSString *_token;
@@ -18,6 +18,7 @@ static NSString *_pixelConfigUrl;
 static NSNumber *_port;
 static NSNumber *_delayMultiplier;
 static NSNumber *_targetMaxDistance;
+static NSNumber * _heartbeatMaxTime;
 static NSNumber *_pokemonMaxTime;
 static NSNumber *_raidMaxTime;
 static NSNumber *_jitterValue;
@@ -26,15 +27,16 @@ static NSNumber *_maxFailedCount;
 static NSNumber *_maxNoQuestCount;
 static NSNumber *_maxWarningTimeRaid;
 static NSNumber *_minDelayLogout;
-static BOOL _ultraQuests;
-static BOOL _deployEggs;
-static BOOL _nearbyTracker;
-static BOOL _autoLogin;
+static bool _ultraIV;
+static bool _ultraQuests;
+static bool _deployEggs;
+static bool _nearbyTracker;
+static bool _autoLogin;
 
 static NSString *_loggingUrl;
 static NSNumber *_loggingPort;
-static BOOL _loggingTls;
-static BOOL _loggingTcp; // Use TCP, otherwise UDP protocol
+static bool _loggingTls;
+static bool _loggingTcp; // Use TCP, otherwise UDP protocol
 
 static NSString *plistFileName = @"config.plist";
 
@@ -42,7 +44,7 @@ static NSString *plistFileName = @"config.plist";
     return _config;
 }
 
--(BOOL)enableAccountManager {
+-(bool)enableAccountManager {
     return _enableAccountManager;
 }
 -(NSString *)backendControllerUrl {
@@ -62,6 +64,9 @@ static NSString *plistFileName = @"config.plist";
 }
 -(NSNumber *)targetMaxDistance {
     return _targetMaxDistance;
+}
+-(NSNumber *)heartbeatMaxTime {
+    return _heartbeatMaxTime;
 }
 -(NSNumber *)pokemonMaxTime {
     return _pokemonMaxTime;
@@ -87,16 +92,19 @@ static NSString *plistFileName = @"config.plist";
 -(NSNumber *)minDelayLogout {
     return _minDelayLogout;
 }
--(BOOL)ultraQuests {
+-(bool)ultraIV {
+    return _ultraIV;
+}
+-(bool)ultraQuests {
     return _ultraQuests;
 }
--(BOOL)deployEggs {
+-(bool)deployEggs {
     return _deployEggs;
 }
--(BOOL)nearbyTracker {
+-(bool)nearbyTracker {
     return _nearbyTracker;
 }
--(BOOL)autoLogin {
+-(bool)autoLogin {
     return _autoLogin;
 }
 
@@ -106,10 +114,10 @@ static NSString *plistFileName = @"config.plist";
 -(NSNumber *)loggingPort {
     return _loggingPort;
 }
--(BOOL)loggingTls {
+-(bool)loggingTls {
     return _loggingTls;
 }
--(BOOL)loggingTcp {
+-(bool)loggingTcp {
     return _loggingTcp;
 }
 
@@ -127,7 +135,7 @@ static NSString *plistFileName = @"config.plist";
             return;
         }
         _config = [sharedInstance fetchRemoteConfig:remoteConfigUrl];//[sharedInstance loadSettings];
-        _enableAccountManager = [_config[@"enableAccountManager"] boolValue] ?: DEFAULT_ENABLE_ACCOUNT_MANAGER;
+        _enableAccountManager = [[_config objectForKey:@"enableAccountManager"] boolValue];
         _backendControllerUrl = _config[@"backendControllerURL"];
         _backendRawUrl = _config[@"backendRawURL"];
         _pixelConfigUrl = _config[@"pixelConfigURL"];
@@ -135,6 +143,7 @@ static NSString *plistFileName = @"config.plist";
         _port = _config[@"port"] ?: DEFAULT_PORT;
         _delayMultiplier = _config[@"delayMultiplier"] ?: DEFAULT_DELAY_MULTIPLIER;
         _targetMaxDistance = _config[@"targetMaxDistance"] ?: DEFAULT_TARGET_MAX_DISTANCE;
+        _heartbeatMaxTime = _config[@"heartbeatMaxTime"] ?: DEFAULT_HEARTBEAT_MAX_TIME;
         _pokemonMaxTime = _config[@"pokemonMaxTime"] ?: DEFAULT_POKEMON_MAX_TIME;
         _raidMaxTime = _config[@"raidMaxTime"] ?: DEFAULT_RAID_MAX_TIME;
         _jitterValue = _config[@"jitterValue"] ?: @(5.0e-05); // 5.0e-05 0.000005 // ?: DEFAULT_JITTER_VALUE;
@@ -143,15 +152,16 @@ static NSString *plistFileName = @"config.plist";
         _maxNoQuestCount = _config[@"maxNoQuestCount"] ?: DEFAULT_MAX_NO_QUEST_COUNT;
         _maxWarningTimeRaid = _config[@"maxWarningTimeRaid"] ?: DEFAULT_MAX_WARNING_TIME_RAID;
         _minDelayLogout = _config[@"minDelayLogout"] ?: DEFAULT_MIN_DELAY_LOGOUT;
-        _ultraQuests = [_config[@"ultraQuests"] boolValue] ?: DEFAULT_ULTRA_QUESTS;
-        _deployEggs = [_config[@"deployEggs"] boolValue] ?: DEFAULT_DEPLOY_EGGS;
-        _nearbyTracker = [_config[@"nearbyTracker"] boolValue] ?: DEFAULT_NEARBY_TRACKER;
-        _autoLogin = [_config[@"autoLogin"] boolValue] ?: DEFAULT_AUTO_LOGIN;
+        _ultraIV = [[_config objectForKey:@"ultraIV"] boolValue];
+        _ultraQuests = [[_config objectForKey:@"ultraQuests"] boolValue];
+        _deployEggs = [[_config objectForKey:@"deployEggs"] boolValue];
+        _nearbyTracker = [[_config objectForKey:@"nearbyTracker"] boolValue];
+        _autoLogin = [[_config objectForKey:@"autoLogin"] boolValue];
         
         _loggingUrl = _config[@"loggingURL"] ?: @"";
         _loggingPort = _config[@"loggingPort"] ?: @9999;
-        _loggingTls = [_config[@"loggingTLS"] boolValue] ?: false;
-        _loggingTcp = [_config[@"loggingTCP"] boolValue] ?: true;
+        _loggingTls = [[_config objectForKey:@"loggingTLS"] boolValue];// ?: false;
+        _loggingTcp = [[_config objectForKey:@"loggingTCP"] boolValue];// ?: true;
     });
     return sharedInstance;
 }

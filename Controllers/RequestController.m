@@ -398,13 +398,19 @@ static int _jitterCorner;
 
 -(NSString *)handleAccountRequest
 {
-    syslog(@"[INFO] Received account request from client.");
-    NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
-    data[@"username"] = [[Device sharedInstance] username];
-    data[@"password"] = [[Device sharedInstance] password];
-    NSString *response = [Utils toJsonString:data withPrettyPrint:true];
-    syslog(@"[INFO] Pretty print account response: %@", response);
-    return response;
+    syslog(@"[INFO] Received account request from client for auto login.");
+    //NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
+    //data[@"username"] = [[Device sharedInstance] username];
+    //data[@"password"] = [[Device sharedInstance] password];
+    //NSString *response = [Utils toJsonString:data withPrettyPrint:false];
+    NSString *response = [NSString stringWithFormat:@"{\"username\":\"%@\",\"password\":\"%@\"}",
+                          [[Device sharedInstance] username],
+                          [[Device sharedInstance] password]];
+    if ([[Settings sharedInstance] autoLogin]) {
+        syslog(@"[INFO] Auto login account response: %@", response);
+        return response;
+    }
+    return JSON_OK;
 }
 
 -(void)showMessage:(NSString*)message withTitle:(NSString *)title

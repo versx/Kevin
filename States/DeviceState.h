@@ -21,18 +21,18 @@
 @property (nonatomic, readwrite, copy) CLLocation *lastLocation;
 @property (nonatomic, readwrite, copy) CLLocation *lastQuestLocation;
 
-@property (nonatomic, readwrite, assign) BOOL gotIV;
-@property (nonatomic, readwrite, assign) BOOL gotQuest;
-@property (nonatomic, readwrite, assign) BOOL gotQuestEarly;
-@property (nonatomic, readwrite, assign) BOOL gotItems;
-@property (nonatomic, readwrite, assign) BOOL waitForData;
-@property (nonatomic, readwrite, assign) BOOL waitRequiresPokemon;
-@property (nonatomic, readwrite, assign) BOOL delayQuest;
-@property (nonatomic, readwrite, assign) BOOL skipSpin;
-@property (nonatomic, readwrite, assign) BOOL isQuestInit;
-@property (nonatomic, readwrite, assign) BOOL newCreated;
-@property (nonatomic, readwrite, assign) BOOL needsLogout;
-@property (nonatomic, readwrite, assign) BOOL isStartup;
+@property (nonatomic, readwrite, assign) bool gotIV;
+@property (nonatomic, readwrite, assign) bool gotQuest;
+@property (nonatomic, readwrite, assign) bool gotQuestEarly;
+@property (nonatomic, readwrite, assign) bool gotItems;
+@property (nonatomic, readwrite, assign) bool waitForData;
+@property (nonatomic, readwrite, assign) bool waitRequiresPokemon;
+@property (nonatomic, readwrite, assign) bool delayQuest;
+@property (nonatomic, readwrite, assign) bool skipSpin;
+@property (nonatomic, readwrite, assign) bool isQuestInit;
+@property (nonatomic, readwrite, assign) bool newCreated;
+@property (nonatomic, readwrite, assign) bool needsLogout;
+@property (nonatomic, readwrite, assign) bool isStartup;
 //static BOOL _newLogIn;
 
 @property (nonatomic, readwrite, assign) NSNumber *failedGetJobCount;
@@ -53,7 +53,7 @@
 
 
 +(void)logout;
-+(void)logout:(BOOL)skipRestart;
++(void)logout:(bool)skipRestart;
 +(void)restart;
 +(void)checkWarning:(NSString *)timestamp;
 

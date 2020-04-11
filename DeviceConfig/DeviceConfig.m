@@ -46,7 +46,7 @@
                 case 375: // iPhone Normal (6, 6S, 7)
                     syslog(@"[INFO] Normal Phone size detected (Width: %f, Height: %f, Ratio: %d)",
                            width, height, ratio);
-                    sharedInstance = [[DeviceRatio1775 alloc] init:width
+                    sharedInstance = [[DeviceIPhoneNormal alloc] init:width
                                                                height:height
                                                            multiplier:0.9//0.65//1.17 0.853 //1.0
                                                         tapMultiplier:tapMultiplier];//1.17 0.47976] //tapMultiplier];
