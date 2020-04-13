@@ -9,6 +9,7 @@
 
 @implementation DeviceIPhoneNormal
 
+/*
 static DeviceCoordinateScalar *scalar;
 static double _tapScalar;
 
@@ -31,6 +32,7 @@ static double _tapScalar;
     }
     return self;
 }
+*/
 
 
 #pragma mark Login Coordinates

@@ -106,7 +106,7 @@
 +(void)logout:(bool)skipRestart
 {
     syslog(@"[INFO] Attempting to logout.");
-    dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+    //dispatch_semaphore_t sem = dispatch_semaphore_create(0);
     //dispatch_async(dispatch_get_main_queue(), ^{
         NSString *oldUsername = [[Device sharedInstance] username];
         [[Device sharedInstance] setIsLoggedIn:false];
@@ -221,10 +221,10 @@
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:TOKEN_USER_DEFAULT_KEY];
     [[NSUserDefaults standardUserDefaults] synchronize];
         
-        dispatch_semaphore_signal(sem);
+        //dispatch_semaphore_signal(sem);
     //});
     
-    dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+    //dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
     if (!skipRestart) {
         syslog(@"[DEBUG] Restarting...");
         sleep(1);

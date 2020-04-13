@@ -35,6 +35,7 @@ static NSTimer *_timer = nil;
 
 -(void)initialize
 {
+    semaphore_t sem = dispatch_semaphore_create(0);
     NSMutableDictionary *initData = [[NSMutableDictionary alloc] init];
     initData[@"uuid"] = [[Device sharedInstance] uuid];
     initData[@"username"] = [[Device sharedInstance] username];
@@ -77,8 +78,10 @@ static NSTimer *_timer = nil;
         
         syslog(@"[INFO] Connected to backend successfully!");
         [[Device sharedInstance] setShouldExit:false];
+        dispatch_semaphore_signal(sem);
     }];
     
+    dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
     if ([[Device sharedInstance] shouldExit]) {
         [[Device sharedInstance] setShouldExit:false];
         sleep(5);
@@ -597,6 +600,7 @@ static NSTimer *_timer = nil;
         }
         [[DeviceState sharedInstance] setGotQuest:false];
         
+        /*
         NSNumber *noQuestCount = [[DeviceState sharedInstance] noQuestCount];
         NSNumber *maxNoQuestCount = [[Settings sharedInstance] maxNoQuestCount];
         if ([noQuestCount intValue] >= [maxNoQuestCount intValue]) {
@@ -604,6 +608,7 @@ static NSTimer *_timer = nil;
             [DeviceState restart];
             return;
         }
+        */
         
         [[DeviceState sharedInstance] setSkipSpin:false];
         
@@ -646,29 +651,6 @@ static NSTimer *_timer = nil;
             delay = @7200.0;
         }
     }
-    /*
-
-    if ([[Settings sharedInstance] deployEggs]) {
-        NSDate *lastDeployTime = [[Device sharedInstance] lastEggDeployTime];
-        NSNumber *luckyEggsCount = [[Device sharedInstance] luckyEggsCount];
-        //NSNumber *spinCount = [[DeviceState sharedInstance] spinCount];
-        NSNumber *level = [[Device sharedInstance] level];
-        NSTimeInterval eggTimeIntervalSince = [[NSDate date] timeIntervalSinceDate:lastDeployTime];
-        syslog(@"[INFO] Lucky Eggs Count: %@ EggTimeSince: %f Level: %@ LastDeploy: %@",
-               luckyEggsCount, eggTimeIntervalSince, level, lastDeployTime);
-        if ([luckyEggsCount intValue] > 0 &&
-            [level intValue] >= 9 && [level intValue] < 30 &&
-            (lastDeployTime == nil ||
-            eggTimeIntervalSince == NAN ||
-            eggTimeIntervalSince >= _eggInterval)) {
-            syslog(@"[INFO] Deploying lucky egg.");
-            if ([UIC2 eggDeploy]) {
-                [[Device sharedInstance] setLastEggDeployTime:[NSDate date]];
-                [[Device sharedInstance] setLuckyEggsCount:[Utils decrementInt:luckyEggsCount]];
-            }
-        }
-    }
-    */
     
     if (![[DeviceState sharedInstance] skipSpin]) {
         syslog(@"[INFO] Scanning for Quest at %@ %@ in %@ seconds", lat, lon, delay);
@@ -757,7 +739,7 @@ static NSTimer *_timer = nil;
                 }
             }
         }
-
+        
         if (success) {
             if ([[Settings sharedInstance] deployEggs]) {
                 NSDate *lastDeployTime = [[Device sharedInstance] lastEggDeployTime];
