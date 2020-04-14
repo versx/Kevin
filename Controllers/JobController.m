@@ -35,7 +35,7 @@ static NSTimer *_timer = nil;
 
 -(void)initialize
 {
-    semaphore_t sem = dispatch_semaphore_create(0);
+    dispatch_semaphore_t sem = dispatch_semaphore_create(0);
     NSMutableDictionary *initData = [[NSMutableDictionary alloc] init];
     initData[@"uuid"] = [[Device sharedInstance] uuid];
     initData[@"username"] = [[Device sharedInstance] username];

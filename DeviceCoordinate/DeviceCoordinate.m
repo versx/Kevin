@@ -20,8 +20,7 @@
 
 -(id)init:(int)x withY:(int)y andTapScalar:(double)scalar
 {
-    self = [super init];
-    if (self) {
+    if (self = [super init]) {
         self.x = x;
         self.y = y;
         self.tapX = (int)lround(x * scalar);
@@ -32,8 +31,7 @@
 
 -(id)init:(int)x withY:(int)y andDeviceCoordinateScalar:(DeviceCoordinateScalar *)scalar
 {
-    self = [super init];
-    if (self) {
+    if (self = [super init]) {
         self.x = [scalar scaleX:x];
         self.y = [scalar scaleY:y];
         self.tapX = [scalar tapScaleX:x];
