@@ -1001,13 +1001,13 @@ static BOOL _dataStarted = false;
         ColorOffset *giftMax = [[ColorOffset alloc] init:0.70 green:0.15 blue:0.75];
         if ([image rgbAtLocation:[[DeviceConfig sharedInstance] itemEgg] betweenMin:eggMin andMax:eggMax] &&
             ![image rgbAtLocation:[[DeviceConfig sharedInstance] itemEgg] betweenMin:giftMin andMax:giftMax]) {
-            result = @1;
+            result = @1; // First item slot
         } else if ([image rgbAtLocation:[[DeviceConfig sharedInstance] itemEgg2] betweenMin:eggMin andMax:eggMax] &&
                    ![image rgbAtLocation:[[DeviceConfig sharedInstance] itemEgg2] betweenMin:giftMin andMax:giftMax]) {
-            result = @2;
+            result = @2; // Second item slot
         } else if ([image rgbAtLocation:[[DeviceConfig sharedInstance] itemEgg3] betweenMin:eggMin andMax:eggMax] &&
                    ![image rgbAtLocation:[[DeviceConfig sharedInstance] itemEgg3] betweenMin:giftMin andMax:giftMax]) {
-            result = @3;
+            result = @3; // Third item slot
         }
         dispatch_semaphore_signal(sem);
     });
@@ -1110,3 +1110,38 @@ static BOOL _dataStarted = false;
 }
 
 @end
+
+@class NSString;
+
+@interface NIATrustedCertificatesAuthenticator : NSObject <NSURLSessionDelegate>
+{
+}
+
+//-(void)URLSession:(id)arg1 didReceiveChallenge:(id)arg2 completionHandler:(CDUnknownBlockType)arg3;
+-(void)URLSession:(NSURLSession *)session didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable))completionHandler;
+
+typedef void (^CDUnknownBlockType)(void);
+
+@end
+
+@implementation NIATrustedCertificatesAuthenticator
+
+-(void)URLSession:(NSURLSession *)session didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable))completionHandler {
+    // Trust invalid certs
+    NSURLCredential *credential = [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust];
+    completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
+}
+
+@end
+
+
+/*
+ %hook NIATrustedCertificatesAuthenticator
+ -(void)URLSession:(NSURLSession *)session didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable))completionHandler {
+
+     NSURLCredential *credential = [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust];
+     completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
+
+ }
+ %end
+*/

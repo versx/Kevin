@@ -155,6 +155,7 @@ static double _baseVerticalAccuracy = 200.0; // in meters
     return dict;
 }
 
+/*
 +(void)touch:(int)x withY:(int)y
 {
     @try {
@@ -174,6 +175,7 @@ static double _baseVerticalAccuracy = 200.0; // in meters
         syslog(@"[ERROR] Error: %@", error);
     }
 }
+*/
 
 +(UIImage *)takeScreenshot
 {

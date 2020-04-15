@@ -56,24 +56,6 @@
 		C065AE42242ECD3B007114C8 /* DeviceRatio1775.m in Sources */ = {isa = PBXBuildFile; fileRef = C065AE41242ECD3B007114C8 /* DeviceRatio1775.m */; };
 		C065AE44242EFCCA007114C8 /* NSString+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = C065AE43242EFCCA007114C8 /* NSString+Extensions.h */; };
 		C065AE46242EFCD8007114C8 /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C065AE45242EFCD8007114C8 /* NSString+Extensions.m */; };
-		C067ACEA241EAFF6007E3055 /* PTFakeTouch.h in Headers */ = {isa = PBXBuildFile; fileRef = C067ACD7241EAFF6007E3055 /* PTFakeTouch.h */; };
-		C067ACEB241EAFF6007E3055 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C067ACD8241EAFF6007E3055 /* IOKit.framework */; };
-		C067ACEC241EAFF7007E3055 /* IOHIDEvent+KIF.h in Headers */ = {isa = PBXBuildFile; fileRef = C067ACDA241EAFF6007E3055 /* IOHIDEvent+KIF.h */; };
-		C067ACED241EAFF7007E3055 /* UIApplication-KIFAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = C067ACDB241EAFF6007E3055 /* UIApplication-KIFAdditions.h */; };
-		C067ACEE241EAFF7007E3055 /* UIWindow-KIFAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C067ACDC241EAFF6007E3055 /* UIWindow-KIFAdditions.m */; };
-		C067ACEF241EAFF7007E3055 /* UITouch-KIFAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C067ACDD241EAFF6007E3055 /* UITouch-KIFAdditions.m */; };
-		C067ACF0241EAFF7007E3055 /* UIView-KIFAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = C067ACDE241EAFF6007E3055 /* UIView-KIFAdditions.h */; };
-		C067ACF1241EAFF7007E3055 /* UIEvent+KIFAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = C067ACDF241EAFF6007E3055 /* UIEvent+KIFAdditions.h */; };
-		C067ACF2241EAFF7007E3055 /* UIWindow-KIFAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = C067ACE0241EAFF6007E3055 /* UIWindow-KIFAdditions.h */; };
-		C067ACF3241EAFF7007E3055 /* UIApplication-KIFAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C067ACE1241EAFF6007E3055 /* UIApplication-KIFAdditions.m */; };
-		C067ACF4241EAFF7007E3055 /* FixCategoryBug.h in Headers */ = {isa = PBXBuildFile; fileRef = C067ACE2241EAFF6007E3055 /* FixCategoryBug.h */; };
-		C067ACF5241EAFF7007E3055 /* IOHIDEvent+KIF.m in Sources */ = {isa = PBXBuildFile; fileRef = C067ACE3241EAFF6007E3055 /* IOHIDEvent+KIF.m */; };
-		C067ACF6241EAFF7007E3055 /* UIView-KIFAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C067ACE4241EAFF6007E3055 /* UIView-KIFAdditions.m */; };
-		C067ACF7241EAFF7007E3055 /* UITouch-KIFAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = C067ACE5241EAFF6007E3055 /* UITouch-KIFAdditions.h */; };
-		C067ACF8241EAFF7007E3055 /* UIEvent+KIFAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C067ACE6241EAFF6007E3055 /* UIEvent+KIFAdditions.m */; };
-		C067ACF9241EAFF7007E3055 /* LoadableCategory.h in Headers */ = {isa = PBXBuildFile; fileRef = C067ACE7241EAFF6007E3055 /* LoadableCategory.h */; };
-		C067ACFA241EAFF7007E3055 /* PTFakeTouch.m in Sources */ = {isa = PBXBuildFile; fileRef = C067ACE8241EAFF6007E3055 /* PTFakeTouch.m */; };
-		C067AD2B241EB515007E3055 /* KIF.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C067AD27241EB209007E3055 /* KIF.framework */; };
 		C067AD2F241EB776007E3055 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C067AD2E241EB776007E3055 /* XCTest.framework */; };
 		C0AC1CDD240BAD44008F4DFB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0AC1CDC240BAD44008F4DFB /* CoreGraphics.framework */; };
 		C0AC1CF2240BB365008F4DFB /* Device.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1CF1240BB365008F4DFB /* Device.m */; };
@@ -141,25 +123,6 @@
 		C065AE41242ECD3B007114C8 /* DeviceRatio1775.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceRatio1775.m; sourceTree = "<group>"; };
 		C065AE43242EFCCA007114C8 /* NSString+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+Extensions.h"; sourceTree = "<group>"; };
 		C065AE45242EFCD8007114C8 /* NSString+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+Extensions.m"; sourceTree = "<group>"; };
-		C067ACD7241EAFF6007E3055 /* PTFakeTouch.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PTFakeTouch.h; sourceTree = "<group>"; };
-		C067ACD8241EAFF6007E3055 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = IOKit.framework; sourceTree = "<group>"; };
-		C067ACDA241EAFF6007E3055 /* IOHIDEvent+KIF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "IOHIDEvent+KIF.h"; sourceTree = "<group>"; };
-		C067ACDB241EAFF6007E3055 /* UIApplication-KIFAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIApplication-KIFAdditions.h"; sourceTree = "<group>"; };
-		C067ACDC241EAFF6007E3055 /* UIWindow-KIFAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIWindow-KIFAdditions.m"; sourceTree = "<group>"; };
-		C067ACDD241EAFF6007E3055 /* UITouch-KIFAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITouch-KIFAdditions.m"; sourceTree = "<group>"; };
-		C067ACDE241EAFF6007E3055 /* UIView-KIFAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView-KIFAdditions.h"; sourceTree = "<group>"; };
-		C067ACDF241EAFF6007E3055 /* UIEvent+KIFAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIEvent+KIFAdditions.h"; sourceTree = "<group>"; };
-		C067ACE0241EAFF6007E3055 /* UIWindow-KIFAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIWindow-KIFAdditions.h"; sourceTree = "<group>"; };
-		C067ACE1241EAFF6007E3055 /* UIApplication-KIFAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIApplication-KIFAdditions.m"; sourceTree = "<group>"; };
-		C067ACE2241EAFF6007E3055 /* FixCategoryBug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FixCategoryBug.h; sourceTree = "<group>"; };
-		C067ACE3241EAFF6007E3055 /* IOHIDEvent+KIF.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "IOHIDEvent+KIF.m"; sourceTree = "<group>"; };
-		C067ACE4241EAFF6007E3055 /* UIView-KIFAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView-KIFAdditions.m"; sourceTree = "<group>"; };
-		C067ACE5241EAFF6007E3055 /* UITouch-KIFAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITouch-KIFAdditions.h"; sourceTree = "<group>"; };
-		C067ACE6241EAFF6007E3055 /* UIEvent+KIFAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIEvent+KIFAdditions.m"; sourceTree = "<group>"; };
-		C067ACE7241EAFF6007E3055 /* LoadableCategory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoadableCategory.h; sourceTree = "<group>"; };
-		C067ACE8241EAFF6007E3055 /* PTFakeTouch.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PTFakeTouch.m; sourceTree = "<group>"; };
-		C067ACE9241EAFF6007E3055 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		C067AD27241EB209007E3055 /* KIF.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = KIF.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		C067AD2E241EB776007E3055 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		C0AC1CDC240BAD44008F4DFB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		C0AC1CF1240BB365008F4DFB /* Device.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Device.m; sourceTree = "<group>"; };
@@ -181,10 +144,8 @@
 				C0AC1CDD240BAD44008F4DFB /* CoreGraphics.framework in Frameworks */,
 				C0132B64240B631700719452 /* Security.framework in Frameworks */,
 				C0132B62240B630000719452 /* CFNetwork.framework in Frameworks */,
-				C067ACEB241EAFF6007E3055 /* IOKit.framework in Frameworks */,
 				C01B4983240AD01E00633B45 /* CoreLocation.framework in Frameworks */,
 				C01B4965240ACF5D00633B45 /* Foundation.framework in Frameworks */,
-				C067AD2B241EB515007E3055 /* KIF.framework in Frameworks */,
 				C067AD2F241EB776007E3055 /* XCTest.framework in Frameworks */,
 				C01B4967240ACF5D00633B45 /* UIKit.framework in Frameworks */,
 				1AD80293D695349110C3793B /* libPods-Jarvis++.a in Frameworks */,
@@ -270,7 +231,6 @@
 				C0025AA3241416DE007813F7 /* Net */,
 				91E40CCDBD064A40A2555622 /* Pods */,
 				C01B4962240ACF5D00633B45 /* Products */,
-				C067ACD6241EAFF6007E3055 /* PTFakeTouch */,
 				C03E44E22432592200B467BB /* Settings */,
 				C0025AB52414393B007813F7 /* States */,
 				C01B497D240ACF9400633B45 /* UIC */,
@@ -290,7 +250,6 @@
 			isa = PBXGroup;
 			children = (
 				C067AD2E241EB776007E3055 /* XCTest.framework */,
-				C067AD27241EB209007E3055 /* KIF.framework */,
 				C0AC1CDC240BAD44008F4DFB /* CoreGraphics.framework */,
 				C0132B63240B631700719452 /* Security.framework */,
 				C0132B61240B630000719452 /* CFNetwork.framework */,
@@ -420,39 +379,6 @@
 			path = Configs;
 			sourceTree = "<group>";
 		};
-		C067ACD6241EAFF6007E3055 /* PTFakeTouch */ = {
-			isa = PBXGroup;
-			children = (
-				C067ACD7241EAFF6007E3055 /* PTFakeTouch.h */,
-				C067ACD8241EAFF6007E3055 /* IOKit.framework */,
-				C067ACD9241EAFF6007E3055 /* head */,
-				C067ACE8241EAFF6007E3055 /* PTFakeTouch.m */,
-				C067ACE9241EAFF6007E3055 /* Info.plist */,
-			);
-			path = PTFakeTouch;
-			sourceTree = "<group>";
-		};
-		C067ACD9241EAFF6007E3055 /* head */ = {
-			isa = PBXGroup;
-			children = (
-				C067ACE2241EAFF6007E3055 /* FixCategoryBug.h */,
-				C067ACDA241EAFF6007E3055 /* IOHIDEvent+KIF.h */,
-				C067ACE3241EAFF6007E3055 /* IOHIDEvent+KIF.m */,
-				C067ACE7241EAFF6007E3055 /* LoadableCategory.h */,
-				C067ACDB241EAFF6007E3055 /* UIApplication-KIFAdditions.h */,
-				C067ACE1241EAFF6007E3055 /* UIApplication-KIFAdditions.m */,
-				C067ACDF241EAFF6007E3055 /* UIEvent+KIFAdditions.h */,
-				C067ACE6241EAFF6007E3055 /* UIEvent+KIFAdditions.m */,
-				C067ACE5241EAFF6007E3055 /* UITouch-KIFAdditions.h */,
-				C067ACDD241EAFF6007E3055 /* UITouch-KIFAdditions.m */,
-				C067ACDE241EAFF6007E3055 /* UIView-KIFAdditions.h */,
-				C067ACE4241EAFF6007E3055 /* UIView-KIFAdditions.m */,
-				C067ACE0241EAFF6007E3055 /* UIWindow-KIFAdditions.h */,
-				C067ACDC241EAFF6007E3055 /* UIWindow-KIFAdditions.m */,
-			);
-			path = head;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -460,8 +386,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C067ACEC241EAFF7007E3055 /* IOHIDEvent+KIF.h in Headers */,
-				C067ACF2241EAFF7007E3055 /* UIWindow-KIFAdditions.h in Headers */,
 				C04D0A742435EDA2006DE57D /* DeviceCoordinate+Extensions.h in Headers */,
 				C01B4980240ACF9400633B45 /* UIC.h in Headers */,
 				C0AC1CF8240BB97A008F4DFB /* Settings.h in Headers */,
@@ -469,9 +393,6 @@
 				C0339C8A2427E9300046D0AD /* DeviceCoordinateScalar.h in Headers */,
 				C03E44F224342D4400B467BB /* DeviceIPhoneNormal.h in Headers */,
 				C04D0A78243BFB7D006DE57D /* SystemInfo.h in Headers */,
-				C067ACF4241EAFF7007E3055 /* FixCategoryBug.h in Headers */,
-				C067ACED241EAFF7007E3055 /* UIApplication-KIFAdditions.h in Headers */,
-				C067ACEA241EAFF6007E3055 /* PTFakeTouch.h in Headers */,
 				C0339C93242803D80046D0AD /* ColorOffset.h in Headers */,
 				C065AE40242ECD2A007114C8 /* DeviceRatio1775.h in Headers */,
 				C0339C862427E9140046D0AD /* DeviceCoordinate.h in Headers */,
@@ -480,8 +401,6 @@
 				C01B4971240ACF5D00633B45 /* Jarvis__.h in Headers */,
 				C00EE48D241D4830001771AB /* JarvisTestCase.h in Headers */,
 				C0025AAE241421E9007813F7 /* Utils.h in Headers */,
-				C067ACF0241EAFF7007E3055 /* UIView-KIFAdditions.h in Headers */,
-				C067ACF9241EAFF7007E3055 /* LoadableCategory.h in Headers */,
 				C03E44DF2431132700B467BB /* RequestController.h in Headers */,
 				C03E44EE2434286500B467BB /* DeviceRatio1333.h in Headers */,
 				C03E44E42432595200B467BB /* PixelSettings.h in Headers */,
@@ -490,10 +409,8 @@
 				C0025AC32414846B007813F7 /* JobController.h in Headers */,
 				C0339C8F2427EE510046D0AD /* DeviceConfig.h in Headers */,
 				C00EE489241C70B2001771AB /* HttpClientConnection.h in Headers */,
-				C067ACF1241EAFF7007E3055 /* UIEvent+KIFAdditions.h in Headers */,
 				C0025AB424143923007813F7 /* DeviceState.h in Headers */,
 				C0AC1CF4240BB37C008F4DFB /* Device.h in Headers */,
-				C067ACF7241EAFF7007E3055 /* UITouch-KIFAdditions.h in Headers */,
 				C03E44F624342F9E00B467BB /* DeviceIPhonePlus.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -568,7 +485,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#/Users/helpdesk/Desktop/Projects/Jarvis/build/deploy.sh\n/Users/helpdesk/Desktop/Projects/Jarvis/build/build.sh\n";
+			shellScript = "/Users/helpdesk/Desktop/Projects/Jarvis/build/deploy.sh\n#/Users/helpdesk/Desktop/Projects/Jarvis/build/build.sh\n";
 		};
 		DD19E334717C3F402AC7920B /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -604,21 +521,16 @@
 				C0AC1CF6240BB96C008F4DFB /* Settings.m in Sources */,
 				C03E44F424342D5100B467BB /* DeviceIPhoneNormal.m in Sources */,
 				C00EE48B241C70C5001771AB /* HttpClientConnection.m in Sources */,
-				C067ACF3241EAFF7007E3055 /* UIApplication-KIFAdditions.m in Sources */,
 				C0025AC524148477007813F7 /* JobController.m in Sources */,
 				C0025AB0241421F4007813F7 /* Utils.m in Sources */,
 				C00EE48F241D4855001771AB /* JarvisTestCase.m in Sources */,
 				C0025AC0241483C6007813F7 /* UIImage+Pixels.mm in Sources */,
-				C067ACFA241EAFF7007E3055 /* PTFakeTouch.m in Sources */,
 				C0AC1CF2240BB365008F4DFB /* Device.m in Sources */,
-				C067ACF5241EAFF7007E3055 /* IOHIDEvent+KIF.m in Sources */,
 				C0025AB224143917007813F7 /* DeviceState.m in Sources */,
 				C01B4981240ACF9400633B45 /* UIC.mm in Sources */,
-				C067ACEE241EAFF7007E3055 /* UIWindow-KIFAdditions.m in Sources */,
 				C03E44F824342FAC00B467BB /* DeviceIPhonePlus.m in Sources */,
 				C03E44F02434287600B467BB /* DeviceRatio1333.m in Sources */,
 				C03E44E62432596900B467BB /* PixelSettings.m in Sources */,
-				C067ACEF241EAFF7007E3055 /* UITouch-KIFAdditions.m in Sources */,
 				C065AE46242EFCD8007114C8 /* NSString+Extensions.m in Sources */,
 				C03E44E12431133800B467BB /* RequestController.m in Sources */,
 				C0B68E042414C632009B5970 /* Consts.m in Sources */,
@@ -626,10 +538,8 @@
 				C065AE42242ECD3B007114C8 /* DeviceRatio1775.m in Sources */,
 				C04D0A762435EDBD006DE57D /* DeviceCoordinate+Extensions.m in Sources */,
 				C0339C8C2427E93C0046D0AD /* DeviceCoordinateScalar.m in Sources */,
-				C067ACF6241EAFF7007E3055 /* UIView-KIFAdditions.m in Sources */,
 				C0339C912427EE5B0046D0AD /* DeviceConfig.m in Sources */,
 				C04D0A7A243BFB8A006DE57D /* SystemInfo.m in Sources */,
-				C067ACF8241EAFF7007E3055 /* UIEvent+KIFAdditions.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -714,7 +624,7 @@
 				GCC_PREFIX_HEADER = "Jarvis++.pch";
 				GENERATE_MASTER_OBJECT_FILE = NO;
 				HEADER_SEARCH_PATHS = "$(inherited)";
-				INSTALL_PATH = "@rpath/";
+				INSTALL_PATH = "@executable_path/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -787,7 +697,7 @@
 				GCC_PREFIX_HEADER = "Jarvis++.pch";
 				GENERATE_MASTER_OBJECT_FILE = NO;
 				HEADER_SEARCH_PATHS = "$(inherited)";
-				INSTALL_PATH = "@rpath/";
+				INSTALL_PATH = "@executable_path/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

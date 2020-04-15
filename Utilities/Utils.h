@@ -11,7 +11,6 @@
 #import <UIKit/UIKit.h>
 
 #import "../Extensions/NSString+Extensions.h"
-#import "../PTFakeTouch/PTFakeTouch.h"
 #import "../Settings/Settings.h"
 #import "../UIC/Consts.h"
 #import "../UIC/Device.h"
@@ -35,8 +34,6 @@
 
 +(NSString *)toJsonString:(NSDictionary *)dict withPrettyPrint:(BOOL)prettyPrint;
 +(NSMutableDictionary *)toDictionary:(NSString *)json;
-
-+(void)touch:(int)x withY:(int)y;
 
 +(UIImage *)takeScreenshot;
 +(void)takeScreenshot:(void (^)(UIImage* image))completion;
