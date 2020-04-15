@@ -56,7 +56,6 @@
 		C065AE42242ECD3B007114C8 /* DeviceRatio1775.m in Sources */ = {isa = PBXBuildFile; fileRef = C065AE41242ECD3B007114C8 /* DeviceRatio1775.m */; };
 		C065AE44242EFCCA007114C8 /* NSString+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = C065AE43242EFCCA007114C8 /* NSString+Extensions.h */; };
 		C065AE46242EFCD8007114C8 /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C065AE45242EFCD8007114C8 /* NSString+Extensions.m */; };
-		C067AD2F241EB776007E3055 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C067AD2E241EB776007E3055 /* XCTest.framework */; };
 		C0AC1CDD240BAD44008F4DFB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0AC1CDC240BAD44008F4DFB /* CoreGraphics.framework */; };
 		C0AC1CF2240BB365008F4DFB /* Device.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1CF1240BB365008F4DFB /* Device.m */; };
 		C0AC1CF4240BB37C008F4DFB /* Device.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1CF3240BB37C008F4DFB /* Device.h */; };
@@ -65,6 +64,7 @@
 		C0B68E022414C33E009B5970 /* Consts.h in Headers */ = {isa = PBXBuildFile; fileRef = C0B68E012414C33E009B5970 /* Consts.h */; };
 		C0B68E042414C632009B5970 /* Consts.m in Sources */ = {isa = PBXBuildFile; fileRef = C0B68E032414C632009B5970 /* Consts.m */; };
 		C0BAF0952418B62C003E2419 /* Jarvis++.pch in Headers */ = {isa = PBXBuildFile; fileRef = C0BAF0942418B62C003E2419 /* Jarvis++.pch */; };
+		C0D50BA52446D6480016C867 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C06C7C112446D5A500C3B862 /* XCTest.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -123,7 +123,7 @@
 		C065AE41242ECD3B007114C8 /* DeviceRatio1775.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceRatio1775.m; sourceTree = "<group>"; };
 		C065AE43242EFCCA007114C8 /* NSString+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+Extensions.h"; sourceTree = "<group>"; };
 		C065AE45242EFCD8007114C8 /* NSString+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+Extensions.m"; sourceTree = "<group>"; };
-		C067AD2E241EB776007E3055 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		C06C7C112446D5A500C3B862 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = XCTest.framework; sourceTree = "<group>"; };
 		C0AC1CDC240BAD44008F4DFB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		C0AC1CF1240BB365008F4DFB /* Device.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Device.m; sourceTree = "<group>"; };
 		C0AC1CF3240BB37C008F4DFB /* Device.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Device.h; sourceTree = "<group>"; };
@@ -141,12 +141,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C0D50BA52446D6480016C867 /* XCTest.framework in Frameworks */,
 				C0AC1CDD240BAD44008F4DFB /* CoreGraphics.framework in Frameworks */,
 				C0132B64240B631700719452 /* Security.framework in Frameworks */,
 				C0132B62240B630000719452 /* CFNetwork.framework in Frameworks */,
 				C01B4983240AD01E00633B45 /* CoreLocation.framework in Frameworks */,
 				C01B4965240ACF5D00633B45 /* Foundation.framework in Frameworks */,
-				C067AD2F241EB776007E3055 /* XCTest.framework in Frameworks */,
 				C01B4967240ACF5D00633B45 /* UIKit.framework in Frameworks */,
 				1AD80293D695349110C3793B /* libPods-Jarvis++.a in Frameworks */,
 			);
@@ -249,7 +249,7 @@
 		C01B4963240ACF5D00633B45 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				C067AD2E241EB776007E3055 /* XCTest.framework */,
+				C06C7C112446D5A500C3B862 /* XCTest.framework */,
 				C0AC1CDC240BAD44008F4DFB /* CoreGraphics.framework */,
 				C0132B63240B631700719452 /* Security.framework */,
 				C0132B61240B630000719452 /* CFNetwork.framework */,
