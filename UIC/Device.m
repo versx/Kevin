@@ -165,7 +165,7 @@
     return sharedInstance;
 }
 
--(BOOL)isOneGbDevice
+-(BOOL)is1GbDevice
 {
     if ([[self model] isEqualToString:@"iPhone 5s"] ||
         [[self model] isEqualToString:@"iPhone 6"] ||

@@ -29,7 +29,6 @@ static NSTimer *_timer = nil;
     if ((self = [super init])) {
         _getJobQueue = dispatch_queue_create("getjob_queue", NULL);
     }
-    
     return self;
 }
 
@@ -44,11 +43,11 @@ static NSTimer *_timer = nil;
                   dict:initData
               blocking:true
             completion:^(NSDictionary *result) {
-        syslog(@"[DEBUG] Response from init: %@", result);
+        //syslog(@"[DEBUG] Response from init: %@", result);
         if (result == nil) {
             syslog(@"[ERROR] Failed to connect to backend! Restarting in 30 seconds.");
             sleep(30);
-            [[Device sharedInstance] setShouldExit:true];
+            //[[Device sharedInstance] setShouldExit:true];
             [DeviceState restart];
             return;
         } else if (![(result[@"status"] ?: @"fail") isEqualToString:@"ok"]) {
@@ -91,7 +90,7 @@ static NSTimer *_timer = nil;
 
 -(void)getAccount
 {
-    syslog(@"[INFO] Sending 'get_account' post request.");
+    //syslog(@"[INFO] Sending 'get_account' post request.");
     if (([[[Device sharedInstance] username] isNullOrEmpty] ||
          [[[Device sharedInstance] username] isEqualToString:@"fail"]) &&
          [[Settings sharedInstance] enableAccountManager]) {
@@ -122,13 +121,6 @@ static NSTimer *_timer = nil;
                     syslog(@"[ERROR] Failed to get account and not logged in.");
                     [[Device sharedInstance] setShouldExit:true];
                     [DeviceState restart];
-                    return;
-                }
-                
-                if (![username isEqualToString:[[Device sharedInstance] username]]) {
-                    syslog(@"[DEBUG] Logged into different account (%@) than returned from backend (%@). Logging out!",
-                           [[Device sharedInstance] username], username);
-                    [DeviceState logout];
                     return;
                 }
                 
@@ -223,7 +215,7 @@ static NSTimer *_timer = nil;
                             [[Device sharedInstance] setMinLevel:minLevel];
                             [[Device sharedInstance] setMaxLevel:maxLevel];
                             syslog(@"[DEBUG] Current level %@ (Min: %@, Max: %@)", currentLevel, minLevel, maxLevel);
-                            if ([currentLevel intValue] != 0 &&
+                            if ([currentLevel intValue] != 0 && // TODO: Remove
                                 ([currentLevel intValue] < [minLevel intValue] ||
                                  [currentLevel intValue] > [maxLevel intValue])) {
                                 syslog(@"[WARN] Account is outside min/max level range. Logging out!");
@@ -276,15 +268,15 @@ static NSTimer *_timer = nil;
                 dispatch_semaphore_signal(sem);
                 
                 NSNumber *emptyGmoCount = [[DeviceState sharedInstance] emptyGmoCount];
-                NSNumber *maxEmptyGMO = [[Settings sharedInstance] maxEmptyGMO];
-                if ([emptyGmoCount intValue] >= [maxEmptyGMO intValue]) {
+                int maxEmptyGMO = [[Settings sharedInstance] maxEmptyGMO];
+                if ([emptyGmoCount intValue] >= maxEmptyGMO) {
                     syslog(@"[WARN] Got Empty GMO %@ times in a row. Restarting...", emptyGmoCount);
                     [DeviceState restart];
                 }
                 
                 NSNumber *failedCount = [[DeviceState sharedInstance] failedCount];
-                NSNumber *maxFailedCount = [[Settings sharedInstance] maxFailedCount];
-                if ([failedCount intValue] >= [maxFailedCount intValue]) {
+                int maxFailedCount = [[Settings sharedInstance] maxFailedCount];
+                if ([failedCount intValue] >= maxFailedCount) {
                     syslog(@"[ERROR] Failed %@ times in a row. Restarting...", failedCount);
                     [DeviceState restart];
                 }
@@ -314,16 +306,35 @@ static NSTimer *_timer = nil;
     }
 }
 
+-(void)sendJobFailed:(NSString *)action withLat:(NSNumber *)lat andLon:(NSNumber *)lon
+{
+    NSMutableDictionary *failedData = [[NSMutableDictionary alloc] init];
+    failedData[@"uuid"] = [[Device sharedInstance] uuid];
+    failedData[@"username"] = [[Device sharedInstance] username];
+    failedData[@"action"] = action;
+    failedData[@"lat"] = lat;
+    failedData[@"lon"] = lon;
+    failedData[@"type"] = TYPE_JOB_FAILED;
+    [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                  dict:failedData
+              blocking:true
+            completion:^(NSDictionary *result) {}
+    ];
+}
+
 
 #pragma mark Job Handlers
 
 -(void)handlePokemonJob:(NSString *)action withData:(NSDictionary *)data hasWarning:(BOOL)hasWarning
 {
-    if (hasWarning && [[Settings sharedInstance] enableAccountManager]) {
+    if (hasWarning &&
+        [[Settings sharedInstance] enableAccountManager] &&
+        ![[Settings sharedInstance] allowWarnedAccounts]) {
         syslog(@"[WARN] Account has a warning and tried to scan for Pokemon. Logging out!");
         CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
         [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
         [DeviceState logout];
+        return;
     }
     
     NSNumber *lat = data[@"lat"];
@@ -339,29 +350,18 @@ static NSTimer *_timer = nil;
     syslog(@"[INFO] Scanning prepared");
     
     bool locked = true;
-    NSNumber *pokemonMaxTime = [[Settings sharedInstance] pokemonMaxTime];
+    int pokemonMaxTime = [[Settings sharedInstance] pokemonMaxTime];
     while (locked) {
         sleep(1);
         NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:start];
         
-        if (timeIntervalSince >= [pokemonMaxTime intValue]) {
+        if (timeIntervalSince >= pokemonMaxTime) {
             locked = false;
             [[DeviceState sharedInstance] setWaitForData:false];
             NSNumber *failedCount = [[DeviceState sharedInstance] failedCount];
             [[DeviceState sharedInstance] setFailedCount:[Utils incrementInt:failedCount]];
             syslog(@"[WARN] Pokemon loading timed out.");
-            NSMutableDictionary *failedData = [[NSMutableDictionary alloc] init];
-            failedData[@"uuid"] = [[Device sharedInstance] uuid];
-            failedData[@"username"] = [[Device sharedInstance] username];
-            failedData[@"action"] = action;
-            failedData[@"lat"] = lat;
-            failedData[@"lon"] = lon;
-            failedData[@"type"] = TYPE_JOB_FAILED;
-            [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
-                          dict:failedData
-                      blocking:true
-                    completion:^(NSDictionary *result) {}
-            ];
+            [self sendJobFailed:action withLat:lat andLon:lon];
         } else {
             locked = [[DeviceState sharedInstance] waitForData];
             if (!locked) {
@@ -376,15 +376,17 @@ static NSTimer *_timer = nil;
 {
     NSDate *firstWarningDate = [[DeviceState sharedInstance] firstWarningDate];
     NSTimeInterval timeSince = [[NSDate date] timeIntervalSinceDate:firstWarningDate];
-    NSNumber *maxWarningTimeRaid = [[Settings sharedInstance] maxWarningTimeRaid];
+    int maxWarningTimeRaid = [[Settings sharedInstance] maxWarningTimeRaid];
     if (hasWarning &&
         firstWarningDate != nil &&
-        timeSince >= [maxWarningTimeRaid intValue] &&
-        [[Settings sharedInstance] enableAccountManager]) {
-        syslog(@"[WARN] Account has warning and is over maxWarningTimeRaid (%@). Logging out!", maxWarningTimeRaid);
+        timeSince >= maxWarningTimeRaid &&
+        [[Settings sharedInstance] enableAccountManager] &&
+        ![[Settings sharedInstance] allowWarnedAccounts]) {
+        syslog(@"[WARN] Account has warning and is over maxWarningTimeRaid (%d). Logging out!", maxWarningTimeRaid);
         CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
         [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
         [DeviceState logout];
+        return;
     }
     
     NSNumber *lat = data[@"lat"] ?: 0;
@@ -400,26 +402,16 @@ static NSTimer *_timer = nil;
     syslog(@"[INFO] Scanning prepared.");
     
     bool locked = true;
-    NSNumber *raidMaxTime = [[Settings sharedInstance] raidMaxTime];
+    int raidMaxTime = [[Settings sharedInstance] raidMaxTime];
     while (locked) {
         NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:start];
-        if (timeIntervalSince >= [raidMaxTime intValue]) {
+        if (timeIntervalSince >= raidMaxTime) {
             locked = false;
             [[DeviceState sharedInstance] setWaitForData:false];
             NSNumber *failedCount = [[DeviceState sharedInstance] failedCount];
             [[DeviceState sharedInstance] setFailedCount:[Utils incrementInt:failedCount]];
             syslog(@"[WARN] Raids loading timed out.");
-            NSMutableDictionary *failedData = [[NSMutableDictionary alloc] init];
-            failedData[@"uuid"] = [[Device sharedInstance] uuid];
-            failedData[@"action"] = action;
-            failedData[@"lat"] = lat;
-            failedData[@"lon"] = lon;
-            failedData[@"type"] = TYPE_JOB_FAILED;
-            [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
-                          dict:failedData
-                      blocking:true
-                    completion:^(NSDictionary *result) {}
-            ];
+            [self sendJobFailed:action withLat:lat andLon:lon];
         } else {
             locked = [[DeviceState sharedInstance] waitForData];
             if (!locked) {
@@ -572,11 +564,30 @@ static NSTimer *_timer = nil;
 
 -(void)handleQuestJob:(NSString *)action withData:(NSDictionary *)data hasWarning:(BOOL)hasWarning
 {
+    NSDate *firstWarningDate = [[DeviceState sharedInstance] firstWarningDate];
+    NSTimeInterval timeSince = [[NSDate date] timeIntervalSinceDate:firstWarningDate];
+    int maxWarningTimeRaid = [[Settings sharedInstance] maxWarningTimeRaid];
+    if (hasWarning &&
+        firstWarningDate != nil &&
+        timeSince >= maxWarningTimeRaid &&
+        [[Settings sharedInstance] enableAccountManager] &&
+        ![[Settings sharedInstance] allowWarnedAccounts]) {
+        syslog(@"[WARN] Account has warning and is over maxWarningTimeRaid (%d). Logging out!", maxWarningTimeRaid);
+        CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
+        [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
+        [DeviceState logout];
+        return;
+    }
+    
     [[DeviceState sharedInstance] setDelayQuest:true];
     NSNumber *lat = data[@"lat"];
     NSNumber *lon = data[@"lon"];
     NSNumber *delay = data[@"delay"];
-    //syslog(@"[INFO] Scanning for Quest at %@ %@ in %@ seconds", lat, lon, delay);
+    if ([action isEqualToString:@"scan_quest"]) {
+        syslog(@"[INFO] Scanning for Quest at %@ %@ in %@ seconds", lat, lon, delay);
+    } else {
+        syslog(@"[INFO] Leveling at %@ %@ in %@ seconds", lat, lon, delay);
+    }
     //NSDate *firstWarningDate = [[DeviceState sharedInstance] firstWarningDate];
     
     if (![[DeviceState sharedInstance] isQuestInit]) {
@@ -658,20 +669,10 @@ static NSTimer *_timer = nil;
         
         // TODO: Check warning
         
-        NSNumber *minDelayLogout = [[Settings sharedInstance] minDelayLogout];
-        if ([delay intValue] >= [minDelayLogout intValue] && [[Settings sharedInstance] enableAccountManager]) {
-            syslog(@"[WARN] Switching account. Delay too large. (Delay: %@ MinDelayLogout: %@)", delay, minDelayLogout);
-            NSMutableDictionary *failedData = [[NSMutableDictionary alloc] init];
-            failedData[@"uuid"] = [[Device sharedInstance] uuid];
-            failedData[@"action"] = action;
-            failedData[@"lat"] = lat;
-            failedData[@"lon"] = lon;
-            failedData[@"type"] = TYPE_JOB_FAILED;
-            [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
-                          dict:failedData
-                      blocking:true
-                    completion:^(NSDictionary *result) {}
-            ];
+        int minDelayLogout = [[Settings sharedInstance] minDelayLogout];
+        if ([delay intValue] >= minDelayLogout && [[Settings sharedInstance] enableAccountManager]) {
+            syslog(@"[WARN] Switching account. Delay too large. (Delay: %@ MinDelayLogout: %d)", delay, minDelayLogout);
+            [self sendJobFailed:action withLat:lat andLon:lon];
             CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
             [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
             [DeviceState logout];
@@ -710,25 +711,15 @@ static NSTimer *_timer = nil;
                 }
                 continue;
             }
-            NSNumber *raidMaxTime = [[Settings sharedInstance] raidMaxTime];
-            NSNumber *totalDelay = @([raidMaxTime doubleValue] + [delay doubleValue]);
+            double raidMaxTime = [[Settings sharedInstance] raidMaxTime];
+            NSNumber *totalDelay = @(raidMaxTime + [delay doubleValue]);
             if (!found && timeIntervalSince >= [totalDelay doubleValue]) {
                 locked = false;
                 [[DeviceState sharedInstance] setWaitForData:false];
                 NSNumber *failedCount = [[DeviceState sharedInstance] failedCount];
                 [[DeviceState sharedInstance] setFailedCount:[Utils incrementInt:failedCount]];
                 syslog(@"[WARN] Pokestop loading timed out.");
-                NSMutableDictionary *failedData = [[NSMutableDictionary alloc] init];
-                failedData[@"uuid"] = [[Device sharedInstance] uuid];
-                failedData[@"action"] = action;
-                failedData[@"lat"] = lat;
-                failedData[@"lon"] = lon;
-                failedData[@"type"] = TYPE_JOB_FAILED;
-                [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
-                              dict:failedData
-                          blocking:true
-                        completion:^(NSDictionary *result) {}
-                ];
+                [self sendJobFailed:action withLat:lat andLon:lon];
             } else {
                 locked = [[DeviceState sharedInstance] waitForData];
                 if (!locked) {
@@ -793,8 +784,8 @@ static NSTimer *_timer = nil;
         [[DeviceState sharedInstance] setGotItems:false];
         
         NSNumber *noItemsCount = [[DeviceState sharedInstance] noItemsCount];
-        NSNumber *maxNoQuestCount = [[Settings sharedInstance] maxNoQuestCount];
-        syslog(@"[DEBUG] NoItemsCount: %@/%@", noItemsCount, maxNoQuestCount);
+        int maxNoQuestCount = [[Settings sharedInstance] maxNoQuestCount];
+        syslog(@"[DEBUG] NoItemsCount: %@/%d", noItemsCount, maxNoQuestCount);
         /*
         if ([noItemsCount intValue] >= [maxNoQuestCount intValue]) {
             [[DeviceState sharedInstance] setIsQuestInit:false];
@@ -838,12 +829,12 @@ static NSTimer *_timer = nil;
         [[DeviceState sharedInstance] setLastQuestLocation:lastQuestLocation];
         NSDate *firstWarningDate = [[DeviceState sharedInstance] firstWarningDate];
         NSTimeInterval timeSince = [[NSDate date] timeIntervalSinceDate:firstWarningDate];
-        NSNumber *maxWarningTimeRaid = [[Settings sharedInstance] maxWarningTimeRaid];
+        int maxWarningTimeRaid = [[Settings sharedInstance] maxWarningTimeRaid];
         if (hasWarning &&
             firstWarningDate != nil &&
-            timeSince >= [maxWarningTimeRaid intValue] &&
+            timeSince >= maxWarningTimeRaid &&
             [[Settings sharedInstance] enableAccountManager]) {
-            syslog(@"[WARN] Account has a warning and is over maxWarningTimeRaid (%@). Logging out!", maxWarningTimeRaid);
+            syslog(@"[WARN] Account has a warning and is over maxWarningTimeRaid (%d). Logging out!", maxWarningTimeRaid);
             CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
             [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
             [[Device sharedInstance] setUsername:nil];
@@ -878,24 +869,14 @@ static NSTimer *_timer = nil;
                 //usleep(MIN(10.0, left) * 1000000));
                 continue;
             }
-            NSNumber *raidMaxTime = [[Settings sharedInstance] raidMaxTime];
-            if (timeIntervalSince >= ([raidMaxTime intValue] + [delayTemp intValue])) {
+            int raidMaxTime = [[Settings sharedInstance] raidMaxTime];
+            if (timeIntervalSince >= (raidMaxTime + [delayTemp intValue])) {
                 locked = false;
                 [[DeviceState sharedInstance] setWaitForData:false];
                 NSNumber *failedCount = [[DeviceState sharedInstance] failedCount];
                 [[DeviceState sharedInstance] setFailedCount:[Utils incrementInt:failedCount]];
                 syslog(@"[WARN] Pokestop loading timed out...");
-                NSMutableDictionary *failedData = [[NSMutableDictionary alloc] init];
-                failedData[@"uuid"] = [[Device sharedInstance] uuid];
-                failedData[@"type"] = TYPE_JOB_FAILED;
-                failedData[@"lat"] = lat;
-                failedData[@"lon"] = lon;
-                failedData[@"action"] = action;
-                [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
-                              dict:failedData
-                          blocking:true
-                        completion:^(NSDictionary *result) {}
-                ];
+                [self sendJobFailed:action withLat:lat andLon:lon];
             } else {
                 locked = [[DeviceState sharedInstance] waitForData];
                 // mizu has locked = false too for some reason?
@@ -973,14 +954,16 @@ static NSTimer *_timer = nil;
 
 -(void)handleIVJob:(NSString *)action withData:(NSDictionary *)data hasWarning:(BOOL)hasWarning
 {
+    // TODO: Make reusable checkAccountWarningTime method
     NSDate *firstWarningDate = [[DeviceState sharedInstance] firstWarningDate];
     NSTimeInterval timeSince = [[NSDate date] timeIntervalSinceDate:firstWarningDate];
-    NSNumber *maxWarningTimeRaid = [[Settings sharedInstance] maxWarningTimeRaid];
+    int maxWarningTimeRaid = [[Settings sharedInstance] maxWarningTimeRaid];
     if (hasWarning &&
         firstWarningDate != nil &&
-        timeSince >= [maxWarningTimeRaid intValue] &&
-        [[Settings sharedInstance] enableAccountManager]) {
-        syslog(@"[WARN] Account has warning and is over maxWarningTimeRaid (%@). Logging out!", maxWarningTimeRaid);
+        timeSince >= maxWarningTimeRaid &&
+        [[Settings sharedInstance] enableAccountManager] &&
+        ![[Settings sharedInstance] allowWarnedAccounts]) {
+        syslog(@"[WARN] Account has warning and is over maxWarningTimeRaid (%d). Logging out!", maxWarningTimeRaid);
         CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
         [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
         [DeviceState logout];
@@ -1001,24 +984,14 @@ static NSTimer *_timer = nil;
     bool locked = true;
     while (locked) {
         NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:start];
-        NSNumber *pokemonMaxTime = [[Settings sharedInstance] pokemonMaxTime];
-        if (timeIntervalSince >= [pokemonMaxTime intValue]) {
+        int pokemonMaxTime = [[Settings sharedInstance] pokemonMaxTime];
+        if (timeIntervalSince >= pokemonMaxTime) {
             locked = false;
             [[DeviceState sharedInstance] setWaitForData:false];
             NSNumber *failedCount = [[DeviceState sharedInstance] failedCount];
             [[DeviceState sharedInstance] setFailedCount:[Utils incrementInt:failedCount]];
             syslog(@"[WARN] Pokemon loading timed out.");
-            NSMutableDictionary *failedData = [[NSMutableDictionary alloc] init];
-            failedData[@"uuid"] = [[Device sharedInstance] uuid];
-            failedData[@"action"] = action;
-            failedData[@"lat"] = lat;
-            failedData[@"lon"] = lon;
-            failedData[@"type"] = TYPE_JOB_FAILED;
-            [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
-                          dict:failedData
-                      blocking:true
-                    completion:^(NSDictionary *result) {}
-            ];
+            [self sendJobFailed:action withLat:lat andLon:lon];
         } else {
             locked = [[DeviceState sharedInstance] waitForData];;
             if (!locked) {

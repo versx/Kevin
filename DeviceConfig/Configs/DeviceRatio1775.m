@@ -218,6 +218,27 @@ static double _tapScalar;
 -(DeviceCoordinate *)tutorialWillowPrompt {
     return [[DeviceCoordinate alloc] init:320 withY:320 andDeviceCoordinateScalar:scalar];
 }
+-(DeviceCoordinate *)compareTutorial2CheckT {
+    return [[DeviceCoordinate alloc] init:158 withY:1070 andDeviceCoordinateScalar:scalar];
+}
+-(DeviceCoordinate *)compareTutorial2CheckWhite {
+    return [[DeviceCoordinate alloc] init:30 withY:1110 andDeviceCoordinateScalar:scalar];
+}
+-(DeviceCoordinate *)compareTutorial2CheckY {
+    return [[DeviceCoordinate alloc] init:113 withY:1079 andDeviceCoordinateScalar:scalar]; //RGB(72, 107, 110)
+}
+-(DeviceCoordinate *)compareTutorial4Pokestops {
+    return [[DeviceCoordinate alloc] init:170 withY:840 andDeviceCoordinateScalar:scalar];
+}
+-(DeviceCoordinate *)compareTutorial4PokestopsWhiteBox {
+    return [[DeviceCoordinate alloc] init:30 withY:1050 andDeviceCoordinateScalar:scalar];
+}
+-(DeviceCoordinate *)tutorialUsernameConfirm {
+    return [[DeviceCoordinate alloc] init:320 withY:620 andDeviceCoordinateScalar:scalar]; //RGB(114, 212, 155)
+}
+-(DeviceCoordinate *)tutorialUsernameReenter {
+    return [[DeviceCoordinate alloc] init:320 withY:640 andDeviceCoordinateScalar:scalar];
+}
 
 
 #pragma mark Pokemon Encounter

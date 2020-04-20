@@ -17,15 +17,14 @@
 
 @interface JarvisTestCase : KIFTestCase
 
-+(JarvisTestCase *)sharedInstance;
++(instancetype)sharedInstance;
 
 -(void)registerUIInterruptionHandler:(NSString *)description;
 
 +(void)type:(NSString *)text;
-+(void)clearAndType:(NSString *)text;
++(void)clearText;
 +(void)touch:(int)x withY:(int)y;
 +(void)drag:(DeviceCoordinate *)start toPoint:(DeviceCoordinate *)end;
-+(void)swipe;
 
 +(void)test;
 

@@ -1,5 +1,5 @@
 //
-//  UIC.cpp
+//  UIC.mm
 //  Jarvis++
 //
 //  Created by versx on 2/24/20.
@@ -7,12 +7,13 @@
 
 #import "UIC.h"
 
+// TODO: Handle warning accounts (make config option to allow/not allow)
+// TODO: Fetch config from DCM, if no config provided wait until one is.
 // TODO: Fix crash after 10 minutes during leveling issue
 // TODO: Fix 6/6+/6s/7/7+/iPad support
-// TODO: Detect different tutorial stages for incomplete tuts
 // TODO: Handle invalid usernames
-// TODO: Move constants to consts class
-// TODO: Remove PTFakeTouch
+// TODO: Handle 'What was your name again?' screens
+// TODO: Make tutorial parts reusable
 // TODO: Pixel offsets in remote config
 // TODO: Fix https://developer.apple.com/documentation/xctest/xctestcase/1496273-adduiinterruptionmonitorwithdesc
 // TODO: Use https://github.com/mattstevens/RoutingHTTPServer for routes
@@ -37,28 +38,6 @@ static BOOL _dataStarted = false;
     if ((self = [super init])) {
         _heartbeatQueue = dispatch_queue_create("heartbeat_queue", NULL);
         _pixelCheckQueue = dispatch_queue_create("pixelcheck_queue", NULL);
-        
-        syslog(@"[INFO] %@ (%@) running %@ %@ with a delay of %@ and a tap multiplier of %f",
-               [[Device sharedInstance] uuid], [[Device sharedInstance] model],
-               [[Device sharedInstance] osName], [[Device sharedInstance] osVersion],
-               [[Device sharedInstance] delayMultiplier],
-               [DeviceConfig tapMultiplier]);
-        
-        syslog(@"[INFO] CPU Usage: %@%%, Count: %lu, Uptime: %@, Thermal State: %@",
-               [[SystemInfo sharedInstance] cpuUsage],
-               (unsigned long)[[SystemInfo sharedInstance] processorCount],
-               [SystemInfo formatTimeInterval:[[SystemInfo sharedInstance] systemUptime]],
-               [SystemInfo formatThermalState:[[SystemInfo sharedInstance] thermalState]]);
-        
-        syslog(@"[INFO] Total Memory: %@, Used Memory: %@, Free Memory: %@",
-               [SystemInfo formatBytes:[[[SystemInfo sharedInstance] totalMemory] longValue]],
-               [SystemInfo formatBytes:[[[SystemInfo sharedInstance] usedMemory] longValue]],
-               [SystemInfo formatBytes:[[[SystemInfo sharedInstance] freeMemory] longValue]]);
-        
-        syslog(@"[INFO] Total Space: %@, Used Space: %@, Free Space: %@",
-               [SystemInfo formatBytes:[[[SystemInfo sharedInstance] totalSpace] longValue]],
-               [SystemInfo formatBytes:[[[SystemInfo sharedInstance] usedSpace] longValue]],
-               [SystemInfo formatBytes:[[[SystemInfo sharedInstance] freeSpace] longValue]]);
     }
     
     return self;
@@ -81,38 +60,62 @@ static BOOL _dataStarted = false;
     int imageCount = _dyld_image_count();
     for (int i = 0; i < imageCount; i++) {
         if (strcmp(_dyld_get_image_name(i), "") == 0) {
-            
         }
         NSLog(@"[Jarvis] [DYLD] %d - %s", i, _dyld_get_image_name(i));
     }
     */
-    
-    // Print config settings
-    [[Settings sharedInstance] config];
-    
-    if ([DeviceConfig sharedInstance] == nil) {
-        return;
-    }
-    syslog(@"[DEBUG] DeviceConfig: %@", [DeviceConfig sharedInstance]);
-    syslog(@"[DEBUG] startupOldOkButton: %@", [[DeviceConfig sharedInstance] startupOldOkButton]);
-    
-    //JarvisTestCase *jarvis = [[JarvisTestCase alloc] init];
-    //[jarvis runTest];
-    //[jarvis registerUIInterruptionHandler:@"System Dialog"];
 
-    // Initalize our http server
-    _httpServer = [[HTTPServer alloc] init];
-    [_httpServer setPort:[[[Settings sharedInstance] port] intValue]];
-    [_httpServer setConnectionClass:[HttpClientConnection class]];
+    //dispatch_async(dispatch_queue_create("wait_queue", NULL), ^{
+        while (![[Settings sharedInstance] gotConfig]) {
+            sleep(1);
+        }
 
-    // TODO: Attempt to start HTTP server, if fails, reboot app or try again.
-    NSError *error = nil;
-    if (![_httpServer start:&error]) {
-        syslog(@"[ERROR] Error starting HTTP Server: %@", error);
-        return;
-    }
+        syslog(@"[INFO] %@ (%@) running %@ %@ with a delay of %@ and a tap multiplier of %f",
+               [[Device sharedInstance] uuid], [[Device sharedInstance] model],
+               [[Device sharedInstance] osName], [[Device sharedInstance] osVersion],
+               [[Device sharedInstance] delayMultiplier],
+               [DeviceConfig tapMultiplier]);
+        
+        syslog(@"[INFO] CPU Usage: %@%%, Count: %lu, Uptime: %@, Thermal State: %@",
+               [[SystemInfo sharedInstance] cpuUsage],
+               (unsigned long)[[SystemInfo sharedInstance] processorCount],
+               [SystemInfo formatTimeInterval:[[SystemInfo sharedInstance] systemUptime]],
+               [SystemInfo formatThermalState:[[SystemInfo sharedInstance] thermalState]]);
+        
+        syslog(@"[INFO] RAM: %@, Used: %@, Free: %@",
+               [SystemInfo formatBytes:[[[SystemInfo sharedInstance] totalMemory] longValue]],
+               [SystemInfo formatBytes:[[[SystemInfo sharedInstance] usedMemory] longValue]],
+               [SystemInfo formatBytes:[[[SystemInfo sharedInstance] freeMemory] longValue]]);
+        
+        syslog(@"[INFO] HDD: %@, Used: %@, Free: %@",
+               [SystemInfo formatBytes:[[[SystemInfo sharedInstance] totalSpace] longValue]],
+               [SystemInfo formatBytes:[[[SystemInfo sharedInstance] usedSpace] longValue]],
+               [SystemInfo formatBytes:[[[SystemInfo sharedInstance] freeSpace] longValue]]);
 
-    [self login];
+        // Check that the device is supported
+        if ([DeviceConfig sharedInstance] == nil) {
+            return;
+        }
+        syslog(@"[DEBUG] DeviceConfig: %@", [DeviceConfig sharedInstance]);
+
+        //JarvisTestCase *jarvis = [[JarvisTestCase alloc] init];
+        //[jarvis runTest];
+        //[jarvis registerUIInterruptionHandler:@"System Dialog"];
+
+        // Initalize our http server
+        _httpServer = [[HTTPServer alloc] init];
+        [_httpServer setPort:[[Settings sharedInstance] port]];
+        [_httpServer setConnectionClass:[HttpClientConnection class]];
+
+        // TODO: Attempt to start HTTP server, if fails, reboot app or try again.
+        NSError *error = nil;
+        if (![_httpServer start:&error]) {
+            syslog(@"[ERROR] Error starting HTTP Server: %@", error);
+            return;
+        }
+
+        [self login];
+    //});
 }
 
 -(void)login
@@ -123,7 +126,7 @@ static BOOL _dataStarted = false;
     
     dispatch_semaphore_t sem = dispatch_semaphore_create(0);
     NSString *username = [[Device sharedInstance] username];
-    syslog(@"[DEBUG] Checking if username is empty and account manager is enabled: %@", username);
+    syslog(@"[DEBUG] Checking if usernam==nil and accountManager==true: %@", username);
     if ([username isNullOrEmpty] && [[Settings sharedInstance] enableAccountManager]) {
         syslog(@"[DEBUG] Username is empty and account manager is enabled, starting account request...");
         NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
@@ -132,12 +135,12 @@ static BOOL _dataStarted = false;
         data[@"min_level"] = [[Device sharedInstance] minLevel];
         data[@"max_level"] = [[Device sharedInstance] maxLevel];
         data[@"type"] = TYPE_GET_ACCOUNT;
-        syslog(@"[DEBUG] Sending get_account request: %@", data);
+        //syslog(@"[DEBUG] Sending get_account request: %@", data);
         [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
                       dict:data
                   blocking:true
                 completion:^(NSDictionary *result) {
-            syslog(@"[DEBUG] get_account postRequest sent, response %@", result);
+            syslog(@"[DEBUG] get_account sent, response %@", result);
             if ([[result objectForKey:@"status"] isEqualToString:@"error"]) {
                 syslog(@"[ERROR] Failed to get account from backend: %@", result[@"error"]);
                 return;
@@ -168,7 +171,7 @@ static BOOL _dataStarted = false;
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
     
     // Delay execution of my block for 5/30 seconds depending on device model.
-    NSNumber *delay = [[Device sharedInstance] isOneGbDevice] ? @15 /*5S*/ : @5; /*SE*/
+    NSNumber *delay = [[Device sharedInstance] is1GbDevice] ? @15 /*5S*/ : @5; /*SE*/
     dispatch_time_t time = dispatch_time(DISPATCH_TIME_NOW, [delay intValue] * NSEC_PER_SEC);
     dispatch_after(time, dispatch_get_main_queue(), ^{
         [self startHeartbeatLoop]; // TODO: Start heartbeat first time after receiving data.
@@ -195,17 +198,17 @@ static BOOL _dataStarted = false;
     ];
     NSNumber *delayMultiplier = [[Device sharedInstance] delayMultiplier];
     dispatch_async(_heartbeatQueue, ^{
-        NSNumber *heartbeatMaxTime = [[Settings sharedInstance] heartbeatMaxTime];
+        int heartbeatMaxTime = [[Settings sharedInstance] heartbeatMaxTime];
         while (heartbeatRunning) {
             // Check if time since last check-in was within 2 minutes, if not reboot device.
             sleep(15);
             NSDate *lastUpdate = [[DeviceState sharedInstance] lastUpdate];
             NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:lastUpdate];
-            if (timeIntervalSince >= [heartbeatMaxTime intValue] * [delayMultiplier intValue]) {
+            if (timeIntervalSince >= heartbeatMaxTime * [delayMultiplier intValue]) {
                 syslog(@"[ERROR] HTTP SERVER DIED. Restarting...");
                 [DeviceState restart];
             } else {
-                syslog(@"[INFO] Last data %f We Good", timeIntervalSince);
+                //syslog(@"[INFO] Last data %f We Good", timeIntervalSince);
             }
         }
         
@@ -426,6 +429,17 @@ static BOOL _dataStarted = false;
     } else if ([UIC2 isTutorial]) {
         syslog(@"[INFO] Found tutorial screen.");
         [UIC2 doTutorialSelection];
+    } else if ([UIC2 isTutorial2]) {
+        syslog(@"[INFO] Found tutorial 2 (Pokemon) screen.");
+        [UIC2 doTutorialPokemonSelection];
+    } else if ([UIC2 isTutorial3]) {
+        syslog(@"[INFO] Found tutorial 3 (Username) screen.");
+        [UIC2 doTutorialUsernameSelection];
+        sleep(1 * delayMultiplier);
+    } else if ([UIC2 isTutorial4]) {
+        syslog(@"[INFO] Found tutorial 4 (Pokestop) screen.");
+        [UIC2 doTutorialPokestopSelection];
+        sleep(1 * delayMultiplier);
     } else if ([UIC2 isBanned]) {
         syslog(@"[INFO] Found banned screen. Restarting...");
         NSMutableDictionary *bannedData = [[NSMutableDictionary alloc] init];
@@ -683,6 +697,142 @@ static BOOL _dataStarted = false;
     sleep(3 * delayMultiplier);
     [JarvisTestCase touch:[willowPrompt tapX] withY:[willowPrompt tapY]];
     sleep(5 * delayMultiplier);
+    
+    NSString *username = [[Device sharedInstance] username];
+    NSString *usernameReturn = [NSString stringWithFormat:@"%@\n", username];
+    /*
+    int count = 0;
+    long max = 15 - [username length];
+    while (![UIC2 isUsernameConfirm] && count < max) {
+        syslog(@"[WARN] Username %@ is not available, adding random letter", username);
+        DeviceCoordinate *reenterUsername = [[DeviceConfig sharedInstance] tutorialUsernameReenter];
+        [JarvisTestCase touch:[reenterUsername tapX] withY:[reenterUsername tapY]];
+        sleep(2 * delayMultiplier);
+        uint32_t min = (uint32_t)MIN(10, [username length]);
+        char character = [username characterAtIndex: (int)arc4random_uniform(min)];
+        NSString *newUsername = [NSString stringWithFormat:@"%@%c", username, character];
+        if ([newUsername length] > 15) {
+            // Too long of a username
+        }
+    }
+    */
+    
+    syslog(@"[INFO] [TUT] Typing in nickname %@", username)
+    [JarvisTestCase type:usernameReturn];
+    sleep(1 * delayMultiplier);
+    // TODO: While not tutorialStyleConfirm button keep trying to enter random username and click OK button on fail.
+    // Click OK button.
+    if ([self isPassengerWarning]) {
+        syslog(@"[INFO] [TUT] Clicking OK username button.");
+        DeviceCoordinate *passenger = [[DeviceConfig sharedInstance] passenger];
+        [JarvisTestCase touch:[passenger tapX] withY:[passenger tapY]];
+    }
+    sleep(2 * delayMultiplier);
+    // Confirm username.
+    syslog(@"[INFO] [TUT] Confirming username.");
+    DeviceCoordinate *confirm = [[DeviceConfig sharedInstance] tutorialStyleConfirm];
+    [JarvisTestCase touch:[confirm tapX] withY:[confirm tapY]];
+    sleep(2 * delayMultiplier);
+    // x 327-765 0.615686 0.835294 0.439216 1
+    syslog(@"[INFO] [TUT] Clicking away Professor Willow screens.");
+    DeviceCoordinate *pokestopConfirm = [[DeviceConfig sharedInstance] tutorialPokestopConfirm];
+    while (![self isAtPixel:pokestopConfirm
+                 betweenMin:[[ColorOffset alloc] init:0.42 green:0.82 blue:0.60]
+                     andMax:[[ColorOffset alloc] init:0.46 green:0.85 blue:0.63]]) {
+        [JarvisTestCase touch:[pokestopConfirm tapX] withY:[pokestopConfirm tapY]];
+        sleep(2 * delayMultiplier);
+    }
+    sleep(3 * delayMultiplier);
+    // Click Pokestop button.
+    syslog(@"[INFO] [TUT] Clicking away spin Pokestop prompt.");
+    [JarvisTestCase touch:[pokestopConfirm tapX] withY:[pokestopConfirm tapY]];
+    sleep(2 * delayMultiplier);
+    syslog(@"[INFO] [TUT] Tutorial done!");
+    NSMutableDictionary *tutData = [[NSMutableDictionary alloc] init];
+    tutData[@"uuid"] = [[Device sharedInstance] uuid];
+    tutData[@"username"] = [[Device sharedInstance] username];
+    tutData[@"type"] = TYPE_TUTORIAL_DONE;
+    [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                  dict:tutData
+              blocking:true
+            completion:^(NSDictionary *result) {}];
+}
+
++(void)doTutorialPokemonSelection
+{
+    int delayMultiplier = [[[Device sharedInstance] delayMultiplier] intValue];
+    syslog(@"[INFO] [TUT] Tapping 2 times passed Professor Willow screen.");
+    DeviceCoordinate *willowPrompt = [[DeviceConfig sharedInstance] tutorialWillowPrompt];
+    [JarvisTestCase touch:[willowPrompt tapX] withY:[willowPrompt tapY]];
+    sleep(1 * delayMultiplier);
+    [JarvisTestCase touch:[willowPrompt tapX] withY:[willowPrompt tapY]];
+    sleep(3 * delayMultiplier);
+
+    int failed = 0;
+    int maxFails = 5;
+    while (![self findAndClickPokemon]) {
+        syslog(@"[WARN] [TUT] Failed to find Pokemon, rotating...");
+        DeviceCoordinate *ageStart = [[DeviceConfig sharedInstance] ageVerificationDragStart];
+        DeviceCoordinate *ageEnd = [[DeviceConfig sharedInstance] ageVerificationDragEnd];
+        [JarvisTestCase drag:ageStart toPoint:ageEnd];
+        sleep(5 * delayMultiplier);
+        failed++;
+        if (failed >= maxFails) {
+            break;
+        }
+    }
+    if (failed >= maxFails) {
+        syslog(@"[ERROR] [TUT] Failed to find and click Pokemon to catch...");
+        return;
+    }
+    sleep(4 * delayMultiplier);
+    // Check for camera permissions prompt.
+    syslog(@"[DEBUG] [TUT] Checking for AR(+) camera permissions prompt...");
+    bool isArPrompt = [self isArPlusPrompt];
+    if (isArPrompt) {
+        syslog(@"[INFO] [TUT] Found AR(+) prompt, clicking.");
+        DeviceCoordinate *startupOldCoordinate = [[DeviceConfig sharedInstance] startupOldOkButton];
+        [JarvisTestCase touch:[startupOldCoordinate tapX] withY:[startupOldCoordinate tapY]];
+        sleep(2 * delayMultiplier);
+    }
+    // TODO: Verify isArPlusModePrompt works.
+    if (![self isArPlusModePrompt]) {
+        syslog(@"[INFO] No AR(+) enabled.");
+    }
+    sleep(3 * delayMultiplier);
+    // If we haven't hit the post capture prompt yet, keep attempting to throw pokeballs.
+    //0.611765 0.839216 0.466667 1
+    //0.611765 0.839216 0.462745 1
+    while (![self isAtPixel:[[DeviceConfig sharedInstance] tutorialCatchConfirm] // passenger / 0.988235 1 0.988235 1
+                 betweenMin:[[ColorOffset alloc] init:0.60 green:0.82 blue:0.45] // catchConfirm / 0.611765 0.839216 0.466667 1
+                     andMax:[[ColorOffset alloc] init:0.63 green:0.85 blue:0.48]] &&
+           ![self isAtPixel:[[DeviceConfig sharedInstance] tutorialCatchConfirm]
+                 betweenMin:[[ColorOffset alloc] init:0.45 green:0.82 blue:0.60]
+                     andMax:[[ColorOffset alloc] init:0.48 green:0.85 blue:0.63]]) {
+        syslog(@"[INFO] [TUT] Attempting to throw Pokeball.");
+        DeviceCoordinate *ageStart = [[DeviceConfig sharedInstance] ageVerificationDragStart];
+        DeviceCoordinate *ageEnd = [[DeviceConfig sharedInstance] ageVerificationDragEnd];
+        [JarvisTestCase drag:ageStart toPoint:ageEnd];
+        syslog(@"[INFO] [TUT] Pokeball thrown.");
+        sleep(10);
+    }
+    syslog(@"[INFO] [TUT] Pokemon caught!");
+    sleep(2 * delayMultiplier);
+    //310x755 - 0.611765 0.839216 0.466667
+    syslog(@"[INFO] [TUT] Tapping OK after Pokemon caught button and waiting 10 seconds.");
+    DeviceCoordinate *catchConfirm = [[DeviceConfig sharedInstance] tutorialCatchConfirm];
+    [JarvisTestCase touch:[catchConfirm tapX] withY:[catchConfirm tapY]];
+    sleep(10); // TODO: Wait for pokedex animation to finish. Wait longer on 5S/6 devices.
+    syslog(@"[INFO] [TUT] Closing Pokemon screen.");
+    // TODO: Pixel check close button
+    DeviceCoordinate *closeButton = [[DeviceConfig sharedInstance] closeMenu];
+    [JarvisTestCase touch:[closeButton tapX] withY:[closeButton tapY]];
+    sleep(3 * delayMultiplier);
+    syslog(@"[INFO] [TUT] Willow prompt, tapping 2 times.");
+    [JarvisTestCase touch:[willowPrompt tapX] withY:[willowPrompt tapY]];
+    sleep(3 * delayMultiplier);
+    [JarvisTestCase touch:[willowPrompt tapX] withY:[willowPrompt tapY]];
+    sleep(5 * delayMultiplier);
     NSString *username = [[Device sharedInstance] username];
     NSString *usernameReturn = [NSString stringWithFormat:@"%@\n", username];
     syslog(@"[INFO] [TUT] Typing in nickname %@", username)
@@ -702,6 +852,86 @@ static BOOL _dataStarted = false;
     [JarvisTestCase touch:[confirm tapX] withY:[confirm tapY]];
     sleep(2 * delayMultiplier);
     // x 327-765 0.615686 0.835294 0.439216 1
+    syslog(@"[INFO] [TUT] Clicking away Professor Willow screens.");
+    DeviceCoordinate *pokestopConfirm = [[DeviceConfig sharedInstance] tutorialPokestopConfirm];
+    while (![self isAtPixel:pokestopConfirm
+                 betweenMin:[[ColorOffset alloc] init:0.42 green:0.82 blue:0.60]
+                     andMax:[[ColorOffset alloc] init:0.46 green:0.85 blue:0.63]]) {
+        [JarvisTestCase touch:[pokestopConfirm tapX] withY:[pokestopConfirm tapY]];
+        sleep(2 * delayMultiplier);
+    }
+    sleep(3 * delayMultiplier);
+    // Click Pokestop button.
+    syslog(@"[INFO] [TUT] Clicking away spin Pokestop prompt.");
+    [JarvisTestCase touch:[pokestopConfirm tapX] withY:[pokestopConfirm tapY]];
+    sleep(2 * delayMultiplier);
+    syslog(@"[INFO] [TUT] Tutorial done!");
+    NSMutableDictionary *tutData = [[NSMutableDictionary alloc] init];
+    tutData[@"uuid"] = [[Device sharedInstance] uuid];
+    tutData[@"username"] = [[Device sharedInstance] username];
+    tutData[@"type"] = TYPE_TUTORIAL_DONE;
+    [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                  dict:tutData
+              blocking:true
+            completion:^(NSDictionary *result) {}];
+}
+
++(void)doTutorialUsernameSelection
+{
+    int delayMultiplier = [[[Device sharedInstance] delayMultiplier] intValue];
+    syslog(@"[INFO] [TUT] Willow prompt, tapping 2 times.");
+    DeviceCoordinate *willowPrompt = [[DeviceConfig sharedInstance] tutorialWillowPrompt];
+    [JarvisTestCase touch:[willowPrompt tapX] withY:[willowPrompt tapY]];
+    sleep(3 * delayMultiplier);
+    [JarvisTestCase touch:[willowPrompt tapX] withY:[willowPrompt tapY]];
+    sleep(5 * delayMultiplier);
+    NSString *username = [[Device sharedInstance] username];
+    NSString *usernameReturn = [NSString stringWithFormat:@"%@\n", username];
+    syslog(@"[INFO] [TUT] Typing in nickname %@", username)
+    [JarvisTestCase type:usernameReturn];
+    sleep(1 * delayMultiplier);
+    // TODO: While not tutorialStyleConfirm button keep trying to enter random username and click OK button on fail.
+    // Click OK button.
+    if ([self isPassengerWarning]) {
+        syslog(@"[INFO] [TUT] Clicking OK username button.");
+        DeviceCoordinate *passenger = [[DeviceConfig sharedInstance] passenger];
+        [JarvisTestCase touch:[passenger tapX] withY:[passenger tapY]];
+    }
+    sleep(2 * delayMultiplier);
+    // Confirm username.
+    syslog(@"[INFO] [TUT] Confirming username.");
+    DeviceCoordinate *confirm = [[DeviceConfig sharedInstance] tutorialStyleConfirm];
+    [JarvisTestCase touch:[confirm tapX] withY:[confirm tapY]];
+    sleep(2 * delayMultiplier);
+    // x 327-765 0.615686 0.835294 0.439216 1
+    // TODO: Call doTutorialPokestopsSelection
+    syslog(@"[INFO] [TUT] Clicking away Professor Willow screens.");
+    DeviceCoordinate *pokestopConfirm = [[DeviceConfig sharedInstance] tutorialPokestopConfirm];
+    while (![self isAtPixel:pokestopConfirm
+                 betweenMin:[[ColorOffset alloc] init:0.42 green:0.82 blue:0.60]
+                     andMax:[[ColorOffset alloc] init:0.46 green:0.85 blue:0.63]]) {
+        [JarvisTestCase touch:[pokestopConfirm tapX] withY:[pokestopConfirm tapY]];
+        sleep(2 * delayMultiplier);
+    }
+    sleep(3 * delayMultiplier);
+    // Click Pokestop button.
+    syslog(@"[INFO] [TUT] Clicking away spin Pokestop prompt.");
+    [JarvisTestCase touch:[pokestopConfirm tapX] withY:[pokestopConfirm tapY]];
+    sleep(2 * delayMultiplier);
+    syslog(@"[INFO] [TUT] Tutorial done!");
+    NSMutableDictionary *tutData = [[NSMutableDictionary alloc] init];
+    tutData[@"uuid"] = [[Device sharedInstance] uuid];
+    tutData[@"username"] = [[Device sharedInstance] username];
+    tutData[@"type"] = TYPE_TUTORIAL_DONE;
+    [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
+                  dict:tutData
+              blocking:true
+            completion:^(NSDictionary *result) {}];
+}
+
++(void)doTutorialPokestopSelection
+{
+    int delayMultiplier = [[[Device sharedInstance] delayMultiplier] intValue];
     syslog(@"[INFO] [TUT] Clicking away Professor Willow screens.");
     DeviceCoordinate *pokestopConfirm = [[DeviceConfig sharedInstance] tutorialPokestopConfirm];
     while (![self isAtPixel:pokestopConfirm
@@ -823,6 +1053,78 @@ static BOOL _dataStarted = false;
                            betweenMin:[[ColorOffset alloc] init:0.3 green:0.5 blue:0.6]
                                andMax:[[ColorOffset alloc] init:0.4 green:0.6 blue:0.7]
                  ];
+        dispatch_semaphore_signal(sem);
+    });
+    dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+    return result;
+}
+
+// Catch a Pokemon screen
++(BOOL)isTutorial2
+{
+    __block bool result = false;
+    dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIImage *image = [Utils takeScreenshot];
+        result = [image rgbAtLocation:[[DeviceConfig sharedInstance] compareTutorial2CheckT]
+                           betweenMin:[[ColorOffset alloc] init:0.29 green:0.40 blue:0.40]
+                               andMax:[[ColorOffset alloc] init:0.49 green:0.60 blue:0.60]] &&
+                 [image rgbAtLocation:[[DeviceConfig sharedInstance] compareTutorial2CheckWhite]
+                           betweenMin:[[ColorOffset alloc] init:0.95 green:0.95 blue:0.95]
+                               andMax:[[ColorOffset alloc] init:1.00 green:1.00 blue:1.00]];
+        dispatch_semaphore_signal(sem);
+    });
+    dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+    return result;
+}
+
+// Username screen
++(BOOL)isTutorial3
+{
+    __block bool result = false;
+    dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIImage *image = [Utils takeScreenshot];
+        result = [image rgbAtLocation:[[DeviceConfig sharedInstance] compareTutorial2CheckY]
+                           betweenMin:[[ColorOffset alloc] init:0.16 green:0.30 blue:0.30]
+                               andMax:[[ColorOffset alloc] init:0.36 green:0.50 blue:0.50]] &&
+                 [image rgbAtLocation:[[DeviceConfig sharedInstance] compareTutorial2CheckWhite]
+                           betweenMin:[[ColorOffset alloc] init:0.95 green:0.95 blue:0.95]
+                               andMax:[[ColorOffset alloc] init:1.00 green:1.00 blue:1.00]];
+        dispatch_semaphore_signal(sem);
+    });
+    dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+    return result;
+}
+
+// Spin a Pokestop screen
++(BOOL)isTutorial4
+{
+    __block bool result = false;
+    dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIImage *image = [Utils takeScreenshot];
+        result = [image rgbAtLocation:[[DeviceConfig sharedInstance] compareTutorial4Pokestops]
+                           betweenMin:[[ColorOffset alloc] init:0.00 green:0.68 blue:0.90]
+                               andMax:[[ColorOffset alloc] init:0.10 green:0.88 blue:1.00]] &&
+                 [image rgbAtLocation:[[DeviceConfig sharedInstance] compareTutorial4PokestopsWhiteBox]
+                           betweenMin:[[ColorOffset alloc] init:0.95 green:0.95 blue:0.95]
+                               andMax:[[ColorOffset alloc] init:1.00 green:1.00 blue:1.00]];
+        dispatch_semaphore_signal(sem);
+    });
+    dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+    return result;
+}
+
++(BOOL)isUsernameConfirm
+{
+    __block bool result = false;
+    dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UIImage *image = [Utils takeScreenshot];
+        result = [image rgbAtLocation:[[DeviceConfig sharedInstance] tutorialUsernameConfirm]
+                           betweenMin:[[ColorOffset alloc] init:0.34 green:0.73 blue:0.50]
+                               andMax:[[ColorOffset alloc] init:0.54 green:0.93 blue:0.70]];
         dispatch_semaphore_signal(sem);
     });
     dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
@@ -1111,6 +1413,7 @@ static BOOL _dataStarted = false;
 
 @end
 
+/*
 @class NSString;
 
 @interface NIATrustedCertificatesAuthenticator : NSObject <NSURLSessionDelegate>
@@ -1126,14 +1429,18 @@ typedef void (^CDUnknownBlockType)(void);
 
 @implementation NIATrustedCertificatesAuthenticator
 
--(void)URLSession:(NSURLSession *)session didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable))completionHandler {
+//-(void)URLSession:(NSURLSession *)session didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable))completionHandler
+-(void)URLSession:(id)arg1 didReceiveChallenge:(id)arg2 completionHandler:(id)arg3
+{
     // Trust invalid certs
-    NSURLCredential *credential = [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust];
-    completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
+    NSLog(@"[Jarvis] [DEBUG] URLSession: %@, Challenge: %@", arg1, arg2);
+    ////NSURLCredential *credential = [NSURLCredential credentialForTrust:arg2.protectionSpace.serverTrust];
+    //NSLog(@"[Jarvis] [DEBUG] Credentials Username: %@ Password: %@", [credential user], [credential password]);
+    //completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
 }
 
 @end
-
+*/
 
 /*
  %hook NIATrustedCertificatesAuthenticator

@@ -38,6 +38,8 @@
 +(UIImage *)takeScreenshot;
 +(void)takeScreenshot:(void (^)(UIImage* image))completion;
 
++(void)sendScreenshot;
+
 +(void)showAlert:(id)obj withMessage:(NSString *)message;
 
 +(void)syslog:(NSString *)fmt;

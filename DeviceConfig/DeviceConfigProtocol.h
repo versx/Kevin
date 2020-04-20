@@ -140,7 +140,20 @@
 -(DeviceCoordinate *)tutorialPokemonAtFeet;
 /** Willow Prompt. */
 -(DeviceCoordinate *)tutorialWillowPrompt;
-
+/** T of "There's a Pokemon nearby! " at the beginning of catch a Pokemon tutorial. */
+-(DeviceCoordinate *)compareTutorial2CheckT;
+/** White color of bottom left corner of white box. */
+-(DeviceCoordinate *)compareTutorial2CheckWhite;
+/** Y of "You've caught your first Pokemon" after catching a Pokemon at tutorial. */
+-(DeviceCoordinate *)compareTutorial2CheckY;
+/** Pokestop icon blue color at "You can find items at Pokestops". */
+-(DeviceCoordinate *)compareTutorial4Pokestops;
+/** White box at "You can find items at Pokestops". */
+-(DeviceCoordinate *)compareTutorial4PokestopsWhiteBox;
+/** Confirm username button. */
+-(DeviceCoordinate *)tutorialUsernameConfirm;
+/** Username re-enter after not available. */
+-(DeviceCoordinate *)tutorialUsernameReenter;
 
 #pragma mark Pokemon Encounter Coordinates
 

@@ -9,36 +9,46 @@
 
 @implementation HttpClientConnection
 
-/* Unused, make sure of them.
-// HTTP endpoints
-NSString * VALID_GET_ENDPOINTS[6] = {
-    @"/loc",
-    @"/config",
-    @"/restart",
-    @"/reboot",
-    @"/clear",
-    @"/account"
-};
-NSString * VALID_POST_ENDPOINTS[7] = {
-    @"/loc",
-    @"/data",
-    @"/touch",
-    @"/type",
-    @"/swipe",
-    @"/pixel",
-    @"/test"
-};
-*/
+static NSArray *ValidGetEndpoints;
+static NSArray *ValidPostEndpoints;
+
+-(id)init
+{
+    if ((self = [super init])) {
+        ValidGetEndpoints = @[
+            @"/account",
+            @"/clear",
+            @"/config",
+            @"/loc",
+            @"/reboot",
+            @"/restart",
+            @"/screen"
+        ];
+        ValidPostEndpoints = @[
+            @"/data",
+            @"/loc",
+            @"/pixel",
+            @"/touch",
+            @"/type",
+            @"/test"
+        ];
+    }
+    return self;
+}
 
 -(BOOL)supportsMethod:(NSString *)method atPath:(NSString *)path
 {
     // Add support for POST
     if ([method isEqualToString:@"POST"]) {
+        /*
+        if ([ValidPostEndpoints containsObject:path]) {
+            return YES;
+        }
+        */
         if ([path isEqualToString:@"/loc"] ||
             [path isEqualToString:@"/data"] ||
             [path isEqualToString:@"/touch"] ||
             [path isEqualToString:@"/type"] ||
-            [path isEqualToString:@"/swipe"] ||
             [path isEqualToString:@"/pixel"] ||
             [path isEqualToString:@"/test"]) {
             // Let's be extra cautious, and make sure the upload isn't 5 gigs
@@ -48,12 +58,18 @@ NSString * VALID_POST_ENDPOINTS[7] = {
     }
     
     if ([method isEqualToString:@"GET"]) {
+        /*
+        if ([ValidGetEndpoints containsObject:path]) {
+            return YES;
+        }
+        */
         if ([path isEqualToString:@"/loc"] ||
             [path isEqualToString:@"/config"] ||
             [path isEqualToString:@"/restart"] ||
             [path isEqualToString:@"/reboot"] ||
             [path isEqualToString:@"/clear"] ||
-            [path isEqualToString:@"/account"]) {
+            [path isEqualToString:@"/account"] ||
+            [path isEqualToString:@"/screen"]) {
             return YES;
         }
     }
@@ -88,8 +104,8 @@ NSString * VALID_POST_ENDPOINTS[7] = {
         if (postData) {
             postStr = [[NSString alloc] initWithData:postData encoding:NSUTF8StringEncoding];
             json = [NSJSONSerialization JSONObjectWithData:postData
-                                                    options:kNilOptions
-                                                      error:&error];
+                                                   options:kNilOptions
+                                                     error:&error];
         }
         //syslog(@"[DEBUG] postStr: %@", postStr);
         NSString *response;
@@ -101,8 +117,6 @@ NSString * VALID_POST_ENDPOINTS[7] = {
             response = [[RequestController sharedInstance] handleTouchRequest:json];
         } else if ([path isEqualToString:@"/type"]) {
             response = [[RequestController sharedInstance] handleTypeRequest:json];
-        } else if ([path isEqualToString:@"/swipe"]) {
-            response = [[RequestController sharedInstance] handleSwipeRequest];
         } else if ([path isEqualToString:@"/pixel"]) {
             response = [[RequestController sharedInstance] handlePixelRequest:json];
         } else if ([path isEqualToString:@"/test"]) {
@@ -123,6 +137,8 @@ NSString * VALID_POST_ENDPOINTS[7] = {
             response = [[RequestController sharedInstance] handleClearRequest];
         } else if ([path isEqualToString:@"/account"]) {
             response = [[RequestController sharedInstance] handleAccountRequest];
+        } else if ([path isEqualToString:@"/screen"]) {
+            response = [[RequestController sharedInstance] handleScreenRequest];
         }
         NSData *responseData = [response dataUsingEncoding:NSUTF8StringEncoding];
         return [[HTTPDataResponse alloc] initWithData:responseData];

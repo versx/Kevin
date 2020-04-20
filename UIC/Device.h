@@ -27,14 +27,17 @@
 @property (nonatomic, readwrite, assign) BOOL isLoggedIn;
 @property (nonatomic, readwrite, assign) BOOL shouldExit;
 
--(BOOL)isOneGbDevice;
+-(BOOL)is1GbDevice;
 
 -(NSString *)username;
 -(void)setUsername:(NSString *)value;
+
 -(NSString *)password;
 -(void)setPassword:(NSString *)value;
+
 -(NSNumber *)minLevel;
 -(void)setMinLevel:(NSNumber *)value;
+
 -(NSNumber *)maxLevel;
 -(void)setMaxLevel:(NSNumber *)value;
 
