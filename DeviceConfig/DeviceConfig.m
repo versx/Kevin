@@ -26,8 +26,6 @@
     NSString *model = [[Device sharedInstance] model];
     if ([model isEqualToString:@"iPhone SE"] || [model isEqualToString:@"iPhone 5s"] || [model isEqualToString:@"iPhone 6"]) {
         tapMultiplier = 0.5;
-    } else {
-        tapMultiplier = 1.0;
     }
     return tapMultiplier;
 }

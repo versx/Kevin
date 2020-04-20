@@ -41,7 +41,7 @@ static int _jitterCorner;
     CLLocation *currentLoc = [[DeviceState sharedInstance] currentLocation];
     if (currentLoc != nil) {
         if ([[DeviceState sharedInstance] waitRequiresPokemon]) {
-            double jitterValue = [[[Settings sharedInstance] jitterValue] doubleValue];
+            double jitterValue = [[Settings sharedInstance] jitterValue];
             double jitterLat = 0.0;
             double jitterLon = 0.0;
             switch (_jitterCorner) {
@@ -136,18 +136,15 @@ static int _jitterCorner;
     [[DeviceState sharedInstance] setLastUpdate:[NSDate date]];
     CLLocation *currentLoc = [Utils createCoordinate:currentLocation.coordinate.latitude
                                                  lon:currentLocation.coordinate.longitude];
-    //NSNumber *targetMaxDistance = _targetMaxDistance;
-    NSString *pokemonEncounterId = [[DeviceState sharedInstance] pokemonEncounterId];
     NSMutableDictionary *data = [params mutableCopy];
     data[@"lat_target"] = @(currentLoc.coordinate.latitude);
     data[@"lon_target"] = @(currentLoc.coordinate.longitude);
-    data[@"target_max_distance"] = [[Settings sharedInstance] targetMaxDistance];
+    data[@"target_max_distnace"] = @(DEFAULT_TARGET_MAX_DISTANCE);// TODO: [[Settings sharedInstance] targetMaxDistance];
     data[@"username"] = [[Device sharedInstance] username] ?: @"";
-    data[@"pokemon_encounter_id"] = pokemonEncounterId ?: @"";
+    data[@"pokemon_encounter_id"] = [[DeviceState sharedInstance] pokemonEncounterId] ?: @"";
     data[@"uuid"] = [[Device sharedInstance] uuid];
     data[@"uuid_control"] = [[Device sharedInstance] uuid];
     data[@"ptcToken"] = [[Device sharedInstance] ptcToken] ?: @"";
-    
     [Utils postRequest:[[Settings sharedInstance] backendRawUrl]
                   dict:data
               blocking:false
@@ -179,9 +176,9 @@ static int _jitterCorner;
         NSNumber *diffLon = @(currentLoc.coordinate.longitude - [targetLon doubleValue]);
         
         // MIZU tut stuff
-        NSString *spinFortId = data[@"spin_fort_id"] ?: @"";
-        NSNumber *spinFortLat = data[@"spin_fort_lat"] ?: @0.0;
-        NSNumber *spinFortLon = data[@"spin_fort_lon"] ?: @0.0;
+        //NSString *spinFortId = data[@"spin_fort_id"] ?: @"";
+        //NSNumber *spinFortLat = data[@"spin_fort_lat"] ?: @0.0;
+        //NSNumber *spinFortLon = data[@"spin_fort_lon"] ?: @0.0;
         if ([level intValue] > 0) {
             if ([[Device sharedInstance] level] != level) {
                 NSNumber *oldLevel = [[Device sharedInstance] level];
@@ -223,6 +220,7 @@ static int _jitterCorner;
         //syslog(@"[DEBUG] [RES1] inArea: %s level: %@ nearby: %@ wild: %@ quests: %@ encounters: %@ plat: %@ plon: %@ encounterResponseId: %@ tarlat: %@ tarlon: %@ emptyGMO: %s invalidGMO: %s containsGMO: %s", (inArea ? "Yes" : "No"), level, nearby, wild, quests, encounters, pokemonLat, pokemonLon, pokemonEncounterIdResult, targetLat, targetLon, (onlyEmptyGmos ? "Yes" : "No"), (onlyInvalidGmos ? "Yes" : "No"), (containsGmo ? "Yes" : "No"));
         //syslog(@"[DEBUG] SpinFortLat: %@ SpinFortLon: %@", spinFortLat, spinFortLon);
 
+        /*
         NSNumber *itemDistance = @10000.0;
         if (![spinFortId isMemberOfClass:[NSNull class]] && ![spinFortLat isMemberOfClass:[NSNull class]]) {
             if ([spinFortLat doubleValue] != 0.0) {
@@ -231,6 +229,7 @@ static int _jitterCorner;
                 syslog(@"[DEBUG] ItemDistance: %@", itemDistance);
             }
         }
+        */
         // End MIZU tut stuff
         
         NSString *msg;
@@ -328,27 +327,13 @@ static int _jitterCorner;
 }
 
 /**
- Handle `/swipe` web requests.
- */
--(NSString *)handleSwipeRequest
-{
-    [JarvisTestCase swipe];
-    return JSON_OK;
-}
-
-/**
  Handle `/config` web requests.
  */
 -(NSString *)handleConfigRequest
 {
-    NSMutableString *text = [[NSMutableString alloc] init];
     NSDictionary *config = [[Settings sharedInstance] config];
-    if (config != nil) {
-        for (id key in config) {
-            [text appendFormat:@"%@=%@\n", key, config[key]];
-        }
-    }
-    return text;
+    NSString *json = [Utils toJsonString:config withPrettyPrint:true];
+    return json ?: JSON_ERROR;
 }
 
 /**
@@ -358,6 +343,35 @@ static int _jitterCorner;
 -(NSString *)handlePixelRequest:(NSDictionary *)params
 {
     syslog(@"[DEBUG] handlePixelRequest: %@", params);
+    /*
+    @try {
+        __block NSNumber *x = params[@"x"];
+        __block NSNumber *y = params[@"y"];
+        __block UIColor *color;
+        dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            UIImage *image = [Utils takeScreenshot];
+            color = [image getPixelColor:[x intValue] withY:[y intValue]];
+            dispatch_semaphore_signal(sem);
+        });
+        dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+        if (color == nil) {
+            syslog(@"[ERROR] Failed to get rgbAtLocation x=%@ y=%@", x, y);
+        } else {
+            syslog(@"[DEBUG] rgbAtLocation: x=%@ y=%@ color=%@", x, y, color);
+        }
+        NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+        dict[@"x"] = x;
+        dict[@"y"] = y;
+        dict[@"color"] = color;
+        NSString *json = [Utils toJsonString:dict withPrettyPrint:true];
+        return json ?: JSON_ERROR;
+    }
+    @catch (NSException *exception) {
+        syslog(@"[ERROR] handlePixelRequest: %@", exception);
+    }
+    return JSON_ERROR;
+    */
     dispatch_async(dispatch_get_main_queue(), ^{
         UIImage *image = [Utils takeScreenshot];
         syslog(@"[DEBUG] Screenshot taken");
@@ -371,6 +385,7 @@ static int _jitterCorner;
         }
     });
     return JSON_OK;
+
 }
 
 -(NSString *)handleClearRequest
@@ -403,33 +418,23 @@ static int _jitterCorner;
     //data[@"username"] = [[Device sharedInstance] username];
     //data[@"password"] = [[Device sharedInstance] password];
     //NSString *response = [Utils toJsonString:data withPrettyPrint:false];
-    NSString *response = [NSString stringWithFormat:@"{\"username\":\"%@\",\"password\":\"%@\"}",
-                          [[Device sharedInstance] username],
-                          [[Device sharedInstance] password]];
     if ([[Settings sharedInstance] autoLogin]) {
+        NSString *response = [NSString stringWithFormat:@"{\"username\":\"%@\",\"password\":\"%@\"}",
+                              [[Device sharedInstance] username],
+                              [[Device sharedInstance] password]];
         syslog(@"[INFO] Auto login account response: %@", response);
         return response;
     }
     return JSON_OK;
 }
 
--(void)showMessage:(NSString*)message withTitle:(NSString *)title
+-(NSString *)handleScreenRequest
 {
-    UIAlertController * alert = [UIAlertController alertControllerWithTitle:title
-                                                                    message:message
-                                                             preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"OK"
-                                                       style:UIAlertActionStyleDefault
-                                                     handler:^(UIAlertAction *action) {
-        //do something when click button
-    }];
-    [alert addAction:okAction];
-    UIApplication *app = [UIApplication sharedApplication];
-    UIWindow *window = [[app delegate] window];
-    UIViewController *controller = [window rootViewController];
-    [controller presentViewController:alert
-                             animated:YES
-                           completion:nil];
+    syslog(@"[INFO] Received screenshot request from user");
+    dispatch_async(dispatch_get_main_queue(), ^{
+       [Utils sendScreenshot];
+    });
+    return JSON_OK;
 }
 
 /**

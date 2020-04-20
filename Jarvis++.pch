@@ -5,12 +5,13 @@
 //  Created by versx on 3/10/20.
 //
 
-#define JARVIS_VERSION @"0.7.58"
+#define JARVIS_VERSION @"0.8.4"
 
 #import <Foundation/Foundation.h>
 #import "Utilities/Utils.h"
 
-#define syslog(fmt, ...) { [Utils syslog:[[NSString stringWithFormat:@"%d  x [Jarvis] %s ", __LINE__, __PRETTY_FUNCTION__] stringByAppendingString:[NSString stringWithFormat:fmt, ##__VA_ARGS__]]]; }
+//#define syslog(fmt, ...) { [Utils syslog:[[NSString stringWithFormat:@"%d  x [Jarvis] %s ", __LINE__, __PRETTY_FUNCTION__] stringByAppendingString:[NSString stringWithFormat:fmt, ##__VA_ARGS__]]]; }
+#define syslog(fmt, ...) { [Utils syslog:[NSString stringWithFormat:fmt, ##__VA_ARGS__]]; }
 
 // Include any system framework and library headers here that should be included in all compilation units.
 // You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.

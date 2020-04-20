@@ -3,6 +3,6 @@
 <plist version="1.0">
 <dict>
 	<key>url</key>
-	<string>http://example.com/uic.plist</string>
+	<string>http://example.com:9991</string>
 </dict>
 </plist>

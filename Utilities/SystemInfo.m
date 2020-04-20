@@ -143,7 +143,7 @@
     vm_statistics_data_t vm_stat;
 
     if (host_statistics(host_port, HOST_VM_INFO, (host_info_t)&vm_stat, &host_size) != KERN_SUCCESS) {
-        NSLog(@"[ERROR] Failed to fetch vm statistics");
+        syslog(@"[ERROR] Failed to fetch vm statistics");
     }
 
     /* Stats in bytes */
@@ -155,7 +155,7 @@
     [self setTotalMemory:@(mem_total)];
     [self setFreeMemory:@(mem_free)];
     [self setUsedMemory:@(mem_total - mem_free)];
-    NSLog(@"[DEBUG] used: %lu free: %lu total: %lu", mem_used, mem_free, mem_total);
+    //NSLog(@"[DEBUG] used: %lu free: %lu total: %lu", mem_used, mem_free, mem_total);
 }
 
 -(void)getDiskSpace
@@ -174,9 +174,9 @@
         [self setTotalSpace:@(totalSpace)];
         [self setFreeSpace:@(totalFreeSpace)];
         [self setUsedSpace:@(totalSpace - totalFreeSpace)];
-        NSLog(@"Memory Capacity of %llu MiB with %llu MiB Free memory available and %llu MiB Used memory.", ((totalSpace/1024ll)/1024ll), ((totalFreeSpace/1024ll)/1024ll), ((totalSpace - totalFreeSpace)/1024ll/1024ll));
+        //NSLog(@"Memory Capacity of %llu MiB with %llu MiB Free memory available and %llu MiB Used memory.", ((totalSpace/1024ll)/1024ll), ((totalFreeSpace/1024ll)/1024ll), ((totalSpace - totalFreeSpace)/1024ll/1024ll));
     } else {
-        NSLog(@"[ERROR] Error obtaining system storage info: %@", error);
+        syslog(@"[ERROR] Error obtaining system storage info: %@", error);
     }
 }
 

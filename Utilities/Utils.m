@@ -53,22 +53,17 @@ static double _baseVerticalAccuracy = 200.0; // in meters
           blocking:(BOOL)blocking
         completion:(void (^)(NSDictionary* result))completion
 {
-    //dispatch_async(dispatch_get_main_queue(), ^{
-    //    @autoreleasepool {
-    //__block BOOL done = false;
-    //__block NSDictionary *resultDict;
-    
     // Create the URLSession on the default configuration
     NSURLSessionConfiguration *defaultSessionConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
     NSURLSession *defaultSession = [NSURLSession sessionWithConfiguration:defaultSessionConfiguration];
 
     // Setup the request with URL
-    //syslog(@"[DEBUG] Sending request to %@ with params %@", urlString, data);
     NSURL *url = [NSURL URLWithString:urlString];
     NSMutableURLRequest *urlRequest = [NSMutableURLRequest requestWithURL:url
                                                               cachePolicy:NSURLRequestUseProtocolCachePolicy
                                                           timeoutInterval:-1]; // 0.5
 
+    // Convert POST string parameters to data using UTF8 Encoding
     NSError *error;
     NSData *postData = [NSJSONSerialization dataWithJSONObject:data options:0 error:&error];
     [urlRequest setHTTPBody:postData];
@@ -79,7 +74,6 @@ static double _baseVerticalAccuracy = 200.0; // in meters
         [urlRequest addValue:token forHTTPHeaderField:@"Authorization"];
     }
     
-    // Convert POST string parameters to data using UTF8 Encoding
     [urlRequest setHTTPMethod:@"POST"];
     [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
     [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Accept"];
@@ -87,7 +81,7 @@ static double _baseVerticalAccuracy = 200.0; // in meters
     // Create dataTask
     NSURLSessionDataTask *dataTask = [defaultSession dataTaskWithRequest:urlRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
-            syslog(@"[ERROR] %@", error);
+            syslog(@"[ERROR] %@ Error: %@", urlString, error);
             return;
         }
         NSString *responseData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
@@ -99,32 +93,14 @@ static double _baseVerticalAccuracy = 200.0; // in meters
                                                                        options:NSJSONReadingMutableContainers
                                                                          error:&jsonError];
             //syslog(@"[DEBUG] postRequest resultJson: %@", resultJson);
-            //resultDict = resultJson;
-            //if (!blocking) {
-                completion(resultJson);
-            //}
+            completion(resultJson);
         } else {
-            //if (!blocking) {
-                completion(nil);
-            //}
+            completion(nil);
         }
-        //done = true;
     }];
 
     // Fire the request
     [dataTask resume];
-    /*
-    if (blocking) {
-        while (!done) {
-            NSLog(@"[Jarvis] [DEBUG] postRequest %@ waiting...", urlString);
-            sleep(1);
-        }
-        syslog(@"[DEBUG] Blocking completed. ResultDict: %@", resultDict);
-        completion(resultDict);
-    }
-    */
-    //    }
-    //});
 }
 
 +(NSString *)toJsonString:(NSDictionary *)dict
@@ -221,9 +197,156 @@ static double _baseVerticalAccuracy = 200.0; // in meters
     });
 }
 
++(void)sendScreenshot
+{
+    syslog(@"[INFO] sendScreenshot");
+    NSString *url = [NSString stringWithFormat:@"%@/api/device/%@/screen",
+                     [[Settings sharedInstance] homebaseUrl],
+                     [[Device sharedInstance] uuid]];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
+    UIImage *image = [self takeScreenshot];
+    NSData *imageData = UIImageJPEGRepresentation(image, 1.0);
+
+    [request setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
+    [request setHTTPShouldHandleCookies:NO];
+    [request setTimeoutInterval:60];
+    [request setHTTPMethod:@"POST"];
+    
+    NSString *boundary = @"unique-consistent-string";
+    
+    // set Content-Type in HTTP header
+    NSString *contentType = [NSString stringWithFormat:@"multipart/form-data; boundary=%@", boundary];
+    [request setValue:contentType forHTTPHeaderField: @"Content-Type"];
+    
+    // post body
+    NSMutableData *body = [NSMutableData data];
+    
+    // add params (all params are strings)
+    [body appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+    [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=%@\r\n\r\n", @"imageCaption"] dataUsingEncoding:NSUTF8StringEncoding]];
+    [body appendData:[[NSString stringWithFormat:@"%@\r\n", @"Test"] dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    // add image data
+    if (imageData) {
+        [body appendData:[[NSString stringWithFormat:@"--%@\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=%@; filename=image.jpg\r\n", @"file"] dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:[@"Content-Type: image/jpeg\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+        [body appendData:imageData];
+        [body appendData:[[NSString stringWithFormat:@"\r\n"] dataUsingEncoding:NSUTF8StringEncoding]];
+    }
+    
+    [body appendData:[[NSString stringWithFormat:@"--%@--\r\n", boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+    
+    // setting the body of the post to the reqeust
+    [request setHTTPBody:body];
+    
+    // set the content-length
+    NSString *postLength = [NSString stringWithFormat:@"%lu", (unsigned long)[body length]];
+    [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
+    
+    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        if (data.length > 0) {
+            syslog(@"[INFO] Successfully sent screenshot");
+        }
+    }];
+}
+
+/*
++(void)uploadScreenshot
+{
+    NSString *url = [NSString stringWithFormat:@"%@/api/device/%@/screen",
+                     [[Settings sharedInstance] homebaseUrl],
+                     [[Device sharedInstance] uuid]];
+    NSDictionary *params = @{@"enctype": @"multipart/form-data"};
+
+    UIImage *image = [self takeScreenshot];
+    NSData *imageData = UIImageJPEGRepresentation(image, 1.0);
+
+
+    //Create a HTTP request type POST for sending the data
+    NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] multipartFormRequestWithMethod:@"POST" URLString:url parameters:params constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
+        /// Add attributes to the forms for using then in NodeJS
+        [formData appendPartWithFileData:cloudData
+                                    name:@"file"
+                                fileName:@"file.png"
+                                mimeType:@"text/plain"];
+
+    } error:nil];
+
+
+    [request setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
+    [request setHTTPShouldHandleCookies:NO];
+    [request setTimeoutInterval:20];
+
+    AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
+
+
+    manager.responseSerializer = [AFHTTPResponseSerializer serializer];
+    //Upload it
+    //Upload tasks are used for making HTTP requests that require a request body
+    NSURLSessionUploadTask *uploadTask;
+
+    // Create a progress object and pass it in
+    __block NSProgress *prog;
+    uploadTask = [manager uploadTaskWithStreamedRequest:request
+                                               progress:^(NSProgress *_Nonnull progress){
+                                                   [progress addObserver:self
+                                                              forKeyPath:@"fractionCompleted"
+                                                                 options:NSKeyValueObservingOptionNew
+                                                                 context:NULL];
+
+                                                   prog = progress;
+                                                  // [self unregisterAsObserverForObject:progress];
+                                               }
+                                      completionHandler:^(NSURLResponse * response, id responseObject, NSError * error)
+    {
+        if (error) {
+            NSLog(@"[INFO] ERROR: %@", error);
+        } else {
+            NSLog(@"[INFO] Upload completed");
+        }
+
+    }];
+}
+*/
+
 +(void)syslog:(NSString *)msg
 {
-    NSLog(@"%@", msg);
+    @try {
+        NSString *message = [NSString stringWithFormat:@"[Jarvis] %@", msg];
+        NSLog(@"%@", message);
+        //return;
+
+        NSString *homebaseUrl = [[Settings sharedInstance] homebaseUrl];
+        //NSLog(@"[Jarvis] homebaseUrl: %@", homebaseUrl);
+        if ([homebaseUrl isNullOrEmpty]) {
+            return;
+        }
+
+        NSString *url = [NSString stringWithFormat:@"%@/api/log/new/%@", homebaseUrl, [[Device sharedInstance] uuid]];
+        NSMutableURLRequest *urlRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
+        [urlRequest setHTTPMethod:@"POST"];
+
+        NSData *postData = [message dataUsingEncoding:NSUTF8StringEncoding];
+        [urlRequest setHTTPBody:postData];
+
+        NSURLSession *session = [NSURLSession sharedSession];
+        NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:urlRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+            if (httpResponse.statusCode != 200) {
+                NSLog(@"[Jarvis] Log error");
+            }
+        }];
+        [dataTask resume];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"[Jarvis] [ERROR] Logs: %@", exception);
+    }
+}
+
+/*
++(void)syslog:(NSString *)msg
+{
     NSString *host = [[Settings sharedInstance] loggingUrl];
     if ([host isNullOrEmpty]) {
         return;
@@ -302,6 +425,7 @@ static double _baseVerticalAccuracy = 200.0; // in meters
         NSLog(@"[Jarvis] [Utils] [ERROR] syslogUdp: %@", exception);
     }
 }
+*/
 
 +(NSString *)iso8601DateTime
 {

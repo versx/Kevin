@@ -47,13 +47,6 @@
 -(NSString *)handleTypeRequest:(NSDictionary *)params;
 
 /**
-* Handle swipe requests from the `/swipe` endpoint
-*
-* @return Response string to client
-*/
--(NSString *)handleSwipeRequest;
-
-/**
 * Handle pixel requests from the `/pixel` endpoint
 *
 * @param params POST data as a dictionary
@@ -83,6 +76,13 @@
 -(NSString *)handleRestartRequest;
 
 -(NSString *)handleAccountRequest;
+
+/**
+ * Handle screenshot requests from the `/screen` endpoint
+ *
+ * @return Image response as base64 string to client
+ */
+-(NSString *)handleScreenRequest;
 
 /**
 * Handles test development requests from the `/test` endpoint

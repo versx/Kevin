@@ -10,33 +10,36 @@
 @implementation Settings
 
 static NSDictionary *_config;
-static bool _enableAccountManager;
+static NSString *_homebaseUrl;
 static NSString *_backendControllerUrl;
 static NSString *_backendRawUrl;
 static NSString *_token;
 static NSString *_pixelConfigUrl;
-static NSNumber *_port;
-static NSNumber *_delayMultiplier;
-static NSNumber *_targetMaxDistance;
-static NSNumber * _heartbeatMaxTime;
-static NSNumber *_pokemonMaxTime;
-static NSNumber *_raidMaxTime;
-static NSNumber *_jitterValue;
-static NSNumber *_maxEmptyGMO;
-static NSNumber *_maxFailedCount;
-static NSNumber *_maxNoQuestCount;
-static NSNumber *_maxWarningTimeRaid;
-static NSNumber *_minDelayLogout;
-static bool _ultraIV;
-static bool _ultraQuests;
+static int _port;
+static int _targetMaxDistance;
+static int  _heartbeatMaxTime;
+static int _pokemonMaxTime;
+static int _raidMaxTime;
+static double _jitterValue;
+static int _maxEmptyGMO;
+static int _maxFailedCount;
+static int _maxNoQuestCount;
+static int _maxWarningTimeRaid;
+static int _minDelayLogout;
+static bool _enableAccountManager;
 static bool _deployEggs;
 static bool _nearbyTracker;
 static bool _autoLogin;
+static bool _ultraIV;
+static bool _ultraQuests;
+static bool _allowWarnedAccounts;
 
 static NSString *_loggingUrl;
 static NSNumber *_loggingPort;
 static bool _loggingTls;
 static bool _loggingTcp; // Use TCP, otherwise UDP protocol
+
+static bool _gotConfig;
 
 static NSString *plistFileName = @"config.plist";
 
@@ -44,9 +47,10 @@ static NSString *plistFileName = @"config.plist";
     return _config;
 }
 
--(bool)enableAccountManager {
-    return _enableAccountManager;
+-(NSString *)homebaseUrl {
+    return _homebaseUrl;
 }
+
 -(NSString *)backendControllerUrl {
     return _backendControllerUrl;
 }
@@ -59,44 +63,41 @@ static NSString *plistFileName = @"config.plist";
 -(NSString *)token {
     return _token;
 }
--(NSNumber *)port {
+-(int)port {
     return _port;
 }
--(NSNumber *)targetMaxDistance {
+-(int)targetMaxDistance {
     return _targetMaxDistance;
 }
--(NSNumber *)heartbeatMaxTime {
+-(int)heartbeatMaxTime {
     return _heartbeatMaxTime;
 }
--(NSNumber *)pokemonMaxTime {
+-(int)pokemonMaxTime {
     return _pokemonMaxTime;
 }
--(NSNumber *)raidMaxTime {
+-(int)raidMaxTime {
     return _raidMaxTime;
 }
--(NSNumber *)jitterValue {
+-(double)jitterValue {
     return _jitterValue;
 }
--(NSNumber*)maxEmptyGMO {
+-(int)maxEmptyGMO {
     return _maxEmptyGMO;
 }
--(NSNumber*)maxFailedCount {
+-(int)maxFailedCount {
     return _maxFailedCount;
 }
--(NSNumber *)maxNoQuestCount {
+-(int)maxNoQuestCount {
     return _maxNoQuestCount;
 }
--(NSNumber *)maxWarningTimeRaid {
+-(int)maxWarningTimeRaid {
     return _maxWarningTimeRaid;
 }
--(NSNumber *)minDelayLogout {
+-(int)minDelayLogout {
     return _minDelayLogout;
 }
--(bool)ultraIV {
-    return _ultraIV;
-}
--(bool)ultraQuests {
-    return _ultraQuests;
+-(bool)enableAccountManager {
+    return _enableAccountManager;
 }
 -(bool)deployEggs {
     return _deployEggs;
@@ -107,11 +108,20 @@ static NSString *plistFileName = @"config.plist";
 -(bool)autoLogin {
     return _autoLogin;
 }
+-(bool)ultraIV {
+    return _ultraIV;
+}
+-(bool)ultraQuests {
+    return _ultraQuests;
+}
+-(bool)allowWarnedAccounts {
+    return _allowWarnedAccounts;
+}
 
 -(NSString *)loggingUrl {
     return _loggingUrl;
 }
--(NSNumber *)loggingPort {
+-(int)loggingPort {
     return _loggingPort;
 }
 -(bool)loggingTls {
@@ -121,70 +131,79 @@ static NSString *plistFileName = @"config.plist";
     return _loggingTcp;
 }
 
+-(bool)gotConfig {
+    return _gotConfig;
+}
+
+
 +(Settings *)sharedInstance
 {
     static Settings *sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [[Settings alloc] init];
-        NSString *remoteConfigUrl = [sharedInstance getRemoteConfigUrl];
-        if (remoteConfigUrl == nil) {
-            NSLog(@"[Jarvis] [FATAL] Failed to fetch remote config, waiting 10 seconds then restarting...");
-            sleep(10);
+
+        _homebaseUrl = [sharedInstance getRemoteConfigUrl];
+        if (_homebaseUrl == nil) {
+            NSLog(@"[Jarvis] [Settings] [FATAL] Failed to fetch remote config url, waiting 30 seconds then restarting...");
+            sleep(30);
             [DeviceState restart];
             return;
         }
-        _config = [sharedInstance fetchRemoteConfig:remoteConfigUrl];//[sharedInstance loadSettings];
-        _enableAccountManager = [[_config objectForKey:@"enableAccountManager"] boolValue];
-        _backendControllerUrl = _config[@"backendControllerURL"];
-        _backendRawUrl = _config[@"backendRawURL"];
-        _pixelConfigUrl = _config[@"pixelConfigURL"];
-        _token = _config[@"token"] ?: @"";
-        _port = _config[@"port"] ?: DEFAULT_PORT;
-        _delayMultiplier = _config[@"delayMultiplier"] ?: DEFAULT_DELAY_MULTIPLIER;
-        _targetMaxDistance = _config[@"targetMaxDistance"] ?: DEFAULT_TARGET_MAX_DISTANCE;
-        _heartbeatMaxTime = _config[@"heartbeatMaxTime"] ?: DEFAULT_HEARTBEAT_MAX_TIME;
-        _pokemonMaxTime = _config[@"pokemonMaxTime"] ?: DEFAULT_POKEMON_MAX_TIME;
-        _raidMaxTime = _config[@"raidMaxTime"] ?: DEFAULT_RAID_MAX_TIME;
-        _jitterValue = _config[@"jitterValue"] ?: @(5.0e-05); // 5.0e-05 0.000005 // ?: DEFAULT_JITTER_VALUE;
-        _maxEmptyGMO = _config[@"maxEmptyGMO"] ?: DEFAULT_MAX_EMPTY_GMO;
-        _maxFailedCount = _config[@"maxFailedCount"] ?: DEFAULT_MAX_FAILED_COUNT;
-        _maxNoQuestCount = _config[@"maxNoQuestCount"] ?: DEFAULT_MAX_NO_QUEST_COUNT;
-        _maxWarningTimeRaid = _config[@"maxWarningTimeRaid"] ?: DEFAULT_MAX_WARNING_TIME_RAID;
-        _minDelayLogout = _config[@"minDelayLogout"] ?: DEFAULT_MIN_DELAY_LOGOUT;
-        _ultraIV = [[_config objectForKey:@"ultraIV"] boolValue];
-        _ultraQuests = [[_config objectForKey:@"ultraQuests"] boolValue];
-        _deployEggs = [[_config objectForKey:@"deployEggs"] boolValue];
-        _nearbyTracker = [[_config objectForKey:@"nearbyTracker"] boolValue];
-        _autoLogin = [[_config objectForKey:@"autoLogin"] boolValue];
+
+        NSDictionary *result;
+        NSString *url = [NSString stringWithFormat:@"%@/api/config/%@", _homebaseUrl, [[Device sharedInstance] uuid]];
+        bool gotConfig = false;
+        while (!gotConfig) {
+            result = [sharedInstance fetchJsonConfig:url];
+            if (result == nil || [result[@"status"] isEqualToString:@"error"]) {
+                NSLog(@"[Jarvis] [Settings] [ERROR] Failed to grab config error: %@ Trying again in 30 seconds...", result[@"error"] ?: @"Are you sure DeviceConfigManager is up?");
+                sleep(30);
+                continue;
+            }
+            sleep(3);
+            _config = result;
+            gotConfig = true;
+        }
+        NSLog(@"[Jarvis] [Settings] [INFO] Got config: %@", result);
+        if (result == nil) {
+            NSLog(@"[Jarvis] [Settings] [ERROR] Some how returned a nil config.");
+            return;
+        }
+
+        NSString *backendUrl = result[@"backendURL"];
+        _backendControllerUrl = [NSString stringWithFormat:@"%@/controler", backendUrl];
+        _backendRawUrl = [NSString stringWithFormat:@"%@/raw", backendUrl];
+        _pixelConfigUrl = result[@"pixelConfigURL"];
+        _token = result[@"token"] ?: @"";
+        _port = [result[@"port"] intValue];// ?: DEFAULT_PORT;
+        // TODO: Startup lat/lon
+        _targetMaxDistance = /*[result[@"targetMaxDistance"] intValue] ?:*/ DEFAULT_TARGET_MAX_DISTANCE;
+        _heartbeatMaxTime = [result[@"heartbeatMaxTime"] intValue] ?: DEFAULT_HEARTBEAT_MAX_TIME;
+        _pokemonMaxTime = [result[@"pokemonMaxTime"] intValue] ?: DEFAULT_POKEMON_MAX_TIME;
+        _raidMaxTime = [result[@"raidMaxTime"] intValue] ?: DEFAULT_RAID_MAX_TIME;
+        _jitterValue = [result[@"jitterValue"] doubleValue] ?: 5.0e-05; // 5.0e-05 0.000005 // ?: DEFAULT_JITTER_VALUE;
+        _maxEmptyGMO = [result[@"maxEmptyGMO"] intValue] ?: DEFAULT_MAX_EMPTY_GMO;
+        _maxFailedCount = [result[@"maxFailedCount"] intValue] ?: DEFAULT_MAX_FAILED_COUNT;
+        _maxNoQuestCount = [result[@"maxNoQuestCount"] intValue] ?: DEFAULT_MAX_NO_QUEST_COUNT;
+        _maxWarningTimeRaid = [result[@"maxWarningTimeRaid"] intValue] ?: DEFAULT_MAX_WARNING_TIME_RAID;
+        _minDelayLogout = [result[@"minDelayLogout"] intValue] ?: DEFAULT_MIN_DELAY_LOGOUT;
+        _enableAccountManager = [[result objectForKey:@"accountManager"] boolValue];
+        _deployEggs = [[result objectForKey:@"deployEggs"] boolValue];
+        _nearbyTracker = [[result objectForKey:@"nearbyTracker"] boolValue];
+        _autoLogin = [[result objectForKey:@"autoLogin"] boolValue];
+        _ultraIV = [[result objectForKey:@"ultraIV"] boolValue];
+        _ultraQuests = [[result objectForKey:@"ultraQuests"] boolValue];
+        _allowWarnedAccounts = [[result objectForKey:@"allowWarnedAccounts"] boolValue];
         
-        _loggingUrl = _config[@"loggingURL"] ?: @"";
-        _loggingPort = _config[@"loggingPort"] ?: @9999;
-        _loggingTls = [[_config objectForKey:@"loggingTLS"] boolValue];// ?: false;
-        _loggingTcp = [[_config objectForKey:@"loggingTCP"] boolValue];// ?: true;
+        _loggingUrl = result[@"loggingURL"] ?: @"";
+        _loggingPort = [result[@"loggingPort"] intValue];// ?: @9999;
+        _loggingTls = [[result objectForKey:@"loggingTLS"] boolValue];// ?: false;
+        _loggingTcp = [[result objectForKey:@"loggingTCP"] boolValue];// ?: true;
+        _gotConfig = true;
     });
     return sharedInstance;
 }
-
-/*
--(NSDictionary *)loadSettings
-{
-    NSString *bundlePath = [[NSBundle mainBundle] bundlePath];
-    NSString *plistPath = [bundlePath stringByAppendingPathComponent:plistFileName];
-    
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    if (![fileManager fileExistsAtPath:plistPath]) {
-        NSLog(@"[Settings] uic.plist DOES NOT EXIST!");
-        return nil;
-    }
-    NSLog(@"[Settings] Loading uic.plist from %@", plistPath);
-    NSDictionary *dict = [NSDictionary dictionaryWithContentsOfFile:plistPath];
-    for (id key in dict) {
-        NSLog(@"key=%@ value=%@", key, dict[key]);
-    }
-    return dict;
-}
-*/
 
 -(NSString *)getRemoteConfigUrl
 {
@@ -201,18 +220,67 @@ static NSString *plistFileName = @"config.plist";
     return dict[@"url"];
 }
 
--(NSDictionary *)fetchRemoteConfig:(NSString *)urlString
+-(NSDictionary *)fetchJsonConfig:(NSString *)urlString
 {
-    // TODO: Attempt to load again on failure
-    NSLog(@"[Jarvis] [Settings] [DEBUG] Fetching remote config from %@", urlString);
-    NSURL *url = [NSURL URLWithString:urlString];
-    NSDictionary *dict = [NSDictionary dictionaryWithContentsOfURL:url];
-    if (dict != nil) {
-        NSLog(@"[Jarvis] [Settings] [DEBUG] Remote Config: %@", dict);
-        return dict;
+    @try {
+        NSURL *urlRequest = [NSURL URLWithString:urlString];
+        NSError *error = nil;
+        NSString *json = [NSString stringWithContentsOfURL:urlRequest
+                                                  encoding:NSUTF8StringEncoding
+                                                     error:&error];
+        NSData *data = [json dataUsingEncoding:NSUTF8StringEncoding];
+        NSDictionary *result = [NSJSONSerialization JSONObjectWithData:data
+                                                               options:NSJSONReadingMutableContainers
+                                                                 error:&error];
+        if (error) {
+            NSLog(@"[Jarvis] [ERROR] Failed to fetch json config %@ Error:%@", urlString, error);
+            return nil;
+        }
+        return result;
     }
-    NSLog(@"[Jarvis] [Settings] [ERROR] Failed to fetch remote config %@", urlString);
+    @catch (NSException *exception) {
+        NSLog(@"[Jarvis] [ERROR] Failed to fetch json config %@ Exception: %@", urlString, exception);
+    }
     return nil;
+}
+
+-(NSDictionary *)getConfigOrWait
+{
+    NSDictionary *dict;
+    NSString *url = [NSString stringWithFormat:@"%@/api/config/%@", _homebaseUrl, [[Device sharedInstance] uuid]];
+    bool gotConfig = false;
+    while (!gotConfig) {
+        dict = [self fetchJsonConfig:url];
+        if (dict == nil || [dict[@"status"] isEqualToString:@"error"]) {
+            NSLog(@"[Jarvis] [Settings] [ERROR] Failed to grab config error: %@ Trying again in 30 seconds...", dict[@"error"] ?: @"Are you sure DeviceConfigManager is up?");
+            sleep(30);
+            continue;
+        }
+        sleep(3);
+        gotConfig = true;
+    }
+    return dict;
+}
+
+-(void)getConfigOrWait:(void (^)(NSDictionary* result))completion
+{
+    NSString *url = [NSString stringWithFormat:@"%@/api/config/%@", _homebaseUrl, [[Device sharedInstance] uuid]];
+    dispatch_async(dispatch_queue_create("config_queue", NULL), ^{
+        NSDictionary *dict;
+        bool gotConfig = false;
+        while (!gotConfig) {
+            dict = [self fetchJsonConfig:url];
+            if (dict == nil || [dict[@"status"] isEqualToString:@"error"]) {
+                NSLog(@"[Jarvis] [Settings] [ERROR] Failed to grab config error: %@ Trying again in 30 seconds...", dict[@"error"] ?: @"Are you sure DeviceConfigManager is up?");
+                sleep(30);
+                continue;
+            }
+            sleep(3);
+            gotConfig = true;
+        }
+        //NSLog(@"[Jarvis] broke while loop: %@", dict);
+        completion(dict);
+    });
 }
 
 @end

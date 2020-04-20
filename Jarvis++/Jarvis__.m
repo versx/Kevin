@@ -17,13 +17,14 @@ static void __attribute__((constructor)) initialize(void) {
 
 -(id)init
 {
-    syslog(@"[INFO] Version: %@", JARVIS_VERSION);
+    //syslog(@"[INFO] Version: %@", JARVIS_VERSION);
+    NSLog(@"[Jarvis] Version: %@", JARVIS_VERSION);
     if ((self = [super init])) {
         NSSetUncaughtExceptionHandler(&onUncaughtException);
         
         _uic = [[UIC2 alloc] init];
         [_uic start];
-        syslog(@"[INFO] started...");
+        //syslog(@"[INFO] started...");
     }
     
     return self;

@@ -67,46 +67,6 @@
     }
 }
 
-+(void)clearAndType:(NSString *)text
-{
-    @try {
-        if ([NSThread isMainThread]) {
-            //[tester clearTextFromFirstResponder];
-            //sleep(1);
-            [tester enterTextIntoCurrentFirstResponder:text
-                                          fallbackView:nil];
-        } else {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                //[tester clearTextFromAndThenEnterTextIntoCurrentFirstResponder:text];
-                //[tester clearTextFromFirstResponder];
-                //sleep(1);
-                [tester enterTextIntoCurrentFirstResponder:text
-                                              fallbackView:nil];
-            });
-        }
-    }
-    @catch (NSException *exception) {
-        syslog(@"[DEBUG] clearAndType: %@", exception);
-    }
-}
-
-+(void)swipe
-{
-    syslog(@"[DEBUG] swipe up");
-    @try {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            UIWindow *window = [[UIApplication sharedApplication] keyWindow];
-            UIView *view = [[window rootViewController] view];
-            DeviceCoordinate *dragStart = [[DeviceConfig sharedInstance] ageVerificationDragStart];
-            DeviceCoordinate *dragEnd   = [[DeviceConfig sharedInstance] ageVerificationDragEnd];
-            [view dragFromPoint:CGPointMake([dragStart tapX], [dragStart tapY])
-                        toPoint:CGPointMake([dragEnd tapX], [dragEnd tapY]) steps:8];
-        });
-    }
-    @catch (NSException *exception) {
-        syslog(@"[ERROR] swipe: %@", exception);
-    }
-}
 +(void)drag/*FromPoint*/:(DeviceCoordinate *)start toPoint:(DeviceCoordinate *)end
 {
     syslog(@"[DEBUG] dragging from %@ to %@", start, end);
@@ -175,7 +135,7 @@
 
 +(void)test
 {
-    BOOL result = [UIAutomationHelper acknowledgeSystemAlert];
+    bool result = [UIAutomationHelper acknowledgeSystemAlert];
     syslog(@"[DEBUG] Test result: %@", result ? @"Yes" : @"No");
 }
 
