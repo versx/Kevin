@@ -417,7 +417,7 @@ static int _jitterCorner;
     //NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
     //data[@"username"] = [[Device sharedInstance] username];
     //data[@"password"] = [[Device sharedInstance] password];
-    //NSString *response = [Utils toJsonString:data withPrettyPrint:false];
+    //NSString *response = [Utils toJsonString:data withPrettyPrint:true];
     if ([[Settings sharedInstance] autoLogin]) {
         NSString *response = [NSString stringWithFormat:@"{\"username\":\"%@\",\"password\":\"%@\"}",
                               [[Device sharedInstance] username],
@@ -435,6 +435,33 @@ static int _jitterCorner;
        [Utils sendScreenshot];
     });
     return JSON_OK;
+}
+
+-(NSString *)handleSystemInfoRequest
+{
+    syslog(@"[INFO] Received system info request from user");
+    //NSDictionary *dict = [[SystemInfo sharedInstance] dictionary];
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+    @try {
+        dict[@"uuid"] = [[Device sharedInstance] uuid];
+        dict[@"model"] = [[Device sharedInstance] model];
+        dict[@"ios_version"] = [[Device sharedInstance] osVersion];
+        dict[@"cpu_usage"] = [[SystemInfo sharedInstance] cpuUsage];
+        //dict[@"cpu_count"] = (unsigned long)[[SystemInfo sharedInstance] processorCount];
+        dict[@"thermal_state"] = [SystemInfo formatThermalState:[[SystemInfo sharedInstance] thermalState]];
+        dict[@"system_uptime"] = [SystemInfo formatTimeInterval:[[SystemInfo sharedInstance] systemUptime]];
+        dict[@"ram_total"] = [[SystemInfo sharedInstance] totalMemory];
+        dict[@"ram_free"] = [[SystemInfo sharedInstance] freeMemory];
+        dict[@"ram_used"] = [[SystemInfo sharedInstance] usedMemory];
+        dict[@"hdd_total"] = [[SystemInfo sharedInstance] totalSpace];
+        dict[@"hdd_free"] = [[SystemInfo sharedInstance] freeSpace];
+        dict[@"hdd_used"] = [[SystemInfo sharedInstance] usedSpace];
+    }
+    @catch (NSException *exception) {
+        syslog(@"[ERROR] handleSystemInfoRequest: %@", exception);
+    }
+    NSString *json = [Utils toJsonString:dict withPrettyPrint:true];
+    return json ?: JSON_ERROR;
 }
 
 /**

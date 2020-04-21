@@ -84,6 +84,8 @@
  */
 -(NSString *)handleScreenRequest;
 
+-(NSString *)handleSystemInfoRequest;
+
 /**
 * Handles test development requests from the `/test` endpoint
 *

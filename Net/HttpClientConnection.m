@@ -9,12 +9,13 @@
 
 @implementation HttpClientConnection
 
-static NSArray *ValidGetEndpoints;
-static NSArray *ValidPostEndpoints;
+//static NSArray *ValidGetEndpoints;
+//static NSArray *ValidPostEndpoints;
 
 -(id)init
 {
     if ((self = [super init])) {
+        /*
         ValidGetEndpoints = @[
             @"/account",
             @"/clear",
@@ -22,7 +23,8 @@ static NSArray *ValidPostEndpoints;
             @"/loc",
             @"/reboot",
             @"/restart",
-            @"/screen"
+            @"/screen",
+            @"/system_info"
         ];
         ValidPostEndpoints = @[
             @"/data",
@@ -32,6 +34,7 @@ static NSArray *ValidPostEndpoints;
             @"/type",
             @"/test"
         ];
+        */
     }
     return self;
 }
@@ -69,7 +72,8 @@ static NSArray *ValidPostEndpoints;
             [path isEqualToString:@"/reboot"] ||
             [path isEqualToString:@"/clear"] ||
             [path isEqualToString:@"/account"] ||
-            [path isEqualToString:@"/screen"]) {
+            [path isEqualToString:@"/screen"] ||
+            [path isEqualToString:@"/system_info"]) {
             return YES;
         }
     }
@@ -139,6 +143,8 @@ static NSArray *ValidPostEndpoints;
             response = [[RequestController sharedInstance] handleAccountRequest];
         } else if ([path isEqualToString:@"/screen"]) {
             response = [[RequestController sharedInstance] handleScreenRequest];
+        } else if ([path isEqualToString:@"/system_info"]) {
+            response = [[RequestController sharedInstance] handleSystemInfoRequest];
         }
         NSData *responseData = [response dataUsingEncoding:NSUTF8StringEncoding];
         return [[HTTPDataResponse alloc] initWithData:responseData];
