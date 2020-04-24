@@ -121,8 +121,8 @@ static DeviceCoordinateScalar *scalar;
 -(DeviceCoordinate *)ageVerificationYear {
     return [[DeviceCoordinate alloc] init:1040 withY:1230 andDeviceCoordinateScalar:scalar];
 }
--(DeviceCoordinate *)ageVerificationYear2007 { // TODO:
-    return [[DeviceCoordinate alloc] init:475 withY:1040 andDeviceCoordinateScalar:scalar];
+-(DeviceCoordinate *)ageVerificationYear2007 {
+    return [[DeviceCoordinate alloc] init:1030 withY:1900 andDeviceCoordinateScalar:scalar];
 }
 -(DeviceCoordinate *)ageVerificationDragStart {
     return [[DeviceCoordinate alloc] init:1030 withY:1780 andDeviceCoordinateScalar:scalar];
@@ -170,14 +170,14 @@ static DeviceCoordinateScalar *scalar;
 -(DeviceCoordinate *)settingsPageCloseButton {
     return [[DeviceCoordinate alloc] init:768 withY:1850 andDeviceCoordinateScalar:scalar];
 }
--(DeviceCoordinate *)trackerMenu { // TODO:
-    return [[DeviceCoordinate alloc] init:1200 withY:1040 andDeviceCoordinateScalar:scalar];
+-(DeviceCoordinate *)trackerMenu {
+    return [[DeviceCoordinate alloc] init:1400 withY:1900 andDeviceCoordinateScalar:scalar];
 }
--(DeviceCoordinate *)trackerTopCenter { // TODO:
-    return [[DeviceCoordinate alloc] init:768 withY:286 andDeviceCoordinateScalar:scalar];
+-(DeviceCoordinate *)trackerTopCenter {
+    return [[DeviceCoordinate alloc] init:750 withY:240 andDeviceCoordinateScalar:scalar];
 }
--(DeviceCoordinate *)trackerBottomCenter { // TODO:
-    return [[DeviceCoordinate alloc] init:768 withY:2200 andDeviceCoordinateScalar:scalar];
+-(DeviceCoordinate *)trackerBottomCenter {
+    return [[DeviceCoordinate alloc] init:765 withY:2020 andDeviceCoordinateScalar:scalar];
 }
 
 
@@ -294,5 +294,27 @@ static DeviceCoordinateScalar *scalar;
     return [[DeviceCoordinate alloc] init:0 withY:0 andDeviceCoordinateScalar:scalar];
 }
 
+// Needs to be found
+- (DeviceCoordinate *)compareTutorial2CheckT { // TODO:
+    return [[DeviceCoordinate alloc] init:0 withY:0 andDeviceCoordinateScalar:scalar];
+}
+- (DeviceCoordinate *)compareTutorial2CheckWhite { // TODO:
+    return [[DeviceCoordinate alloc] init:0 withY:0 andDeviceCoordinateScalar:scalar];
+}
+- (DeviceCoordinate *)compareTutorial2CheckY { // TODO:
+    return [[DeviceCoordinate alloc] init:0 withY:0 andDeviceCoordinateScalar:scalar];
+}
+- (DeviceCoordinate *)compareTutorial4Pokestops { // TODO:
+    return [[DeviceCoordinate alloc] init:0 withY:0 andDeviceCoordinateScalar:scalar];
+}
+- (DeviceCoordinate *)compareTutorial4PokestopsWhiteBox { // TODO:
+    return [[DeviceCoordinate alloc] init:0 withY:0 andDeviceCoordinateScalar:scalar];
+}
+- (DeviceCoordinate *)tutorialUsernameConfirm { // TODO:
+    return [[DeviceCoordinate alloc] init:0 withY:0 andDeviceCoordinateScalar:scalar];
+}
+- (DeviceCoordinate *)tutorialUsernameReenter { // TODO:
+    return [[DeviceCoordinate alloc] init:0 withY:0 andDeviceCoordinateScalar:scalar];
+}
 
 @end

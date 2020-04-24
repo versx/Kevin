@@ -54,6 +54,12 @@
 -(DeviceCoordinate *)ageVerificationDragStart {
     return [[DeviceCoordinate alloc] init:900 withY:1980 andTapScalar:[self tapScalar]];
 }
+-(DeviceCoordinate *)ageVerificationYear {
+    return [[DeviceCoordinate alloc] init:900 withY:1300 andTapScalar:[self tapScalar]];
+}
+-(DeviceCoordinate *)ageVerificationYear2007 {
+    return [[DeviceCoordinate alloc] init:900 withY:2050 andTapScalar:[self tapScalar]];
+}
 
 
 @end

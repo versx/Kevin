@@ -255,8 +255,8 @@ static BOOL _dataStarted = false;
                               betweenMin:[[ColorOffset alloc] init:0.55 green:0.75 blue:0.00]
                                   andMax:[[ColorOffset alloc] init:0.70 green:0.90 blue:1.00]];
         isPassengerWarning = [image rgbAtLocation:[[DeviceConfig sharedInstance] passenger]
-                                       betweenMin:[[ColorOffset alloc] init:0.00 green:0.75 blue:0.55]
-                                           andMax:[[ColorOffset alloc] init:1.00 green:0.90 blue:0.70]];
+                                       betweenMin:[[ColorOffset alloc] init:0.38 green:0.75 blue:0.55]
+                                           andMax:[[ColorOffset alloc] init:0.48 green:0.90 blue:0.70]];
         isWeather = [image rgbAtLocation:[[DeviceConfig sharedInstance] weather]
                               betweenMin:[[ColorOffset alloc] init:0.23 green:0.35 blue:0.50]
                                   andMax:[[ColorOffset alloc] init:0.36 green:0.47 blue:0.65]];

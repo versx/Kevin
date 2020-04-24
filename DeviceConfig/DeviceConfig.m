@@ -16,11 +16,10 @@
     double width = [UIScreen mainScreen].bounds.size.width;
     double tapMultiplier = 1.0; // iOS 12 and below
     if (@available(iOS 13.0, *)) {
-        if (width == 414) { // Plus devices
-            tapMultiplier = 1 / 3;
-        } else {
-            tapMultiplier = 0.5; // iOS 13
-        }
+        tapMultiplier = 0.5; // iOS 13
+    }
+    if (width == 414) { // Plus devices are all 1/3 with this setup
+        tapMultiplier = 0.33333;
     }
     // For whatever reason 5S with iOS 12 support uses 0.5?
     NSString *model = [[Device sharedInstance] model];
@@ -54,8 +53,8 @@
                        width, height, ratio);
                 deviceConfig = [[DeviceIPhoneNormal alloc] init:width
                                                          height:height
-                                                     multiplier:0.9//0.65//1.17 0.853 //1.0
-                                                  tapMultiplier:tapMultiplier];//1.17 0.47976] //tapMultiplier];
+                                                     multiplier:1.0
+                                                  tapMultiplier:tapMultiplier];
                 break;
             case 414: // iPhone Large (6+, 6S+, 7+, 8+)
                 syslog(@"[INFO] Large Phone size detected (Width: %f, Height: %f, Ratio: %d)",

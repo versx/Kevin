@@ -49,9 +49,6 @@ static double _tapScalar;
 -(DeviceCoordinate *)loginPrivacyUpdate {
     return [[DeviceCoordinate alloc] init:375 withY:745 andTapScalar:[self tapScalar]];
 }
--(DeviceCoordinate *)ageVerificationYear2007 {
-    return [[DeviceCoordinate alloc] init:300 withY:620 andTapScalar:[self tapScalar]];
-}
 
 
 #pragma mark Startup Coordinates
