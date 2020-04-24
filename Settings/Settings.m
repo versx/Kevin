@@ -14,30 +14,13 @@ static NSString *_homebaseUrl;
 static NSString *_backendControllerUrl;
 static NSString *_backendRawUrl;
 static NSString *_token;
-static NSString *_pixelConfigUrl;
-static int _port;
-static int _targetMaxDistance;
 static int  _heartbeatMaxTime;
-static int _pokemonMaxTime;
-static int _raidMaxTime;
-static double _jitterValue;
-static int _maxEmptyGMO;
-static int _maxFailedCount;
-static int _maxNoQuestCount;
-static int _maxWarningTimeRaid;
 static int _minDelayLogout;
 static bool _enableAccountManager;
 static bool _deployEggs;
 static bool _nearbyTracker;
 static bool _autoLogin;
-static bool _ultraIV;
-static bool _ultraQuests;
 static bool _allowWarnedAccounts;
-
-static NSString *_loggingUrl;
-static NSNumber *_loggingPort;
-static bool _loggingTls;
-static bool _loggingTcp; // Use TCP, otherwise UDP protocol
 
 static bool _gotConfig;
 
@@ -50,48 +33,41 @@ static NSString *plistFileName = @"config.plist";
 -(NSString *)homebaseUrl {
     return _homebaseUrl;
 }
-
 -(NSString *)backendControllerUrl {
     return _backendControllerUrl;
 }
 -(NSString *)backendRawUrl {
     return _backendRawUrl;
 }
--(NSString *)pixelConfigUrl {
-    return _pixelConfigUrl;
-}
 -(NSString *)token {
     return _token;
 }
 -(int)port {
-    return _port;
-}
--(int)targetMaxDistance {
-    return _targetMaxDistance;
+    return DEFAULT_PORT;
 }
 -(int)heartbeatMaxTime {
     return _heartbeatMaxTime;
 }
 -(int)pokemonMaxTime {
-    return _pokemonMaxTime;
+    return DEFAULT_POKEMON_MAX_TIME;
 }
 -(int)raidMaxTime {
-    return _raidMaxTime;
+    return DEFAULT_RAID_MAX_TIME;
 }
 -(double)jitterValue {
-    return _jitterValue;
+    return DEFAULT_JITTER_VALUE;
 }
 -(int)maxEmptyGMO {
-    return _maxEmptyGMO;
+    return DEFAULT_MAX_EMPTY_GMO;
 }
 -(int)maxFailedCount {
-    return _maxFailedCount;
+    return DEFAULT_MAX_FAILED_COUNT;
 }
 -(int)maxNoQuestCount {
-    return _maxNoQuestCount;
+    return DEFAULT_MAX_NO_QUEST_COUNT;
 }
 -(int)maxWarningTimeRaid {
-    return _maxWarningTimeRaid;
+    return DEFAULT_MAX_WARNING_TIME_RAID;
 }
 -(int)minDelayLogout {
     return _minDelayLogout;
@@ -108,27 +84,8 @@ static NSString *plistFileName = @"config.plist";
 -(bool)autoLogin {
     return _autoLogin;
 }
--(bool)ultraIV {
-    return _ultraIV;
-}
--(bool)ultraQuests {
-    return _ultraQuests;
-}
 -(bool)allowWarnedAccounts {
     return _allowWarnedAccounts;
-}
-
--(NSString *)loggingUrl {
-    return _loggingUrl;
-}
--(int)loggingPort {
-    return _loggingPort;
-}
--(bool)loggingTls {
-    return _loggingTls;
-}
--(bool)loggingTcp {
-    return _loggingTcp;
 }
 
 -(bool)gotConfig {
@@ -154,52 +111,35 @@ static NSString *plistFileName = @"config.plist";
         NSDictionary *result;
         NSString *url = [NSString stringWithFormat:@"%@/api/config/%@", _homebaseUrl, [[Device sharedInstance] uuid]];
         bool gotConfig = false;
-        while (!gotConfig) {
+        //while (!gotConfig) {
             result = [sharedInstance fetchJsonConfig:url];
             if (result == nil || [result[@"status"] isEqualToString:@"error"]) {
                 NSLog(@"[Jarvis] [Settings] [ERROR] Failed to grab config error: %@ Trying again in 30 seconds...", result[@"error"] ?: @"Are you sure DeviceConfigManager is up?");
-                sleep(30);
-                continue;
+                //sleep(30);
+                //continue;
             }
             sleep(3);
             _config = result;
             gotConfig = true;
-        }
+        //}
         NSLog(@"[Jarvis] [Settings] [INFO] Got config: %@", result);
         if (result == nil) {
             NSLog(@"[Jarvis] [Settings] [ERROR] Some how returned a nil config.");
             return;
         }
 
-        NSString *backendUrl = result[@"backendURL"];
+        NSString *backendUrl = result[@"backend_url"];
+        NSArray *dataEndpoints = [result objectForKey:@"data_endpoints"];
         _backendControllerUrl = [NSString stringWithFormat:@"%@/controler", backendUrl];
-        _backendRawUrl = [NSString stringWithFormat:@"%@/raw", backendUrl];
-        _pixelConfigUrl = result[@"pixelConfigURL"];
-        _token = result[@"token"] ?: @"";
-        _port = [result[@"port"] intValue];// ?: DEFAULT_PORT;
-        // TODO: Startup lat/lon
-        _targetMaxDistance = /*[result[@"targetMaxDistance"] intValue] ?:*/ DEFAULT_TARGET_MAX_DISTANCE;
-        _heartbeatMaxTime = [result[@"heartbeatMaxTime"] intValue] ?: DEFAULT_HEARTBEAT_MAX_TIME;
-        _pokemonMaxTime = [result[@"pokemonMaxTime"] intValue] ?: DEFAULT_POKEMON_MAX_TIME;
-        _raidMaxTime = [result[@"raidMaxTime"] intValue] ?: DEFAULT_RAID_MAX_TIME;
-        _jitterValue = [result[@"jitterValue"] doubleValue] ?: 5.0e-05; // 5.0e-05 0.000005 // ?: DEFAULT_JITTER_VALUE;
-        _maxEmptyGMO = [result[@"maxEmptyGMO"] intValue] ?: DEFAULT_MAX_EMPTY_GMO;
-        _maxFailedCount = [result[@"maxFailedCount"] intValue] ?: DEFAULT_MAX_FAILED_COUNT;
-        _maxNoQuestCount = [result[@"maxNoQuestCount"] intValue] ?: DEFAULT_MAX_NO_QUEST_COUNT;
-        _maxWarningTimeRaid = [result[@"maxWarningTimeRaid"] intValue] ?: DEFAULT_MAX_WARNING_TIME_RAID;
-        _minDelayLogout = [result[@"minDelayLogout"] intValue] ?: DEFAULT_MIN_DELAY_LOGOUT;
-        _enableAccountManager = [[result objectForKey:@"accountManager"] boolValue];
-        _deployEggs = [[result objectForKey:@"deployEggs"] boolValue];
-        _nearbyTracker = [[result objectForKey:@"nearbyTracker"] boolValue];
-        _autoLogin = [[result objectForKey:@"autoLogin"] boolValue];
-        _ultraIV = [[result objectForKey:@"ultraIV"] boolValue];
-        _ultraQuests = [[result objectForKey:@"ultraQuests"] boolValue];
-        _allowWarnedAccounts = [[result objectForKey:@"allowWarnedAccounts"] boolValue];
-        
-        _loggingUrl = result[@"loggingURL"] ?: @"";
-        _loggingPort = [result[@"loggingPort"] intValue];// ?: @9999;
-        _loggingTls = [[result objectForKey:@"loggingTLS"] boolValue];// ?: false;
-        _loggingTcp = [[result objectForKey:@"loggingTCP"] boolValue];// ?: true;
+        _backendRawUrl = [NSString stringWithFormat:@"%@/raw", dataEndpoints[0]];
+        _token = result[@"backend_secret_token"] ?: @"";
+        _heartbeatMaxTime = [result[@"heartbeat_max_time"] intValue] ?: DEFAULT_HEARTBEAT_MAX_TIME;
+        _minDelayLogout = [result[@"min_delay_logout"] intValue] ?: DEFAULT_MIN_DELAY_LOGOUT;
+        _enableAccountManager = [[result objectForKey:@"account_manager"] boolValue];
+        _deployEggs = [[result objectForKey:@"deploy_eggs"] boolValue];
+        _nearbyTracker = [[result objectForKey:@"nearby_tracker"] boolValue];
+        _autoLogin = [[result objectForKey:@"auto_login"] boolValue];
+        _allowWarnedAccounts = false;//[[result objectForKey:@"allow_warned_accounts"] boolValue];
         _gotConfig = true;
     });
     return sharedInstance;

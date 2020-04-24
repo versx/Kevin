@@ -83,8 +83,14 @@
 
 -(NSData *)preprocessResponse:(HTTPMessage *)response
 {
-    [response setHeaderField:@"Accept" value:@"application/json"];
-    [response setHeaderField:@"Content-Type" value:@"application/json"];
+    //syslog(@"[DEBUG] Request URI: %@", [self requestURI]);
+    if ([[self requestURI] isEqualToString:@"/screen"]) {
+        [response setHeaderField:@"Accept" value:@"image/jpeg"];
+        [response setHeaderField:@"Content-Type" value:@"image/jpeg"];
+    } else {
+        [response setHeaderField:@"Accept" value:@"application/json"];
+        [response setHeaderField:@"Content-Type" value:@"application/json"];
+    }
     return [response messageData];
 }
 
@@ -142,6 +148,8 @@
         } else if ([path isEqualToString:@"/account"]) {
             response = [[RequestController sharedInstance] handleAccountRequest];
         } else if ([path isEqualToString:@"/screen"]) {
+            //NSData *imgData = [[RequestController sharedInstance] handleScreenRequest];
+            //return [[HTTPDataResponse alloc] initWithData:imgData];
             response = [[RequestController sharedInstance] handleScreenRequest];
         } else if ([path isEqualToString:@"/system_info"]) {
             response = [[RequestController sharedInstance] handleSystemInfoRequest];

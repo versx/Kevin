@@ -40,8 +40,6 @@
 
 +(void)sendScreenshot;
 
-+(void)showAlert:(id)obj withMessage:(NSString *)message;
-
 +(void)syslog:(NSString *)fmt;
 
 @end

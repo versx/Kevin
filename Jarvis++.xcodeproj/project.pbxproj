@@ -48,8 +48,6 @@
 		C03E44F424342D5100B467BB /* DeviceIPhoneNormal.m in Sources */ = {isa = PBXBuildFile; fileRef = C03E44F324342D5100B467BB /* DeviceIPhoneNormal.m */; };
 		C03E44F624342F9E00B467BB /* DeviceIPhonePlus.h in Headers */ = {isa = PBXBuildFile; fileRef = C03E44F524342F9E00B467BB /* DeviceIPhonePlus.h */; };
 		C03E44F824342FAC00B467BB /* DeviceIPhonePlus.m in Sources */ = {isa = PBXBuildFile; fileRef = C03E44F724342FAC00B467BB /* DeviceIPhonePlus.m */; };
-		C04D0A742435EDA2006DE57D /* DeviceCoordinate+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = C04D0A732435EDA2006DE57D /* DeviceCoordinate+Extensions.h */; };
-		C04D0A762435EDBD006DE57D /* DeviceCoordinate+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C04D0A752435EDBD006DE57D /* DeviceCoordinate+Extensions.m */; };
 		C04D0A78243BFB7D006DE57D /* SystemInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = C04D0A77243BFB7D006DE57D /* SystemInfo.h */; };
 		C04D0A7A243BFB8A006DE57D /* SystemInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = C04D0A79243BFB8A006DE57D /* SystemInfo.m */; };
 		C065AE40242ECD2A007114C8 /* DeviceRatio1775.h in Headers */ = {isa = PBXBuildFile; fileRef = C065AE3F242ECD2A007114C8 /* DeviceRatio1775.h */; };
@@ -115,8 +113,6 @@
 		C03E44F324342D5100B467BB /* DeviceIPhoneNormal.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceIPhoneNormal.m; sourceTree = "<group>"; };
 		C03E44F524342F9E00B467BB /* DeviceIPhonePlus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceIPhonePlus.h; sourceTree = "<group>"; };
 		C03E44F724342FAC00B467BB /* DeviceIPhonePlus.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceIPhonePlus.m; sourceTree = "<group>"; };
-		C04D0A732435EDA2006DE57D /* DeviceCoordinate+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "DeviceCoordinate+Extensions.h"; sourceTree = "<group>"; };
-		C04D0A752435EDBD006DE57D /* DeviceCoordinate+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "DeviceCoordinate+Extensions.m"; sourceTree = "<group>"; };
 		C04D0A77243BFB7D006DE57D /* SystemInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SystemInfo.h; sourceTree = "<group>"; };
 		C04D0A79243BFB8A006DE57D /* SystemInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SystemInfo.m; sourceTree = "<group>"; };
 		C065AE3F242ECD2A007114C8 /* DeviceRatio1775.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceRatio1775.h; sourceTree = "<group>"; };
@@ -196,8 +192,6 @@
 		C0025ABC241483A2007813F7 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				C04D0A732435EDA2006DE57D /* DeviceCoordinate+Extensions.h */,
-				C04D0A752435EDBD006DE57D /* DeviceCoordinate+Extensions.m */,
 				C065AE43242EFCCA007114C8 /* NSString+Extensions.h */,
 				C065AE45242EFCD8007114C8 /* NSString+Extensions.m */,
 				C0025ABD241483B7007813F7 /* UIImage+Pixels.h */,
@@ -386,7 +380,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C04D0A742435EDA2006DE57D /* DeviceCoordinate+Extensions.h in Headers */,
 				C01B4980240ACF9400633B45 /* UIC.h in Headers */,
 				C0AC1CF8240BB97A008F4DFB /* Settings.h in Headers */,
 				C0B68E022414C33E009B5970 /* Consts.h in Headers */,
@@ -536,7 +529,6 @@
 				C0B68E042414C632009B5970 /* Consts.m in Sources */,
 				C0339C882427E9220046D0AD /* DeviceCoordinate.m in Sources */,
 				C065AE42242ECD3B007114C8 /* DeviceRatio1775.m in Sources */,
-				C04D0A762435EDBD006DE57D /* DeviceCoordinate+Extensions.m in Sources */,
 				C0339C8C2427E93C0046D0AD /* DeviceCoordinateScalar.m in Sources */,
 				C0339C912427EE5B0046D0AD /* DeviceConfig.m in Sources */,
 				C04D0A7A243BFB8A006DE57D /* SystemInfo.m in Sources */,

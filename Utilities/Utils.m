@@ -174,29 +174,6 @@ static double _baseVerticalAccuracy = 200.0; // in meters
     });
 }
 
-+(void)showAlert:(id)obj withMessage:(NSString *)message
-{
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil
-                                                                   message:@""
-                                                            preferredStyle:UIAlertControllerStyleAlert];
-    UIView *firstSubview = alert.view.subviews.firstObject;
-    UIView *alertContentView = firstSubview.subviews.firstObject;
-    for (UIView *subSubView in alertContentView.subviews) {
-        subSubView.backgroundColor = [UIColor colorWithRed:141 / 255.0f
-                                                     green:0   / 255.0f
-                                                      blue:254 / 255.0f
-                                                     alpha:1.0f];
-    }
-    NSMutableAttributedString *mas = [[NSMutableAttributedString alloc] initWithString:message];
-    [mas addAttribute: NSForegroundColorAttributeName value:[UIColor whiteColor] range:NSMakeRange(0,mas.length)];
-    [alert setValue:mas forKey:@"attributedTitle"];
-    [obj presentViewController:alert animated:YES completion:nil];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [alert dismissViewControllerAnimated:YES completion:^{
-        }];
-    });
-}
-
 +(void)sendScreenshot
 {
     syslog(@"[INFO] sendScreenshot");
@@ -250,65 +227,6 @@ static double _baseVerticalAccuracy = 200.0; // in meters
         }
     }];
 }
-
-/*
-+(void)uploadScreenshot
-{
-    NSString *url = [NSString stringWithFormat:@"%@/api/device/%@/screen",
-                     [[Settings sharedInstance] homebaseUrl],
-                     [[Device sharedInstance] uuid]];
-    NSDictionary *params = @{@"enctype": @"multipart/form-data"};
-
-    UIImage *image = [self takeScreenshot];
-    NSData *imageData = UIImageJPEGRepresentation(image, 1.0);
-
-
-    //Create a HTTP request type POST for sending the data
-    NSMutableURLRequest *request = [[AFHTTPRequestSerializer serializer] multipartFormRequestWithMethod:@"POST" URLString:url parameters:params constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
-        /// Add attributes to the forms for using then in NodeJS
-        [formData appendPartWithFileData:cloudData
-                                    name:@"file"
-                                fileName:@"file.png"
-                                mimeType:@"text/plain"];
-
-    } error:nil];
-
-
-    [request setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
-    [request setHTTPShouldHandleCookies:NO];
-    [request setTimeoutInterval:20];
-
-    AFURLSessionManager *manager = [[AFURLSessionManager alloc] initWithSessionConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration]];
-
-
-    manager.responseSerializer = [AFHTTPResponseSerializer serializer];
-    //Upload it
-    //Upload tasks are used for making HTTP requests that require a request body
-    NSURLSessionUploadTask *uploadTask;
-
-    // Create a progress object and pass it in
-    __block NSProgress *prog;
-    uploadTask = [manager uploadTaskWithStreamedRequest:request
-                                               progress:^(NSProgress *_Nonnull progress){
-                                                   [progress addObserver:self
-                                                              forKeyPath:@"fractionCompleted"
-                                                                 options:NSKeyValueObservingOptionNew
-                                                                 context:NULL];
-
-                                                   prog = progress;
-                                                  // [self unregisterAsObserverForObject:progress];
-                                               }
-                                      completionHandler:^(NSURLResponse * response, id responseObject, NSError * error)
-    {
-        if (error) {
-            NSLog(@"[INFO] ERROR: %@", error);
-        } else {
-            NSLog(@"[INFO] Upload completed");
-        }
-
-    }];
-}
-*/
 
 +(void)syslog:(NSString *)msg
 {

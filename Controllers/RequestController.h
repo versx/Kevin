@@ -82,6 +82,7 @@
  *
  * @return Image response as base64 string to client
  */
+//-(NSData *)handleScreenRequest;
 -(NSString *)handleScreenRequest;
 
 -(NSString *)handleSystemInfoRequest;

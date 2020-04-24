@@ -252,9 +252,6 @@ static NSTimer *_timer = nil;
                 } else if ([action isEqualToString:@"switch_account"]) {
                     syslog(@"[DEBUG] [STATUS] Switching Accounts");
                     [self handleSwitchAccount:action withData:data hasWarning:hasWarning];
-                //} else if ([action isEqualToString:@"leveling"]) {
-                //    syslog(@"[DEBUG] [STATUS] Leveling");
-                //    [self handleLevelingJob:action withData:data hasWarning:hasWarning];
                 } else if ([action isEqualToString:@"scan_iv"]) {
                     syslog(@"[DEBUG] [STATUS] IV");
                     [self handleIVJob:action withData:data hasWarning:hasWarning];
@@ -344,7 +341,6 @@ static NSTimer *_timer = nil;
     NSDate *start = [NSDate date];
     [[DeviceState sharedInstance] setWaitRequiresPokemon:true];
     [[DeviceState sharedInstance] setPokemonEncounterId:nil];
-    //_targetMaxDistance = [[Settings sharedInstance] targetMaxDistance];
     [[DeviceState sharedInstance] setCurrentLocation:[Utils createCoordinate:[lat doubleValue] lon:[lon doubleValue]]];
     [[DeviceState sharedInstance] setWaitForData:true];
     syslog(@"[INFO] Scanning prepared");
@@ -354,7 +350,6 @@ static NSTimer *_timer = nil;
     while (locked) {
         sleep(1);
         NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:start];
-        
         if (timeIntervalSince >= pokemonMaxTime) {
             locked = false;
             [[DeviceState sharedInstance] setWaitForData:false];
@@ -397,7 +392,6 @@ static NSTimer *_timer = nil;
     CLLocation *currentLocation = [Utils createCoordinate:[lat doubleValue] lon:[lon doubleValue]];
     [[DeviceState sharedInstance] setCurrentLocation:currentLocation];
     [[DeviceState sharedInstance] setWaitRequiresPokemon:false];
-    //_targetMaxDistance = [[Settings sharedInstance] targetMaxDistance];
     [[DeviceState sharedInstance] setWaitForData:true];
     syslog(@"[INFO] Scanning prepared.");
     
@@ -421,146 +415,6 @@ static NSTimer *_timer = nil;
         }
     }
 }
-
-/*
--(void)handleQuestJob:(NSString *)action withData:(NSDictionary *)data hasWarning:(BOOL)hasWarning
-{
-    [[DeviceState sharedInstance] setDelayQuest:true];
-    NSNumber *lat = data[@"lat"];
-    NSNumber *lon = data[@"lon"];
-    NSNumber *delay = data[@"delay"];
-    syslog(@"[INFO] Scanning for Quest at %@ %@ in %@ seconds", lat, lon, delay);
-    NSDate *firstWarningDate = [[DeviceState sharedInstance] firstWarningDate];
-    
-    if (hasWarning && firstWarningDate != nil && [NSDate date]) {
-        syslog(@"[WARN] Account has a warning and is over maxWarningTimeRaid. Logging out!");
-        CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
-        [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
-        [DeviceState logout];
-    }
-
-    if ([[Settings sharedInstance] deployEggs]) {
-        NSDate *lastDeployTime = [[Device sharedInstance] lastEggDeployTime];
-        NSNumber *luckyEggsCount = [[Device sharedInstance] luckyEggsCount];
-        //NSNumber *spinCount = [[DeviceState sharedInstance] spinCount];
-        NSNumber *level = [[Device sharedInstance] level];
-        NSTimeInterval eggTimeIntervalSince = [[NSDate date] timeIntervalSinceDate:lastDeployTime];
-        syslog(@"[INFO] Lucky Eggs Count: %@ EggTimeSince: %f Level: %@ LastDeploy: %@",
-               luckyEggsCount, eggTimeIntervalSince, level, lastDeployTime);
-        if ([luckyEggsCount intValue] > 0 &&
-            [level intValue] >= 9 && [level intValue] < 30 &&
-            (lastDeployTime == nil ||
-            eggTimeIntervalSince == NAN ||
-            eggTimeIntervalSince >= _eggInterval)) {
-            syslog(@"[INFO] Deploying lucky egg.");
-            if ([UIC2 eggDeploy]) {
-                [[Device sharedInstance] setLastEggDeployTime:[NSDate date]];
-                [[Device sharedInstance] setLuckyEggsCount:[Utils decrementInt:luckyEggsCount]];
-            }
-        }
-    }
-    
-    NSNumber *minDelayLogout = [[Settings sharedInstance] minDelayLogout];
-    if ([delay intValue] >= [minDelayLogout intValue] && [[Settings sharedInstance] enableAccountManager]) {
-        syslog(@"[WARN] Switching account. Delay too large. (Delay: %@ MinDelayLogout: %@)", delay, minDelayLogout);
-        NSMutableDictionary *failedData = [[NSMutableDictionary alloc] init];
-        failedData[@"uuid"] = [[Device sharedInstance] uuid];
-        failedData[@"action"] = action;
-        failedData[@"lat"] = lat;
-        failedData[@"lon"] = lon;
-        failedData[@"type"] = TYPE_JOB_FAILED;
-        [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
-                      dict:failedData
-                  blocking:true
-                completion:^(NSDictionary *result) {}
-        ];
-        CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
-        [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
-        [DeviceState logout];
-    }
-    
-    CLLocation *currentLocation = [Utils createCoordinate:[lat doubleValue] lon:[lon doubleValue]];
-    [[DeviceState sharedInstance] setNewCreated:false];
-    [[DeviceState sharedInstance] setCurrentLocation:currentLocation];
-    [[DeviceState sharedInstance] setWaitRequiresPokemon:false];
-    [[DeviceState sharedInstance] setPokemonEncounterId:nil];
-    //_targetMaxDistance = [[Settings sharedInstance] targetMaxDistance];
-    [[DeviceState sharedInstance] setWaitForData:true];
-    syslog(@"[INFO] Scanning prepared");
-    
-    NSDate *start = [NSDate date];
-    bool success = false;
-    bool locked = true;
-    bool found = false;
-    while (locked) {
-        sleep(1 * [[[Device sharedInstance] delayMultiplier] intValue]);
-        NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:start];
-        if (timeIntervalSince <= 5) {
-            continue;
-        }
-        if (!found && (timeIntervalSince <= [delay doubleValue])) {
-            NSNumber *left = @([delay doubleValue] - timeIntervalSince);
-            syslog(@"[INFO] Delaying by %@ seconds.", left);
-            while (!found && ([[NSDate date] timeIntervalSinceDate:start] <= [delay doubleValue])) {
-                locked = [[DeviceState sharedInstance] gotQuestEarly];
-                if (locked) {
-                    sleep(1);
-                } else {
-                    found = true;
-                }
-            }
-            continue;
-        }
-        NSNumber *raidMaxTime = [[Settings sharedInstance] raidMaxTime];
-        NSNumber *totalDelay = @([raidMaxTime doubleValue] + [delay doubleValue]);
-        if (!found && timeIntervalSince >= [totalDelay doubleValue]) {
-            locked = false;
-            [[DeviceState sharedInstance] setWaitForData:false];
-            NSNumber *failedCount = [[DeviceState sharedInstance] failedCount];
-            [[DeviceState sharedInstance] setFailedCount:[Utils incrementInt:failedCount]];
-            syslog(@"[WARN] Pokestop loading timed out.");
-            NSMutableDictionary *failedData = [[NSMutableDictionary alloc] init];
-            failedData[@"uuid"] = [[Device sharedInstance] uuid];
-            failedData[@"action"] = action;
-            failedData[@"lat"] = lat;
-            failedData[@"lon"] = lon;
-            failedData[@"type"] = TYPE_JOB_FAILED;
-            [Utils postRequest:[[Settings sharedInstance] backendControllerUrl]
-                          dict:failedData
-                      blocking:true
-                    completion:^(NSDictionary *result) {}
-            ];
-        } else {
-            locked = [[DeviceState sharedInstance] waitForData];
-            if (!locked) {
-                [[DeviceState sharedInstance] setDelayQuest:true];
-                success = true;
-                [[DeviceState sharedInstance] setFailedCount:@0];
-                syslog(@"[INFO] Pokestop loaded after %f", timeIntervalSince);
-            }
-        }
-    }
-
-    if ([[DeviceState sharedInstance] gotQuest]) {
-        [[DeviceState sharedInstance] setNoQuestCount:@0];
-    } else {
-        NSNumber *noQuestCount = [[DeviceState sharedInstance] noQuestCount];
-        [[DeviceState sharedInstance] setNoQuestCount:[Utils incrementInt:noQuestCount]];
-    }
-    
-    NSNumber *noQuestCount = [[DeviceState sharedInstance] noQuestCount];
-    NSNumber *maxNoQuestCount = [[Settings sharedInstance] maxNoQuestCount];
-    if ([noQuestCount intValue] >= [maxNoQuestCount intValue]) {
-        syslog(@"[WARN] Stuck somewhere. Restarting...");
-        [DeviceState logout];
-    }
-    
-    if (success) {
-        bool gotQuest = [[DeviceState sharedInstance] gotQuest];
-        syslog(@"[INFO] Got quest data: %@", gotQuest ? @"Yes" : @"No");
-    }
-}
-*/
 
 -(void)handleQuestJob:(NSString *)action withData:(NSDictionary *)data hasWarning:(BOOL)hasWarning
 {
@@ -592,11 +446,7 @@ static NSTimer *_timer = nil;
     
     if (![[DeviceState sharedInstance] isQuestInit]) {
         [[DeviceState sharedInstance] setIsQuestInit:true];
-        if ([[Settings sharedInstance] ultraQuests]) {
-            delay = @30.0;
-        } else {
-            delay = @0.0;
-        }
+        delay = @30.0;
     } else {
         CLLocation *newLocation = [Utils createCoordinate:[lat doubleValue] lon:[lon doubleValue]];
         CLLocation *lastQuestLocation = [[DeviceState sharedInstance] lastQuestLocation];
@@ -684,7 +534,6 @@ static NSTimer *_timer = nil;
         [[DeviceState sharedInstance] setCurrentLocation:currentLocation];
         [[DeviceState sharedInstance] setWaitRequiresPokemon:false];
         [[DeviceState sharedInstance] setPokemonEncounterId:nil];
-        //_targetMaxDistance = [[Settings sharedInstance] targetMaxDistance];
         [[DeviceState sharedInstance] setWaitForData:true];
         syslog(@"[INFO] Scanning prepared");
         
@@ -692,6 +541,7 @@ static NSTimer *_timer = nil;
         bool success = false;
         bool locked = true;
         bool found = false;
+        int raidMaxTime = [[Settings sharedInstance] raidMaxTime];
         while (locked) {
             sleep(1 * [[[Device sharedInstance] delayMultiplier] intValue]);
             NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:start];
@@ -711,7 +561,6 @@ static NSTimer *_timer = nil;
                 }
                 continue;
             }
-            double raidMaxTime = [[Settings sharedInstance] raidMaxTime];
             NSNumber *totalDelay = @(raidMaxTime + [delay doubleValue]);
             if (!found && timeIntervalSince >= [totalDelay doubleValue]) {
                 locked = false;
@@ -735,7 +584,6 @@ static NSTimer *_timer = nil;
             if ([[Settings sharedInstance] deployEggs]) {
                 NSDate *lastDeployTime = [[Device sharedInstance] lastEggDeployTime];
                 NSNumber *luckyEggsCount = [[Device sharedInstance] luckyEggsCount];
-                //NSNumber *spinCount = [[DeviceState sharedInstance] spinCount];
                 NSNumber *level = [[Device sharedInstance] level];
                 NSTimeInterval eggTimeIntervalSince = [[NSDate date] timeIntervalSinceDate:lastDeployTime];
                 syslog(@"[INFO] Lucky Eggs Count: %@ EggTimeSince: %f Level: %@ LastDeploy: %@",
@@ -751,204 +599,6 @@ static NSTimer *_timer = nil;
             syslog(@"[INFO] Got quest data: %@", gotQuest ? @"Yes" : @"No");
         }
         
-    }
-}
-
--(void)handleLevelingJob:(NSString *)action withData:(NSDictionary *)data hasWarning:(BOOL)hasWarning
-{
-    [[DeviceState sharedInstance] setDelayQuest:false];
-    //degreePerMeter = 83267.0991559005
-    NSNumber *lat = data[@"lat"] ?: 0;
-    NSNumber *lon = data[@"lon"] ?: 0;
-    NSNumber *delay = data[@"delay"] ?: @0.0;
-    //NSString *fortType = data[@"fort_type"] ?: @"P";
-    NSString *targetFortId = data[@"fort_id"] ?: @"";
-    [[DeviceState sharedInstance] setTargetFortId:targetFortId];
-    //syslog(@"[DEBUG] [RES1] Location: %@ %@ Delay: %@ FortType: %@ FortId: %@", lat, lon, delay, fortType, targetFortId);
-    
-    if (![[DeviceState sharedInstance] isQuestInit]) {
-        [[DeviceState sharedInstance] setIsQuestInit:true];
-        delay = @30.0;
-    } else {
-        CLLocation *newLocation = [Utils createCoordinate:[lat doubleValue] lon:[lon doubleValue]];
-        CLLocation *lastLocation = [[DeviceState sharedInstance] lastQuestLocation];
-        NSNumber *questDistance = [NSNumber numberWithDouble:[newLocation distanceFromLocation:lastLocation]];
-        
-        // Check if previous spin had quest data
-        if ([[DeviceState sharedInstance] gotItems]) {
-            [[DeviceState sharedInstance] setNoItemsCount:@0];
-        } else {
-            NSNumber *noItemsCount = [[DeviceState sharedInstance] noItemsCount];
-            [[DeviceState sharedInstance] setNoItemsCount:[Utils incrementInt:noItemsCount]];
-        }
-        [[DeviceState sharedInstance] setGotItems:false];
-        
-        NSNumber *noItemsCount = [[DeviceState sharedInstance] noItemsCount];
-        int maxNoQuestCount = [[Settings sharedInstance] maxNoQuestCount];
-        syslog(@"[DEBUG] NoItemsCount: %@/%d", noItemsCount, maxNoQuestCount);
-        /*
-        if ([noItemsCount intValue] >= [maxNoQuestCount intValue]) {
-            [[DeviceState sharedInstance] setIsQuestInit:false];
-            [[DeviceState sharedInstance] setNoItemsCount:@0];
-            [[Device sharedInstance] setShouldExit:true];
-            syslog(@"[WARN] Stuck somewhere %@/%@ no items. Restarting accounts...",
-                   noItemsCount,
-                   [[Settings sharedInstance] maxNoQuestCount]);
-            [DeviceState restart];
-            return;
-        }
-        */
-        
-        [[DeviceState sharedInstance] setSkipSpin:false];
-        syslog(@"[DEBUG] Quest Distance: %@", questDistance);
-        if ([questDistance doubleValue] <= 5.0) {
-            delay = @0.0;
-            [[DeviceState sharedInstance] setSkipSpin:true];
-            syslog(@"[DEBUG] Quest Distance: %@m < 30.0m Already spun this pokestop. Go to next pokestop.", questDistance);
-            [[DeviceState sharedInstance] setGotItems:true];
-        } else if ([questDistance intValue] <= 100.0) {
-            delay = @3.0;
-        } else if ([questDistance intValue] <= 1000.0) {
-            delay = @(([questDistance intValue] / 1000.0) * 60.0);
-        } else if ([questDistance intValue] <= 2000.0) {
-            delay = @(([questDistance intValue] / 2000.0) * 90.0);
-        } else if ([questDistance intValue] <= 4000.0) {
-            delay = @(([questDistance intValue] / 4000.0) * 120.0);
-        } else if ([questDistance intValue] <= 5000.0) {
-            delay = @(([questDistance intValue] / 5000.0) * 150.0);
-        } else if ([questDistance intValue] <= 8000.0) {
-            delay = @(([questDistance intValue] / 8000.0) * 360.0);
-        } else {
-            delay = @7200.0;
-        }
-    }
-    
-    if (![[DeviceState sharedInstance] skipSpin]) {
-        syslog(@"[INFO] Spinning fort at %@ %@ in %@ seconds", lat, lon, delay);
-        CLLocation *lastQuestLocation = [Utils createCoordinate:[lat doubleValue] lon:[lon doubleValue]];
-        [[DeviceState sharedInstance] setLastQuestLocation:lastQuestLocation];
-        NSDate *firstWarningDate = [[DeviceState sharedInstance] firstWarningDate];
-        NSTimeInterval timeSince = [[NSDate date] timeIntervalSinceDate:firstWarningDate];
-        int maxWarningTimeRaid = [[Settings sharedInstance] maxWarningTimeRaid];
-        if (hasWarning &&
-            firstWarningDate != nil &&
-            timeSince >= maxWarningTimeRaid &&
-            [[Settings sharedInstance] enableAccountManager]) {
-            syslog(@"[WARN] Account has a warning and is over maxWarningTimeRaid (%d). Logging out!", maxWarningTimeRaid);
-            CLLocation *startupLocation = [[DeviceState sharedInstance] startupLocation];
-            [[DeviceState sharedInstance] setCurrentLocation:startupLocation];
-            [[Device sharedInstance] setUsername:nil];
-            [[Device sharedInstance] setIsLoggedIn:false];
-            [[DeviceState sharedInstance] setIsQuestInit:false];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-            [DeviceState logout];
-        }
-        
-        [[DeviceState sharedInstance] setNewCreated:false];
-        [[DeviceState sharedInstance] setCurrentLocation:[Utils createCoordinate:[lat doubleValue] lon:[lon doubleValue]]];
-        [[DeviceState sharedInstance] setWaitRequiresPokemon:false];
-        [[DeviceState sharedInstance] setPokemonEncounterId:nil];
-        //_targetMaxDistance = [[Settings sharedInstance] targetMaxDistance] ?: @250.0;
-        [[DeviceState sharedInstance] setWaitForData:true];
-        syslog(@"[INFO] Scanning prepared");
-        
-        NSDate *start = [NSDate date];
-        NSNumber *delayTemp = delay;
-        if ([[Settings sharedInstance] ultraQuests]) {
-            delayTemp = @0;
-        }
-        bool success = false;
-        bool locked = true;
-        while (locked) {
-            usleep(100000 * [[[Device sharedInstance] delayMultiplier] intValue]);
-            NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:start];
-            if (timeIntervalSince <= [delayTemp intValue]) {
-                NSNumber *left = @([delayTemp intValue] - timeIntervalSince);
-                syslog(@"[DEBUG] Delaying by %@", left);
-                usleep(MIN(10, [left intValue]) * 1000000.0);
-                //usleep(MIN(10.0, left) * 1000000));
-                continue;
-            }
-            int raidMaxTime = [[Settings sharedInstance] raidMaxTime];
-            if (timeIntervalSince >= (raidMaxTime + [delayTemp intValue])) {
-                locked = false;
-                [[DeviceState sharedInstance] setWaitForData:false];
-                NSNumber *failedCount = [[DeviceState sharedInstance] failedCount];
-                [[DeviceState sharedInstance] setFailedCount:[Utils incrementInt:failedCount]];
-                syslog(@"[WARN] Pokestop loading timed out...");
-                [self sendJobFailed:action withLat:lat andLon:lon];
-            } else {
-                locked = [[DeviceState sharedInstance] waitForData];
-                // mizu has locked = false too for some reason?
-                //locked = false;
-                if (!locked) {
-                    success = true;
-                    [[DeviceState sharedInstance] setDelayQuest:true];
-                    [[DeviceState sharedInstance] setFailedCount:@0];
-                    syslog(@"[INFO] Pokestop loaded after %f", [[NSDate date] timeIntervalSinceDate:start]);
-                    //sleep(1);
-                }
-            }
-        }
-        
-        if (success) {
-            syslog(@"[INFO] Spinning Pokestop");
-            NSDate *lastDeployTime = [[Device sharedInstance] lastEggDeployTime];
-            NSNumber *luckyEggsCount = [[Device sharedInstance] luckyEggsCount];
-            //NSNumber *spinCount = [[DeviceState sharedInstance] spinCount];
-            NSNumber *level = [[Device sharedInstance] level];
-            NSTimeInterval eggTimeIntervalSince = [[NSDate date] timeIntervalSinceDate:lastDeployTime];
-            syslog(@"[INFO] Lucky Eggs Count: %@ EggTimeSince: %f Level: %@ LastDeploy: %@",
-                   luckyEggsCount, eggTimeIntervalSince, level, lastDeployTime);
-            if (([luckyEggsCount intValue] > 0 &&
-                [level intValue] >= 9 && [level intValue] < 30) ||
-                eggTimeIntervalSince >= _eggInterval) {
-                [self startEggTimer];
-            }
-            /*
-            if (([luckyEggsCount intValue] > 0 &&
-                [level intValue] >= 9 && [level intValue] < 30) &&
-                (lastDeployTime == nil ||
-                eggTimeIntervalSince == NAN ||
-                eggTimeIntervalSince >= _eggInterval)) {
-                syslog(@"[INFO] Deploying lucky egg.");
-                if ([UIC2 eggDeploy]) {
-                    [[Device sharedInstance] setLastEggDeployTime:[NSDate date]];
-                    [[Device sharedInstance] setLuckyEggsCount:[Utils decrementInt:luckyEggsCount]];
-                } else {
-                    //syslog(@"[ERROR] Failed to deploy lucky egg.");
-                }
-            }
-            */
-            /*
-            [[DeviceState sharedInstance] setSpinCount:@0];
-            sleep(1 * [[[Device sharedInstance] delayMultiplier] intValue]);
-            int attempts = 0;
-            while ([[NSDate date] timeIntervalSinceDate:start] < 15.0 + [delay intValue]) {
-                if (![[DeviceState sharedInstance] gotItems]) {
-                    if (attempts % 5 == 0) {
-                        syslog(@"[DEBUG] Waiting to spin...");
-                    }
-                    sleep(1);
-                } else {
-            */
-                    syslog(@"[INFO] Successfully spun Pokestop");
-                    NSNumber *spins = [[DeviceState sharedInstance] spinCount];
-                    [[DeviceState sharedInstance] setSpinCount:[Utils incrementInt:spins]];
-                    //sleep(1 * [[[Device sharedInstance] delayMultiplier] intValue]);
-            /*
-                    break;
-                }
-                attempts++;
-            }
-            if (![[DeviceState sharedInstance] gotItems]) {
-                syslog(@"[ERROR] Failed to spin Pokestop");
-            }
-            */
-        }
-    } else {
-        syslog(@"[DEBUG] Sleep 3 seconds before skipping...");
-        sleep(3);
     }
 }
 
@@ -975,16 +625,15 @@ static NSTimer *_timer = nil;
     
     NSDate *start = [NSDate date];
     [[DeviceState sharedInstance] setWaitRequiresPokemon:true];
-    // REVIEW: Not used - _targetMaxDisance = [[Settings sharedInstance] targetMaxDistance];
     CLLocation *currentLocation = [Utils createCoordinate:[lat doubleValue] lon:[lon doubleValue]];
     [[DeviceState sharedInstance] setCurrentLocation:currentLocation];
     [[DeviceState sharedInstance] setWaitForData:true];
     syslog(@"[INFO] Scanning prepared");
     
     bool locked = true;
+    int pokemonMaxTime = [[Settings sharedInstance] pokemonMaxTime];
     while (locked) {
         NSTimeInterval timeIntervalSince = [[NSDate date] timeIntervalSinceDate:start];
-        int pokemonMaxTime = [[Settings sharedInstance] pokemonMaxTime];
         if (timeIntervalSince >= pokemonMaxTime) {
             locked = false;
             [[DeviceState sharedInstance] setWaitForData:false];

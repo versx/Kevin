@@ -89,25 +89,16 @@ static int _jitterCorner;
             responseData[@"lat"] = currentLat;
             responseData[@"lng"] = currentLon;
             
-            bool ultraQuests = [[Settings sharedInstance] ultraQuests];
             bool delayQuest = [[DeviceState sharedInstance] delayQuest];
             NSString *action = [[DeviceState sharedInstance] lastAction];
             NSNumber *luckyEggsCount = [[Device sharedInstance] luckyEggsCount];
-            if (ultraQuests && [action isEqualToString:@"scan_quest"] && delayQuest) {
+            if ([action isEqualToString:@"scan_quest"] && delayQuest) {
                 // Auto-spinning should only happen when ultraQuests is
                 // set and the instance is scan_quest type
                 if ([[[Device sharedInstance] level] intValue] >= 30) {
                     responseData[@"actions"] = @[@"pokemon", @"pokestop"];
                 } else {
                     responseData[@"actions"] = @[@"pokestop"];
-                }
-            } else if (!ultraQuests && [action isEqualToString:@"scan_quest"]) {
-                // Auto-spinning should only happen when ultraQuests is
-                // set and the instance is scan_quest type
-                if ([[[Device sharedInstance] level] intValue] >= 30) {
-                    responseData[@"actions"] = @[@"pokemon"];
-                } else {
-                    responseData[@"actions"] = @[@""];
                 }
             } else if ([action isEqualToString:@"leveling"]) {
                 if ([luckyEggsCount intValue] > 0) {
@@ -139,7 +130,7 @@ static int _jitterCorner;
     NSMutableDictionary *data = [params mutableCopy];
     data[@"lat_target"] = @(currentLoc.coordinate.latitude);
     data[@"lon_target"] = @(currentLoc.coordinate.longitude);
-    data[@"target_max_distnace"] = @(DEFAULT_TARGET_MAX_DISTANCE);// TODO: [[Settings sharedInstance] targetMaxDistance];
+    data[@"target_max_distnace"] = @(DEFAULT_TARGET_MAX_DISTANCE);
     data[@"username"] = [[Device sharedInstance] username] ?: @"";
     data[@"pokemon_encounter_id"] = [[DeviceState sharedInstance] pokemonEncounterId] ?: @"";
     data[@"uuid"] = [[Device sharedInstance] uuid];
@@ -414,40 +405,40 @@ static int _jitterCorner;
 -(NSString *)handleAccountRequest
 {
     syslog(@"[INFO] Received account request from client for auto login.");
-    //NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
-    //data[@"username"] = [[Device sharedInstance] username];
-    //data[@"password"] = [[Device sharedInstance] password];
-    //NSString *response = [Utils toJsonString:data withPrettyPrint:true];
-    if ([[Settings sharedInstance] autoLogin]) {
-        NSString *response = [NSString stringWithFormat:@"{\"username\":\"%@\",\"password\":\"%@\"}",
-                              [[Device sharedInstance] username],
-                              [[Device sharedInstance] password]];
-        syslog(@"[INFO] Auto login account response: %@", response);
-        return response;
-    }
-    return JSON_OK;
+    NSMutableDictionary *data = [[NSMutableDictionary alloc] init];
+    data[@"username"] = [[Device sharedInstance] username];
+    data[@"password"] = [[Device sharedInstance] password];
+    NSString *response = [Utils toJsonString:data withPrettyPrint:true];
+    syslog(@"[INFO] Auto login account response: %@", response);
+    return response;
 }
 
 -(NSString *)handleScreenRequest
 {
     syslog(@"[INFO] Received screenshot request from user");
+    __block NSData *data = nil;
+    dispatch_semaphore_t sem = dispatch_semaphore_create(0);
     dispatch_async(dispatch_get_main_queue(), ^{
-       [Utils sendScreenshot];
+        [Utils sendScreenshot];
+        //UIImage *image = [Utils takeScreenshot];
+        //data = UIImageJPEGRepresentation(image, 1);
+        dispatch_semaphore_signal(sem);
     });
+    dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+    //return data;
     return JSON_OK;
 }
 
 -(NSString *)handleSystemInfoRequest
 {
     syslog(@"[INFO] Received system info request from user");
-    //NSDictionary *dict = [[SystemInfo sharedInstance] dictionary];
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
     @try {
         dict[@"uuid"] = [[Device sharedInstance] uuid];
         dict[@"model"] = [[Device sharedInstance] model];
         dict[@"ios_version"] = [[Device sharedInstance] osVersion];
         dict[@"cpu_usage"] = [[SystemInfo sharedInstance] cpuUsage];
-        //dict[@"cpu_count"] = (unsigned long)[[SystemInfo sharedInstance] processorCount];
+        // TODO: dict[@"cpu_count"] = (unsigned long)[[SystemInfo sharedInstance] processorCount];
         dict[@"thermal_state"] = [SystemInfo formatThermalState:[[SystemInfo sharedInstance] thermalState]];
         dict[@"system_uptime"] = [SystemInfo formatTimeInterval:[[SystemInfo sharedInstance] systemUptime]];
         dict[@"ram_total"] = [[SystemInfo sharedInstance] totalMemory];

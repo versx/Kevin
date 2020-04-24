@@ -88,13 +88,13 @@
 {
     syslog(@"[INFO] Restarting...");
     dispatch_async(dispatch_get_main_queue(), ^{
+        sleep(3);
         while (true) { // REVIEW: Uhh this doesn't look safe. ;-|
             SEL selector = [[NSXPCConnection currentConnection] respondsToSelector:@selector(invalidate)];
             [[[UIControl alloc] init] sendAction:selector
                                               to:[UIApplication sharedApplication]
                                         forEvent:nil
             ];
-            sleep(2);
         }
     });
 }

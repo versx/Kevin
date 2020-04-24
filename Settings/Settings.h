@@ -17,10 +17,9 @@
 -(NSString *)homebaseUrl;
 -(NSString *)backendControllerUrl;
 -(NSString *)backendRawUrl;
--(NSString *)pixelConfigUrl;
+//-(NSString *)pixelConfigUrl;
 -(NSString *)token;
 -(int)port;
--(int)targetMaxDistance;
 -(int)heartbeatMaxTime;
 -(int)pokemonMaxTime;
 -(int)raidMaxTime;
@@ -34,14 +33,7 @@
 -(bool)deployEggs;
 -(bool)nearbyTracker;
 -(bool)autoLogin;
--(bool)ultraIV;
--(bool)ultraQuests;
 -(bool)allowWarnedAccounts;
-
--(NSString *)loggingUrl;
--(int)loggingPort;
--(bool)loggingTls;
--(bool)loggingTcp;
 
 -(bool)gotConfig;
 
