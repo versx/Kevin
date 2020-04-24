@@ -82,7 +82,7 @@
 -(DeviceCoordinate *)ageVerificationDragStart;
 /** Location to end Scrolling for Birth year. **/
 -(DeviceCoordinate *)ageVerificationDragEnd;
-/** ? pixel in ? of logged out. */ //TODO: - Where?
+/** Green pixel in button of passenger warning pop-up. **/
 -(DeviceCoordinate *)passenger;
 /** ? pixel in ? of weather popup. */ //TODO: - Where?
 -(DeviceCoordinate *)weather;
