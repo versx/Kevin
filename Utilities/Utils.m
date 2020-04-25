@@ -230,6 +230,7 @@ static double _baseVerticalAccuracy = 200.0; // in meters
 
 +(void)syslog:(NSString *)msg
 {
+    NSLog(@"[Jarvis] Trying to send log %@", msg);
     @try {
         NSString *message = [NSString stringWithFormat:@"[Jarvis] %@", msg];
         NSLog(@"%@", message);
@@ -244,15 +245,26 @@ static double _baseVerticalAccuracy = 200.0; // in meters
         NSString *url = [NSString stringWithFormat:@"%@/api/log/new/%@", homebaseUrl, [[Device sharedInstance] uuid]];
         NSMutableURLRequest *urlRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
         [urlRequest setHTTPMethod:@"POST"];
+        [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+        [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Accept"];
 
         NSData *postData = [message dataUsingEncoding:NSUTF8StringEncoding];
         [urlRequest setHTTPBody:postData];
 
+        /*
         NSURLSession *session = [NSURLSession sharedSession];
         NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:urlRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
             if (httpResponse.statusCode != 200) {
                 NSLog(@"[Jarvis] Log error");
+            }
+        }];
+        */
+        NSURLSession *session = [NSURLSession sharedSession];
+        NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:urlRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+            if(httpResponse.statusCode != 200) {
+                NSLog(@"[Jarvis] Log Error");
             }
         }];
         [dataTask resume];
