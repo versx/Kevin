@@ -24,21 +24,6 @@
     return self;
 }
 
--(void)dealloc
-{
-    [currentLocation release];
-    [startupLocation release];
-    [lastLocation release];
-    [lastQuestLocation release];
-    [firstWarningDate release];
-    [eggStart release];
-    [lastUpdate release];
-    [pokemonEncounterId release];
-    [targetFortId release];
-    
-    [super dealloc];
-}
-
 +(DeviceState *)sharedInstance
 {
     static DeviceState *sharedInstance = nil;

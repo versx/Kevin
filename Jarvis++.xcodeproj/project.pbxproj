@@ -19,7 +19,7 @@
 		C00EE489241C70B2001771AB /* HttpClientConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = C00EE488241C70B2001771AB /* HttpClientConnection.h */; };
 		C00EE48B241C70C5001771AB /* HttpClientConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = C00EE48A241C70C5001771AB /* HttpClientConnection.m */; };
 		C00EE48D241D4830001771AB /* JarvisTestCase.h in Headers */ = {isa = PBXBuildFile; fileRef = C00EE48C241D4830001771AB /* JarvisTestCase.h */; };
-		C00EE48F241D4855001771AB /* JarvisTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = C00EE48E241D4855001771AB /* JarvisTestCase.m */; };
+		C00EE48F241D4855001771AB /* JarvisTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = C00EE48E241D4855001771AB /* JarvisTestCase.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		C0132B62240B630000719452 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0132B61240B630000719452 /* CFNetwork.framework */; };
 		C0132B64240B631700719452 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0132B63240B631700719452 /* Security.framework */; };
 		C01B4965240ACF5D00633B45 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01B4964240ACF5D00633B45 /* Foundation.framework */; };
@@ -594,6 +594,7 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ARCHS = arm64;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
@@ -667,6 +668,7 @@
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ARCHS = arm64;
 				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;

@@ -29,11 +29,6 @@ static void __attribute__((constructor)) initialize(void) {
     
     return self;
 }
--(void)dealloc
-{
-    [_uic release];
-    [super dealloc];
-}
 
 void onUncaughtException(NSException* exception)
 {

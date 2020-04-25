@@ -110,19 +110,17 @@ static NSString *plistFileName = @"config.plist";
         
         NSString *url = [NSString stringWithFormat:@"%@/api/config", _homebaseUrl];
         NSDictionary *result = [sharedInstance fetchJsonConfig:url];
-        /*
         if (result == nil || [result[@"status"] isEqualToString:@"error"]) {
             NSLog(@"[Jarvis] [Settings] [ERROR] Failed to grab config error: %@ Trying again in 30 seconds...", result[@"error"] ?: @"Are you sure DeviceConfigManager is up?");
-            //sleep(30);
-            //continue;
+            sleep(30);
+            return;
         }
-        */
-        _config = result;
         NSLog(@"[Jarvis] [Settings] [INFO] Got config: %@", result);
-        //if (result == nil) {
-        //    NSLog(@"[Jarvis] [Settings] [ERROR] Some how returned a nil config.");
-        //    return;
-        //}
+        if (result == nil) {
+            NSLog(@"[Jarvis] [Settings] [ERROR] Some how returned a nil config.");
+            return;
+        }
+        _config = result;
 
         NSString *backendUrl = result[@"backend_url"];
         NSArray *dataEndpoints = [result objectForKey:@"data_endpoints"];

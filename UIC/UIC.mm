@@ -43,14 +43,6 @@ static BOOL _dataStarted = false;
     return self;
 }
 
--(void)dealloc
-{
-    [_httpServer release];
-    [_heartbeatQueue release];
-    [_pixelCheckQueue release];
-    [super dealloc];
-}
-
 
 #pragma mark Login Handlers
 
