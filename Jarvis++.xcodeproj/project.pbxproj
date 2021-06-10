@@ -1,0 +1,763 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		1AD80293D695349110C3793B /* libPods-Jarvis++.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DDDB883D38BFB1DFFF011E2A /* libPods-Jarvis++.a */; };
+		C0025AAE241421E9007813F7 /* Utils.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AAD241421E9007813F7 /* Utils.h */; };
+		C0025AB0241421F4007813F7 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = C0025AAF241421F4007813F7 /* Utils.m */; };
+		C0025AB224143917007813F7 /* DeviceState.m in Sources */ = {isa = PBXBuildFile; fileRef = C0025AB124143917007813F7 /* DeviceState.m */; };
+		C0025AB424143923007813F7 /* DeviceState.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AB324143923007813F7 /* DeviceState.h */; };
+		C0025ABE241483B7007813F7 /* UIImage+Pixels.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025ABD241483B7007813F7 /* UIImage+Pixels.h */; };
+		C0025AC0241483C6007813F7 /* UIImage+Pixels.mm in Sources */ = {isa = PBXBuildFile; fileRef = C0025ABF241483C6007813F7 /* UIImage+Pixels.mm */; };
+		C0025AC32414846B007813F7 /* JobController.h in Headers */ = {isa = PBXBuildFile; fileRef = C0025AC22414846B007813F7 /* JobController.h */; };
+		C0025AC524148477007813F7 /* JobController.m in Sources */ = {isa = PBXBuildFile; fileRef = C0025AC424148477007813F7 /* JobController.m */; };
+		C00EE489241C70B2001771AB /* HttpClientConnection.h in Headers */ = {isa = PBXBuildFile; fileRef = C00EE488241C70B2001771AB /* HttpClientConnection.h */; };
+		C00EE48B241C70C5001771AB /* HttpClientConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = C00EE48A241C70C5001771AB /* HttpClientConnection.m */; };
+		C00EE48D241D4830001771AB /* JarvisTestCase.h in Headers */ = {isa = PBXBuildFile; fileRef = C00EE48C241D4830001771AB /* JarvisTestCase.h */; };
+		C00EE48F241D4855001771AB /* JarvisTestCase.m in Sources */ = {isa = PBXBuildFile; fileRef = C00EE48E241D4855001771AB /* JarvisTestCase.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
+		C0132B62240B630000719452 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0132B61240B630000719452 /* CFNetwork.framework */; };
+		C0132B64240B631700719452 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0132B63240B631700719452 /* Security.framework */; };
+		C01B4965240ACF5D00633B45 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01B4964240ACF5D00633B45 /* Foundation.framework */; };
+		C01B4967240ACF5D00633B45 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01B4966240ACF5D00633B45 /* UIKit.framework */; };
+		C01B4971240ACF5D00633B45 /* Jarvis__.h in Headers */ = {isa = PBXBuildFile; fileRef = C01B4970240ACF5D00633B45 /* Jarvis__.h */; };
+		C01B4973240ACF5D00633B45 /* Jarvis__.m in Sources */ = {isa = PBXBuildFile; fileRef = C01B4972240ACF5D00633B45 /* Jarvis__.m */; };
+		C01B4980240ACF9400633B45 /* UIC.h in Headers */ = {isa = PBXBuildFile; fileRef = C01B497E240ACF9400633B45 /* UIC.h */; };
+		C01B4981240ACF9400633B45 /* UIC.mm in Sources */ = {isa = PBXBuildFile; fileRef = C01B497F240ACF9400633B45 /* UIC.mm */; };
+		C01B4983240AD01E00633B45 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C01B4982240AD01E00633B45 /* CoreLocation.framework */; };
+		C0339C862427E9140046D0AD /* DeviceCoordinate.h in Headers */ = {isa = PBXBuildFile; fileRef = C0339C852427E9140046D0AD /* DeviceCoordinate.h */; };
+		C0339C882427E9220046D0AD /* DeviceCoordinate.m in Sources */ = {isa = PBXBuildFile; fileRef = C0339C872427E9220046D0AD /* DeviceCoordinate.m */; };
+		C0339C8A2427E9300046D0AD /* DeviceCoordinateScalar.h in Headers */ = {isa = PBXBuildFile; fileRef = C0339C892427E9300046D0AD /* DeviceCoordinateScalar.h */; };
+		C0339C8C2427E93C0046D0AD /* DeviceCoordinateScalar.m in Sources */ = {isa = PBXBuildFile; fileRef = C0339C8B2427E93C0046D0AD /* DeviceCoordinateScalar.m */; };
+		C0339C8F2427EE510046D0AD /* DeviceConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = C0339C8E2427EE510046D0AD /* DeviceConfig.h */; };
+		C0339C912427EE5B0046D0AD /* DeviceConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = C0339C902427EE5B0046D0AD /* DeviceConfig.m */; };
+		C0339C93242803D80046D0AD /* ColorOffset.h in Headers */ = {isa = PBXBuildFile; fileRef = C0339C92242803D80046D0AD /* ColorOffset.h */; };
+		C0339C95242803E40046D0AD /* ColorOffset.m in Sources */ = {isa = PBXBuildFile; fileRef = C0339C94242803E40046D0AD /* ColorOffset.m */; };
+		C03E44DF2431132700B467BB /* RequestController.h in Headers */ = {isa = PBXBuildFile; fileRef = C03E44DE2431132700B467BB /* RequestController.h */; };
+		C03E44E12431133800B467BB /* RequestController.m in Sources */ = {isa = PBXBuildFile; fileRef = C03E44E02431133800B467BB /* RequestController.m */; };
+		C03E44E42432595200B467BB /* PixelSettings.h in Headers */ = {isa = PBXBuildFile; fileRef = C03E44E32432595200B467BB /* PixelSettings.h */; };
+		C03E44E62432596900B467BB /* PixelSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = C03E44E52432596900B467BB /* PixelSettings.m */; };
+		C03E44EC24340FD800B467BB /* DeviceConfigProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = C03E44EB24340FD800B467BB /* DeviceConfigProtocol.h */; };
+		C03E44EE2434286500B467BB /* DeviceRatio1333.h in Headers */ = {isa = PBXBuildFile; fileRef = C03E44ED2434286500B467BB /* DeviceRatio1333.h */; };
+		C03E44F02434287600B467BB /* DeviceRatio1333.m in Sources */ = {isa = PBXBuildFile; fileRef = C03E44EF2434287600B467BB /* DeviceRatio1333.m */; };
+		C03E44F224342D4400B467BB /* DeviceIPhoneNormal.h in Headers */ = {isa = PBXBuildFile; fileRef = C03E44F124342D4400B467BB /* DeviceIPhoneNormal.h */; };
+		C03E44F424342D5100B467BB /* DeviceIPhoneNormal.m in Sources */ = {isa = PBXBuildFile; fileRef = C03E44F324342D5100B467BB /* DeviceIPhoneNormal.m */; };
+		C03E44F624342F9E00B467BB /* DeviceIPhonePlus.h in Headers */ = {isa = PBXBuildFile; fileRef = C03E44F524342F9E00B467BB /* DeviceIPhonePlus.h */; };
+		C03E44F824342FAC00B467BB /* DeviceIPhonePlus.m in Sources */ = {isa = PBXBuildFile; fileRef = C03E44F724342FAC00B467BB /* DeviceIPhonePlus.m */; };
+		C04D0A78243BFB7D006DE57D /* SystemInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = C04D0A77243BFB7D006DE57D /* SystemInfo.h */; };
+		C04D0A7A243BFB8A006DE57D /* SystemInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = C04D0A79243BFB8A006DE57D /* SystemInfo.m */; };
+		C065AE40242ECD2A007114C8 /* DeviceRatio1775.h in Headers */ = {isa = PBXBuildFile; fileRef = C065AE3F242ECD2A007114C8 /* DeviceRatio1775.h */; };
+		C065AE42242ECD3B007114C8 /* DeviceRatio1775.m in Sources */ = {isa = PBXBuildFile; fileRef = C065AE41242ECD3B007114C8 /* DeviceRatio1775.m */; };
+		C065AE44242EFCCA007114C8 /* NSString+Extensions.h in Headers */ = {isa = PBXBuildFile; fileRef = C065AE43242EFCCA007114C8 /* NSString+Extensions.h */; };
+		C065AE46242EFCD8007114C8 /* NSString+Extensions.m in Sources */ = {isa = PBXBuildFile; fileRef = C065AE45242EFCD8007114C8 /* NSString+Extensions.m */; };
+		C0AC1CDD240BAD44008F4DFB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C0AC1CDC240BAD44008F4DFB /* CoreGraphics.framework */; };
+		C0AC1CF2240BB365008F4DFB /* Device.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1CF1240BB365008F4DFB /* Device.m */; };
+		C0AC1CF4240BB37C008F4DFB /* Device.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1CF3240BB37C008F4DFB /* Device.h */; };
+		C0AC1CF6240BB96C008F4DFB /* Settings.m in Sources */ = {isa = PBXBuildFile; fileRef = C0AC1CF5240BB96C008F4DFB /* Settings.m */; };
+		C0AC1CF8240BB97A008F4DFB /* Settings.h in Headers */ = {isa = PBXBuildFile; fileRef = C0AC1CF7240BB97A008F4DFB /* Settings.h */; };
+		C0B68E022414C33E009B5970 /* Consts.h in Headers */ = {isa = PBXBuildFile; fileRef = C0B68E012414C33E009B5970 /* Consts.h */; };
+		C0B68E042414C632009B5970 /* Consts.m in Sources */ = {isa = PBXBuildFile; fileRef = C0B68E032414C632009B5970 /* Consts.m */; };
+		C0BAF0952418B62C003E2419 /* Jarvis++.pch in Headers */ = {isa = PBXBuildFile; fileRef = C0BAF0942418B62C003E2419 /* Jarvis++.pch */; };
+		C0D50BA52446D6480016C867 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C06C7C112446D5A500C3B862 /* XCTest.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		4B79D2905CA6EE7C52F90E32 /* Pods-Jarvis++.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jarvis++.debug.xcconfig"; path = "Target Support Files/Pods-Jarvis++/Pods-Jarvis++.debug.xcconfig"; sourceTree = "<group>"; };
+		C0025AAD241421E9007813F7 /* Utils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
+		C0025AAF241421F4007813F7 /* Utils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Utils.m; sourceTree = "<group>"; };
+		C0025AB124143917007813F7 /* DeviceState.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceState.m; sourceTree = "<group>"; };
+		C0025AB324143923007813F7 /* DeviceState.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceState.h; sourceTree = "<group>"; };
+		C0025ABD241483B7007813F7 /* UIImage+Pixels.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIImage+Pixels.h"; sourceTree = "<group>"; };
+		C0025ABF241483C6007813F7 /* UIImage+Pixels.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "UIImage+Pixels.mm"; sourceTree = "<group>"; };
+		C0025AC22414846B007813F7 /* JobController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JobController.h; sourceTree = "<group>"; };
+		C0025AC424148477007813F7 /* JobController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JobController.m; sourceTree = "<group>"; };
+		C00EE488241C70B2001771AB /* HttpClientConnection.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HttpClientConnection.h; sourceTree = "<group>"; };
+		C00EE48A241C70C5001771AB /* HttpClientConnection.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HttpClientConnection.m; sourceTree = "<group>"; };
+		C00EE48C241D4830001771AB /* JarvisTestCase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = JarvisTestCase.h; sourceTree = "<group>"; };
+		C00EE48E241D4855001771AB /* JarvisTestCase.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = JarvisTestCase.m; sourceTree = "<group>"; };
+		C0132B61240B630000719452 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		C0132B63240B631700719452 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		C019482824161E730094A2C8 /* config.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = config.plist; sourceTree = "<group>"; };
+		C01B4961240ACF5D00633B45 /* libJarvis++.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = "libJarvis++.dylib"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C01B4964240ACF5D00633B45 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		C01B4966240ACF5D00633B45 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		C01B496B240ACF5D00633B45 /* control.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = control.txt; sourceTree = "<group>"; };
+		C01B496C240ACF5D00633B45 /* control */ = {isa = PBXFileReference; lastKnownFileType = text; path = control; sourceTree = "<group>"; };
+		C01B496E240ACF5D00633B45 /* PackageVersion.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = PackageVersion.plist; path = ../PackageVersion.plist; sourceTree = "<group>"; };
+		C01B4970240ACF5D00633B45 /* Jarvis__.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Jarvis__.h; sourceTree = "<group>"; };
+		C01B4972240ACF5D00633B45 /* Jarvis__.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Jarvis__.m; sourceTree = "<group>"; };
+		C01B4976240ACF5D00633B45 /* 0xdeadfa11 */ = {isa = PBXFileReference; lastKnownFileType = text; path = 0xdeadfa11; sourceTree = "<group>"; };
+		C01B497E240ACF9400633B45 /* UIC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UIC.h; sourceTree = "<group>"; };
+		C01B497F240ACF9400633B45 /* UIC.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = UIC.mm; sourceTree = "<group>"; };
+		C01B4982240AD01E00633B45 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		C0339C852427E9140046D0AD /* DeviceCoordinate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceCoordinate.h; sourceTree = "<group>"; };
+		C0339C872427E9220046D0AD /* DeviceCoordinate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceCoordinate.m; sourceTree = "<group>"; };
+		C0339C892427E9300046D0AD /* DeviceCoordinateScalar.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceCoordinateScalar.h; sourceTree = "<group>"; };
+		C0339C8B2427E93C0046D0AD /* DeviceCoordinateScalar.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceCoordinateScalar.m; sourceTree = "<group>"; };
+		C0339C8E2427EE510046D0AD /* DeviceConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceConfig.h; sourceTree = "<group>"; };
+		C0339C902427EE5B0046D0AD /* DeviceConfig.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceConfig.m; sourceTree = "<group>"; };
+		C0339C92242803D80046D0AD /* ColorOffset.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ColorOffset.h; sourceTree = "<group>"; };
+		C0339C94242803E40046D0AD /* ColorOffset.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ColorOffset.m; sourceTree = "<group>"; };
+		C03E44DE2431132700B467BB /* RequestController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RequestController.h; sourceTree = "<group>"; };
+		C03E44E02431133800B467BB /* RequestController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RequestController.m; sourceTree = "<group>"; };
+		C03E44E32432595200B467BB /* PixelSettings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PixelSettings.h; sourceTree = "<group>"; };
+		C03E44E52432596900B467BB /* PixelSettings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PixelSettings.m; sourceTree = "<group>"; };
+		C03E44EB24340FD800B467BB /* DeviceConfigProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceConfigProtocol.h; sourceTree = "<group>"; };
+		C03E44ED2434286500B467BB /* DeviceRatio1333.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceRatio1333.h; sourceTree = "<group>"; };
+		C03E44EF2434287600B467BB /* DeviceRatio1333.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceRatio1333.m; sourceTree = "<group>"; };
+		C03E44F124342D4400B467BB /* DeviceIPhoneNormal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceIPhoneNormal.h; sourceTree = "<group>"; };
+		C03E44F324342D5100B467BB /* DeviceIPhoneNormal.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceIPhoneNormal.m; sourceTree = "<group>"; };
+		C03E44F524342F9E00B467BB /* DeviceIPhonePlus.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceIPhonePlus.h; sourceTree = "<group>"; };
+		C03E44F724342FAC00B467BB /* DeviceIPhonePlus.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceIPhonePlus.m; sourceTree = "<group>"; };
+		C04D0A77243BFB7D006DE57D /* SystemInfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SystemInfo.h; sourceTree = "<group>"; };
+		C04D0A79243BFB8A006DE57D /* SystemInfo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SystemInfo.m; sourceTree = "<group>"; };
+		C065AE3F242ECD2A007114C8 /* DeviceRatio1775.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DeviceRatio1775.h; sourceTree = "<group>"; };
+		C065AE41242ECD3B007114C8 /* DeviceRatio1775.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DeviceRatio1775.m; sourceTree = "<group>"; };
+		C065AE43242EFCCA007114C8 /* NSString+Extensions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSString+Extensions.h"; sourceTree = "<group>"; };
+		C065AE45242EFCD8007114C8 /* NSString+Extensions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSString+Extensions.m"; sourceTree = "<group>"; };
+		C06C7C112446D5A500C3B862 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = XCTest.framework; sourceTree = "<group>"; };
+		C0AC1CDC240BAD44008F4DFB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		C0AC1CF1240BB365008F4DFB /* Device.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Device.m; sourceTree = "<group>"; };
+		C0AC1CF3240BB37C008F4DFB /* Device.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Device.h; sourceTree = "<group>"; };
+		C0AC1CF5240BB96C008F4DFB /* Settings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Settings.m; sourceTree = "<group>"; };
+		C0AC1CF7240BB97A008F4DFB /* Settings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Settings.h; sourceTree = "<group>"; };
+		C0B68E012414C33E009B5970 /* Consts.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Consts.h; sourceTree = "<group>"; };
+		C0B68E032414C632009B5970 /* Consts.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Consts.m; sourceTree = "<group>"; };
+		C0BAF0942418B62C003E2419 /* Jarvis++.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Jarvis++.pch"; sourceTree = "<group>"; };
+		CAA9A8ACBA3A702C6AC49374 /* Pods-Jarvis++.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Jarvis++.release.xcconfig"; path = "Target Support Files/Pods-Jarvis++/Pods-Jarvis++.release.xcconfig"; sourceTree = "<group>"; };
+		DDDB883D38BFB1DFFF011E2A /* libPods-Jarvis++.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Jarvis++.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C01B495D240ACF5D00633B45 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0D50BA52446D6480016C867 /* XCTest.framework in Frameworks */,
+				C0AC1CDD240BAD44008F4DFB /* CoreGraphics.framework in Frameworks */,
+				C0132B64240B631700719452 /* Security.framework in Frameworks */,
+				C0132B62240B630000719452 /* CFNetwork.framework in Frameworks */,
+				C01B4983240AD01E00633B45 /* CoreLocation.framework in Frameworks */,
+				C01B4965240ACF5D00633B45 /* Foundation.framework in Frameworks */,
+				C01B4967240ACF5D00633B45 /* UIKit.framework in Frameworks */,
+				1AD80293D695349110C3793B /* libPods-Jarvis++.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		91E40CCDBD064A40A2555622 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				4B79D2905CA6EE7C52F90E32 /* Pods-Jarvis++.debug.xcconfig */,
+				CAA9A8ACBA3A702C6AC49374 /* Pods-Jarvis++.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+		C0025AA3241416DE007813F7 /* Net */ = {
+			isa = PBXGroup;
+			children = (
+				C00EE488241C70B2001771AB /* HttpClientConnection.h */,
+				C00EE48A241C70C5001771AB /* HttpClientConnection.m */,
+			);
+			path = Net;
+			sourceTree = "<group>";
+		};
+		C0025AAC241421D5007813F7 /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				C04D0A77243BFB7D006DE57D /* SystemInfo.h */,
+				C04D0A79243BFB8A006DE57D /* SystemInfo.m */,
+				C0025AAD241421E9007813F7 /* Utils.h */,
+				C0025AAF241421F4007813F7 /* Utils.m */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		C0025AB52414393B007813F7 /* States */ = {
+			isa = PBXGroup;
+			children = (
+				C0025AB324143923007813F7 /* DeviceState.h */,
+				C0025AB124143917007813F7 /* DeviceState.m */,
+			);
+			path = States;
+			sourceTree = "<group>";
+		};
+		C0025ABC241483A2007813F7 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				C065AE43242EFCCA007114C8 /* NSString+Extensions.h */,
+				C065AE45242EFCD8007114C8 /* NSString+Extensions.m */,
+				C0025ABD241483B7007813F7 /* UIImage+Pixels.h */,
+				C0025ABF241483C6007813F7 /* UIImage+Pixels.mm */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		C0025AC124148455007813F7 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				C0025AC22414846B007813F7 /* JobController.h */,
+				C0025AC424148477007813F7 /* JobController.m */,
+				C03E44DE2431132700B467BB /* RequestController.h */,
+				C03E44E02431133800B467BB /* RequestController.m */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		C01B4957240ACF5D00633B45 = {
+			isa = PBXGroup;
+			children = (
+				C019482824161E730094A2C8 /* config.plist */,
+				C0BAF0942418B62C003E2419 /* Jarvis++.pch */,
+				C0025AC124148455007813F7 /* Controllers */,
+				C0339C8D2427EE410046D0AD /* DeviceConfig */,
+				C0339C842427E8F30046D0AD /* DeviceCoordinate */,
+				C0025ABC241483A2007813F7 /* Extensions */,
+				C01B4963240ACF5D00633B45 /* Frameworks */,
+				C01B4968240ACF5D00633B45 /* Jarvis++ */,
+				C0025AA3241416DE007813F7 /* Net */,
+				91E40CCDBD064A40A2555622 /* Pods */,
+				C01B4962240ACF5D00633B45 /* Products */,
+				C03E44E22432592200B467BB /* Settings */,
+				C0025AB52414393B007813F7 /* States */,
+				C01B497D240ACF9400633B45 /* UIC */,
+				C0025AAC241421D5007813F7 /* Utilities */,
+			);
+			sourceTree = "<group>";
+		};
+		C01B4962240ACF5D00633B45 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C01B4961240ACF5D00633B45 /* libJarvis++.dylib */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C01B4963240ACF5D00633B45 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C06C7C112446D5A500C3B862 /* XCTest.framework */,
+				C0AC1CDC240BAD44008F4DFB /* CoreGraphics.framework */,
+				C0132B63240B631700719452 /* Security.framework */,
+				C0132B61240B630000719452 /* CFNetwork.framework */,
+				C01B4982240AD01E00633B45 /* CoreLocation.framework */,
+				C01B4964240ACF5D00633B45 /* Foundation.framework */,
+				C01B4966240ACF5D00633B45 /* UIKit.framework */,
+				DDDB883D38BFB1DFFF011E2A /* libPods-Jarvis++.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		C01B4968240ACF5D00633B45 /* Jarvis++ */ = {
+			isa = PBXGroup;
+			children = (
+				C01B4970240ACF5D00633B45 /* Jarvis__.h */,
+				C01B4972240ACF5D00633B45 /* Jarvis__.m */,
+				C01B4969240ACF5D00633B45 /* Package */,
+				C01B496D240ACF5D00633B45 /* Supporting Files */,
+			);
+			path = "Jarvis++";
+			sourceTree = "<group>";
+		};
+		C01B4969240ACF5D00633B45 /* Package */ = {
+			isa = PBXGroup;
+			children = (
+				C01B496A240ACF5D00633B45 /* DEBIAN */,
+				C01B4974240ACF5D00633B45 /* usr */,
+			);
+			path = Package;
+			sourceTree = "<group>";
+		};
+		C01B496A240ACF5D00633B45 /* DEBIAN */ = {
+			isa = PBXGroup;
+			children = (
+				C01B496B240ACF5D00633B45 /* control.txt */,
+				C01B496C240ACF5D00633B45 /* control */,
+			);
+			path = DEBIAN;
+			sourceTree = "<group>";
+		};
+		C01B496D240ACF5D00633B45 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				C01B496E240ACF5D00633B45 /* PackageVersion.plist */,
+			);
+			path = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		C01B4974240ACF5D00633B45 /* usr */ = {
+			isa = PBXGroup;
+			children = (
+				C01B4975240ACF5D00633B45 /* lib */,
+			);
+			path = usr;
+			sourceTree = "<group>";
+		};
+		C01B4975240ACF5D00633B45 /* lib */ = {
+			isa = PBXGroup;
+			children = (
+				C01B4976240ACF5D00633B45 /* 0xdeadfa11 */,
+			);
+			path = lib;
+			sourceTree = "<group>";
+		};
+		C01B497D240ACF9400633B45 /* UIC */ = {
+			isa = PBXGroup;
+			children = (
+				C0B68E012414C33E009B5970 /* Consts.h */,
+				C0B68E032414C632009B5970 /* Consts.m */,
+				C0AC1CF3240BB37C008F4DFB /* Device.h */,
+				C0AC1CF1240BB365008F4DFB /* Device.m */,
+				C00EE48C241D4830001771AB /* JarvisTestCase.h */,
+				C00EE48E241D4855001771AB /* JarvisTestCase.m */,
+				C01B497E240ACF9400633B45 /* UIC.h */,
+				C01B497F240ACF9400633B45 /* UIC.mm */,
+			);
+			path = UIC;
+			sourceTree = "<group>";
+		};
+		C0339C842427E8F30046D0AD /* DeviceCoordinate */ = {
+			isa = PBXGroup;
+			children = (
+				C0339C852427E9140046D0AD /* DeviceCoordinate.h */,
+				C0339C872427E9220046D0AD /* DeviceCoordinate.m */,
+				C0339C892427E9300046D0AD /* DeviceCoordinateScalar.h */,
+				C0339C8B2427E93C0046D0AD /* DeviceCoordinateScalar.m */,
+			);
+			path = DeviceCoordinate;
+			sourceTree = "<group>";
+		};
+		C0339C8D2427EE410046D0AD /* DeviceConfig */ = {
+			isa = PBXGroup;
+			children = (
+				C065AE3E242ECD04007114C8 /* Configs */,
+				C0339C92242803D80046D0AD /* ColorOffset.h */,
+				C0339C94242803E40046D0AD /* ColorOffset.m */,
+				C0339C8E2427EE510046D0AD /* DeviceConfig.h */,
+				C0339C902427EE5B0046D0AD /* DeviceConfig.m */,
+				C03E44EB24340FD800B467BB /* DeviceConfigProtocol.h */,
+			);
+			path = DeviceConfig;
+			sourceTree = "<group>";
+		};
+		C03E44E22432592200B467BB /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				C03E44E32432595200B467BB /* PixelSettings.h */,
+				C03E44E52432596900B467BB /* PixelSettings.m */,
+				C0AC1CF7240BB97A008F4DFB /* Settings.h */,
+				C0AC1CF5240BB96C008F4DFB /* Settings.m */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		C065AE3E242ECD04007114C8 /* Configs */ = {
+			isa = PBXGroup;
+			children = (
+				C03E44F124342D4400B467BB /* DeviceIPhoneNormal.h */,
+				C03E44F324342D5100B467BB /* DeviceIPhoneNormal.m */,
+				C03E44F524342F9E00B467BB /* DeviceIPhonePlus.h */,
+				C03E44F724342FAC00B467BB /* DeviceIPhonePlus.m */,
+				C03E44ED2434286500B467BB /* DeviceRatio1333.h */,
+				C03E44EF2434287600B467BB /* DeviceRatio1333.m */,
+				C065AE3F242ECD2A007114C8 /* DeviceRatio1775.h */,
+				C065AE41242ECD3B007114C8 /* DeviceRatio1775.m */,
+			);
+			path = Configs;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		C01B495E240ACF5D00633B45 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C01B4980240ACF9400633B45 /* UIC.h in Headers */,
+				C0AC1CF8240BB97A008F4DFB /* Settings.h in Headers */,
+				C0B68E022414C33E009B5970 /* Consts.h in Headers */,
+				C0339C8A2427E9300046D0AD /* DeviceCoordinateScalar.h in Headers */,
+				C03E44F224342D4400B467BB /* DeviceIPhoneNormal.h in Headers */,
+				C04D0A78243BFB7D006DE57D /* SystemInfo.h in Headers */,
+				C0339C93242803D80046D0AD /* ColorOffset.h in Headers */,
+				C065AE40242ECD2A007114C8 /* DeviceRatio1775.h in Headers */,
+				C0339C862427E9140046D0AD /* DeviceCoordinate.h in Headers */,
+				C03E44EC24340FD800B467BB /* DeviceConfigProtocol.h in Headers */,
+				C0025ABE241483B7007813F7 /* UIImage+Pixels.h in Headers */,
+				C01B4971240ACF5D00633B45 /* Jarvis__.h in Headers */,
+				C00EE48D241D4830001771AB /* JarvisTestCase.h in Headers */,
+				C0025AAE241421E9007813F7 /* Utils.h in Headers */,
+				C03E44DF2431132700B467BB /* RequestController.h in Headers */,
+				C03E44EE2434286500B467BB /* DeviceRatio1333.h in Headers */,
+				C03E44E42432595200B467BB /* PixelSettings.h in Headers */,
+				C0BAF0952418B62C003E2419 /* Jarvis++.pch in Headers */,
+				C065AE44242EFCCA007114C8 /* NSString+Extensions.h in Headers */,
+				C0025AC32414846B007813F7 /* JobController.h in Headers */,
+				C0339C8F2427EE510046D0AD /* DeviceConfig.h in Headers */,
+				C00EE489241C70B2001771AB /* HttpClientConnection.h in Headers */,
+				C0025AB424143923007813F7 /* DeviceState.h in Headers */,
+				C0AC1CF4240BB37C008F4DFB /* Device.h in Headers */,
+				C03E44F624342F9E00B467BB /* DeviceIPhonePlus.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		C01B4960240ACF5D00633B45 /* Jarvis++ */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C01B4979240ACF5D00633B45 /* Build configuration list for PBXNativeTarget "Jarvis++" */;
+			buildPhases = (
+				DD19E334717C3F402AC7920B /* [CP] Check Pods Manifest.lock */,
+				C01B495C240ACF5D00633B45 /* Sources */,
+				C01B495D240ACF5D00633B45 /* Frameworks */,
+				C01B495E240ACF5D00633B45 /* Headers */,
+				C0BAF09324174FAE003E2419 /* Run Script */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Jarvis++";
+			productName = "Jarvis++";
+			productReference = C01B4961240ACF5D00633B45 /* libJarvis++.dylib */;
+			productType = "com.apple.product-type.library.dynamic";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		C01B4958240ACF5D00633B45 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 1130;
+				TargetAttributes = {
+					C01B4960240ACF5D00633B45 = {
+						CreatedOnToolsVersion = 11.3.1;
+					};
+				};
+			};
+			buildConfigurationList = C01B495B240ACF5D00633B45 /* Build configuration list for PBXProject "Jarvis++" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = C01B4957240ACF5D00633B45;
+			productRefGroup = C01B4962240ACF5D00633B45 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				C01B4960240ACF5D00633B45 /* Jarvis++ */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		C0BAF09324174FAE003E2419 /* Run Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/Users/helpdesk/Desktop/Projects/Jarvis/build/deploy.sh\n#/Users/helpdesk/Desktop/Projects/Jarvis/build/build.sh\n";
+		};
+		DD19E334717C3F402AC7920B /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Jarvis++-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C01B495C240ACF5D00633B45 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C0339C95242803E40046D0AD /* ColorOffset.m in Sources */,
+				C01B4973240ACF5D00633B45 /* Jarvis__.m in Sources */,
+				C0AC1CF6240BB96C008F4DFB /* Settings.m in Sources */,
+				C03E44F424342D5100B467BB /* DeviceIPhoneNormal.m in Sources */,
+				C00EE48B241C70C5001771AB /* HttpClientConnection.m in Sources */,
+				C0025AC524148477007813F7 /* JobController.m in Sources */,
+				C0025AB0241421F4007813F7 /* Utils.m in Sources */,
+				C00EE48F241D4855001771AB /* JarvisTestCase.m in Sources */,
+				C0025AC0241483C6007813F7 /* UIImage+Pixels.mm in Sources */,
+				C0AC1CF2240BB365008F4DFB /* Device.m in Sources */,
+				C0025AB224143917007813F7 /* DeviceState.m in Sources */,
+				C01B4981240ACF9400633B45 /* UIC.mm in Sources */,
+				C03E44F824342FAC00B467BB /* DeviceIPhonePlus.m in Sources */,
+				C03E44F02434287600B467BB /* DeviceRatio1333.m in Sources */,
+				C03E44E62432596900B467BB /* PixelSettings.m in Sources */,
+				C065AE46242EFCD8007114C8 /* NSString+Extensions.m in Sources */,
+				C03E44E12431133800B467BB /* RequestController.m in Sources */,
+				C0B68E042414C632009B5970 /* Consts.m in Sources */,
+				C0339C882427E9220046D0AD /* DeviceCoordinate.m in Sources */,
+				C065AE42242ECD3B007114C8 /* DeviceRatio1775.m in Sources */,
+				C0339C8C2427E93C0046D0AD /* DeviceCoordinateScalar.m in Sources */,
+				C0339C912427EE5B0046D0AD /* DeviceConfig.m in Sources */,
+				C04D0A7A243BFB8A006DE57D /* SystemInfo.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		C01B4977240ACF5D00633B45 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.gch (*) .DS_Store CVS .svn .git .hg *.xcodeproj *.xcode *.pbproj *.pbxproj";
+				FRAMEWORK_SEARCH_PATHS = "$(SDKROOT)/System/Library/PrivateFrameworks";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "$(THEOS)/vendor/include/**";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LIBRARY_SEARCH_PATHS = "$(THEOS)/vendor/lib/**";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				THEOS = /opt/theos;
+				VALIDATE_PRODUCT = NO;
+			};
+			name = Debug;
+		};
+		C01B4978240ACF5D00633B45 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.gch (*) .DS_Store CVS .svn .git .hg *.xcodeproj *.xcode *.pbproj *.pbxproj";
+				FRAMEWORK_SEARCH_PATHS = "$(SDKROOT)/System/Library/PrivateFrameworks";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_MISSING_PROTOTYPES = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = "$(THEOS)/vendor/include/**";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LIBRARY_SEARCH_PATHS = "$(THEOS)/vendor/lib/**";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				THEOS = /opt/theos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		C01B497A240ACF5D00633B45 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4B79D2905CA6EE7C52F90E32 /* Pods-Jarvis++.debug.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = arm64;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_BITCODE = NO;
+				ENABLE_TESTABILITY = NO;
+				EXECUTABLE_PREFIX = lib;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks/**",
+					"$(SDKROOT)/System/Library/Frameworks",
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(PROJECT_DIR)/PTFakeTouch",
+				);
+				GCC_NO_COMMON_BLOCKS = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Jarvis++.pch";
+				GENERATE_MASTER_OBJECT_FILE = NO;
+				HEADER_SEARCH_PATHS = "$(inherited)";
+				INSTALL_PATH = "@executable_path/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/CocoaAsyncSocket\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/CocoaHTTPServer\"",
+				);
+				MACH_O_TYPE = mh_dylib;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"CocoaAsyncSocket\"",
+					"-l\"CocoaHTTPServer\"",
+					"-l\"xml2\"",
+					"-framework",
+					"\"CFNetwork\"",
+					"-framework",
+					"\"CoreGraphics\"",
+					"-framework",
+					"\"IOKit\"",
+					"-framework",
+					"\"QuartzCore\"",
+					"-framework",
+					"\"Security\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = NO;
+				USER_HEADER_SEARCH_PATHS = "";
+				VALID_ARCHS = arm64;
+				iOSOpenDevBuildPackageOnAnyBuild = NO;
+				iOSOpenDevCopyOnBuild = NO;
+				iOSOpenDevDevice = 192.168.0.0;
+				iOSOpenDevInstallOnAnyBuild = NO;
+				iOSOpenDevInstallOnProfiling = NO;
+				iOSOpenDevRespringOnInstall = YES;
+				iOSOpenDevUsePackageVersionPList = YES;
+			};
+			name = Debug;
+		};
+		C01B497B240ACF5D00633B45 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = CAA9A8ACBA3A702C6AC49374 /* Pods-Jarvis++.release.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = arm64;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				ENABLE_BITCODE = NO;
+				ENABLE_TESTABILITY = NO;
+				EXECUTABLE_PREFIX = lib;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PLATFORM_DIR)/Developer/Library/Frameworks/**",
+					"$(SDKROOT)/System/Library/Frameworks",
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(PROJECT_DIR)/PTFakeTouch",
+				);
+				GCC_NO_COMMON_BLOCKS = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Jarvis++.pch";
+				GENERATE_MASTER_OBJECT_FILE = NO;
+				HEADER_SEARCH_PATHS = "$(inherited)";
+				INSTALL_PATH = "@executable_path/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/CocoaAsyncSocket\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/CocoaHTTPServer\"",
+				);
+				MACH_O_TYPE = mh_dylib;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-ObjC",
+					"-l\"CocoaAsyncSocket\"",
+					"-l\"CocoaHTTPServer\"",
+					"-l\"xml2\"",
+					"-framework",
+					"\"CFNetwork\"",
+					"-framework",
+					"\"CoreGraphics\"",
+					"-framework",
+					"\"IOKit\"",
+					"-framework",
+					"\"QuartzCore\"",
+					"-framework",
+					"\"Security\"",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = NO;
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = "";
+				USER_HEADER_SEARCH_PATHS = "";
+				VALID_ARCHS = arm64;
+				iOSOpenDevBuildPackageOnAnyBuild = NO;
+				iOSOpenDevCopyOnBuild = NO;
+				iOSOpenDevDevice = 192.168.0.0;
+				iOSOpenDevInstallOnAnyBuild = NO;
+				iOSOpenDevInstallOnProfiling = NO;
+				iOSOpenDevRespringOnInstall = YES;
+				iOSOpenDevUsePackageVersionPList = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		C01B495B240ACF5D00633B45 /* Build configuration list for PBXProject "Jarvis++" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01B4977240ACF5D00633B45 /* Debug */,
+				C01B4978240ACF5D00633B45 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		C01B4979240ACF5D00633B45 /* Build configuration list for PBXNativeTarget "Jarvis++" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C01B497A240ACF5D00633B45 /* Debug */,
+				C01B497B240ACF5D00633B45 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = C01B4958240ACF5D00633B45 /* Project object */;
+}
