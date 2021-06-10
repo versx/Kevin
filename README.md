@@ -10,3 +10,6 @@ Build scripts are hardcoded, change paths to suite needs. No support is provided
 
 ## Credits  
 - COVID-19
+- [UIC](https://github.com/RealDeviceMap/RealDeviceMap-UIControl)  
+- [Lorgnette](https://gitlab.com/mzsmakr/Lorgnette)  
+- [Jarvis](https://gitlab.com/dergel/jarvis)  
