@@ -43,14 +43,6 @@ static BOOL _dataStarted = false;
     return self;
 }
 
--(void)dealloc
-{
-    [_httpServer release];
-    [_heartbeatQueue release];
-    [_pixelCheckQueue release];
-    [super dealloc];
-}
-
 
 #pragma mark Login Handlers
 
@@ -984,7 +976,7 @@ static BOOL _dataStarted = false;
     dispatch_async(dispatch_get_main_queue(), ^{
         UIImage *image = [Utils takeScreenshot];
         if ([image rgbAtLocation:[[DeviceConfig sharedInstance] startupNewCautionSign]
-                      betweenMin:[[ColorOffset alloc] init:1.00 green:0.97 blue:0.60]
+                      betweenMin:[[ColorOffset alloc] init:0.95 green:0.97 blue:0.60]
                           andMax:[[ColorOffset alloc] init:1.00 green:1.00 blue:0.65]] &&
             [image rgbAtLocation:[[DeviceConfig sharedInstance] startupNewButton]
                       betweenMin:[[ColorOffset alloc] init:0.28 green:0.79 blue:0.62]

@@ -23,7 +23,10 @@
     }
     // For whatever reason 5S with iOS 12 support uses 0.5?
     NSString *model = [[Device sharedInstance] model];
-    if ([model isEqualToString:@"iPhone SE"] || [model isEqualToString:@"iPhone 5s"] || [model isEqualToString:@"iPhone 6"]) {
+    if ([model isEqualToString:@"iPhone SE"] ||
+        [model isEqualToString:@"iPhone 5s"] ||
+        [model isEqualToString:@"iPhone 6"] ||
+        [model isEqualToString:@"iPhone 6s"]) {
         tapMultiplier = 0.5;
     }
     return tapMultiplier;

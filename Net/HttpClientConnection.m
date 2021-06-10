@@ -84,6 +84,7 @@
 -(NSData *)preprocessResponse:(HTTPMessage *)response
 {
     //syslog(@"[DEBUG] Request URI: %@", [self requestURI]);
+    [response setHeaderField:@"Access-Control-Allow-Origin" value:@"*"];
     if ([[self requestURI] isEqualToString:@"/screen"]) {
         [response setHeaderField:@"Accept" value:@"image/jpeg"];
         [response setHeaderField:@"Content-Type" value:@"image/jpeg"];

@@ -84,9 +84,8 @@ static double _baseVerticalAccuracy = 200.0; // in meters
             syslog(@"[ERROR] %@ Error: %@", urlString, error);
             return;
         }
-        NSString *responseData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+        //NSString *responseData = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
         //syslog(@"[DEBUG] postRequest response: %@", responseData);
-        [responseData release];
         if (data != nil) {
             NSError *jsonError;
             NSDictionary *resultJson = [NSJSONSerialization JSONObjectWithData:data
@@ -241,18 +240,24 @@ static double _baseVerticalAccuracy = 200.0; // in meters
             return;
         }
 
-        NSString *url = [NSString stringWithFormat:@"%@/api/log/new/%@", homebaseUrl, [[Device sharedInstance] uuid]];
+        NSString *url = [NSString stringWithFormat:@"%@/api/log/new", homebaseUrl];
         NSMutableURLRequest *urlRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:url]];
         [urlRequest setHTTPMethod:@"POST"];
+        [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+        [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Accept"];
 
-        NSData *postData = [message dataUsingEncoding:NSUTF8StringEncoding];
+        NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+        dict[@"uuid"] = [[Device sharedInstance] uuid];
+        dict[@"messages"] = @[message];
+
+        NSData *postData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:nil];
         [urlRequest setHTTPBody:postData];
 
         NSURLSession *session = [NSURLSession sharedSession];
         NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:urlRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
             if (httpResponse.statusCode != 200) {
-                NSLog(@"[Jarvis] Log error");
+                NSLog(@"[Jarvis] Log Error");
             }
         }];
         [dataTask resume];

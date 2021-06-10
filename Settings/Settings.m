@@ -107,26 +107,20 @@ static NSString *plistFileName = @"config.plist";
             [DeviceState restart];
             return;
         }
-
-        NSDictionary *result;
-        NSString *url = [NSString stringWithFormat:@"%@/api/config/%@", _homebaseUrl, [[Device sharedInstance] uuid]];
-        bool gotConfig = false;
-        //while (!gotConfig) {
-            result = [sharedInstance fetchJsonConfig:url];
-            if (result == nil || [result[@"status"] isEqualToString:@"error"]) {
-                NSLog(@"[Jarvis] [Settings] [ERROR] Failed to grab config error: %@ Trying again in 30 seconds...", result[@"error"] ?: @"Are you sure DeviceConfigManager is up?");
-                //sleep(30);
-                //continue;
-            }
-            sleep(3);
-            _config = result;
-            gotConfig = true;
-        //}
+        
+        NSString *url = [NSString stringWithFormat:@"%@/api/config", _homebaseUrl];
+        NSDictionary *result = [sharedInstance fetchJsonConfig:url];
+        if (result == nil || [result[@"status"] isEqualToString:@"error"]) {
+            NSLog(@"[Jarvis] [Settings] [ERROR] Failed to grab config error: %@ Trying again in 30 seconds...", result[@"error"] ?: @"Are you sure DeviceConfigManager is up?");
+            sleep(30);
+            return;
+        }
         NSLog(@"[Jarvis] [Settings] [INFO] Got config: %@", result);
         if (result == nil) {
             NSLog(@"[Jarvis] [Settings] [ERROR] Some how returned a nil config.");
             return;
         }
+        _config = result;
 
         NSString *backendUrl = result[@"backend_url"];
         NSArray *dataEndpoints = [result objectForKey:@"data_endpoints"];
@@ -163,19 +157,45 @@ static NSString *plistFileName = @"config.plist";
 -(NSDictionary *)fetchJsonConfig:(NSString *)urlString
 {
     @try {
-        NSURL *urlRequest = [NSURL URLWithString:urlString];
+        __block NSDictionary *result;
+        dispatch_semaphore_t sem = dispatch_semaphore_create(0);
+        NSURL *url = [NSURL URLWithString:urlString];
+        NSMutableURLRequest *urlRequest = [[NSMutableURLRequest alloc] initWithURL:url];
+
+        NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+        dict[@"uuid"] = [[Device sharedInstance] uuid];
+        dict[@"ios_version"] = [[Device sharedInstance] osVersion];
+        dict[@"ipa_version"] = JARVIS_VERSION;
+
+        [urlRequest setHTTPMethod:@"POST"];
+        [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+        [urlRequest addValue:@"application/json" forHTTPHeaderField:@"Accept"];
+
         NSError *error = nil;
-        NSString *json = [NSString stringWithContentsOfURL:urlRequest
-                                                  encoding:NSUTF8StringEncoding
-                                                     error:&error];
-        NSData *data = [json dataUsingEncoding:NSUTF8StringEncoding];
-        NSDictionary *result = [NSJSONSerialization JSONObjectWithData:data
-                                                               options:NSJSONReadingMutableContainers
-                                                                 error:&error];
-        if (error) {
-            NSLog(@"[Jarvis] [ERROR] Failed to fetch json config %@ Error:%@", urlString, error);
-            return nil;
-        }
+        NSData *postData = [NSJSONSerialization dataWithJSONObject:dict options:0 error:&error];
+        
+        //Apply the data to the body
+        [urlRequest setHTTPBody:postData];
+        [urlRequest setValue:[NSString stringWithFormat:@"%lu", (unsigned long)[postData length]] forHTTPHeaderField:@"Content-Length"];
+
+        NSURLSession *session = [NSURLSession sharedSession];
+        NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:urlRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+            NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
+            if(httpResponse.statusCode == 200) {
+                NSError *parseError = nil;
+                NSDictionary *resultJson = [NSJSONSerialization JSONObjectWithData:data
+                                                                           options:NSJSONReadingMutableContainers
+                                                                             error:&parseError];
+                NSLog(@"[Jarvis] Response: %@", resultJson);
+                result = resultJson;
+            } else {
+                NSLog(@"[Jarvis] Error");
+            }
+            dispatch_semaphore_signal(sem);
+        }];
+        [dataTask resume];
+        dispatch_semaphore_wait(sem, DISPATCH_TIME_FOREVER);
+        NSLog(@"[Jarvis] Config: %@", result);
         return result;
     }
     @catch (NSException *exception) {
