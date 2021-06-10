@@ -8,6 +8,19 @@ Build scripts are hardcoded, change paths to suite needs. No support is provided
 
 **Important:** You will still need to provide a MITM static library (or dynamic...) that supports dynamic library injection for this to work, this is not a full deployment solution.  
 
+## Build  
+Copy MITM app to `app.zip` within root folder path.  
+```
+./build/build.sh
+```
+
+## Delployment  
+Copy MITM app to `app.zip` within root folder path.  
+Requires Deployer-Redux commit: `74f35a42aa965fbaecc7d9f83c6167e1c4c71191` or higher with local deploy support)  
+```
+./build/deploy.sh (deploys to all connected devices)  
+```
+
 ## Credits  
 - COVID-19
 - [UIC](https://github.com/RealDeviceMap/RealDeviceMap-UIControl)  
